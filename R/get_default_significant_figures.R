@@ -8,7 +8,7 @@
 #' @export
 #'
 #' @examples 
-#' x <- 1:8
+#' x <- 1:10
 #' get_default_significant_figures(x)
 get_default_significant_figures <- function(data) {
   if(is.numeric(data)) return(3)

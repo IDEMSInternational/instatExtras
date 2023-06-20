@@ -3,5 +3,4 @@
 export("%>%")
 export(convert_to_character_matrix)
 export(get_default_significant_figures)
-export(import_from_ODK)
 importFrom(magrittr,"%>%")
