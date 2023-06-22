@@ -2,6 +2,7 @@
 
 export("%>%")
 export(convert_to_character_matrix)
+export(dekad)
 export(get_default_significant_figures)
 export(import_from_ODK)
 export(next_default_item)
