@@ -13,7 +13,7 @@
 #' desirable, for example, when comparing day of year numbers across years that
 #' contain leap years and non leap years.
 #' 
-#' @param x A Date object
+#' @param date A Date object
 #'
 #' @return An integer between 1 and 366 representing the day of the year number of \code{x}.
 #' 

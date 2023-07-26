@@ -56,22 +56,22 @@ This function generates a plot of the mean excess for a given threshold in a dat
 \examples{
 # Example 1: Single plot
 # Generate a data frame
-data <- data.frame(
-  station = c("A", "A", "B", "B", "C", "C"),
-  element = c(10, 15, 20, 25, 30, 35)
-)
+# data <- data.frame(
+#  station = c("A", "A", "B", "B", "C", "C"),
+#  element = c(10, 15, 20, 25, 30, 35)
+# )
 
 # Generate a plot for the element column with default settings
-plot_mrl(data, element_name = "element")
+# plot_mrl(data, element_name = "element")
 
 # Example 2: Grid of plots
 # Generate a data frame
-data <- data.frame(
-  station = c("A", "A", "B", "B", "C", "C"),
-  element = c(10, 15, 20, 25, 30, 35)
-)
+# data <- data.frame(
+#  station = c("A", "A", "B", "B", "C", "C"),
+#  element = c(10, 15, 20, 25, 30, 35)
+# )
 
 # Generate a grid of plots for each station
-plot_mrl(data, station_name = "station", element_name = "element", ncol = 2)
+# plot_mrl(data, station_name = "station", element_name = "element", ncol = 2)
 
 }

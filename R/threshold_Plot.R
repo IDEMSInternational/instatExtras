@@ -21,7 +21,7 @@
 #' data <- c(2.1, 2.2, 3.4, 4.5, 5.6, 6.7, 7.8, 8.9, 9.0, 10.1)
 #' threshold_Plot(data, type = "GP")
 threshold_Plot <- function(x, r, type = c("GP", "PP", "Exponential"), nint = 10,
-                           alpha = 0.05, na.action = na.omit, xlb = "", main = NULL , verbose = FALSE,
+                           alpha = 0.05, na.action = stats::na.omit, xlb = "", main = NULL , verbose = FALSE,
                            ...) {
   type <- match.arg(type)
   x <- na.action(x)

@@ -33,7 +33,7 @@ plot_declustered <- function(data, station_col_name, element_col_name, threshold
     for (i in seq_along(stations)) {
       station <- stations[i]
       d <- data[station_col == station, ]
-      obj <- texmex::declust(y = na.exclude(d[, element_col_name]), r = r, threshold = threshold)
+      obj <- texmex::declust(y = stats::na.exclude(d[, element_col_name]), r = r, threshold = threshold)
       if (print_summary) {
         cat("Station:", paste0("", station, ""), "\n \n")
         cat("Threshold", obj$threshold, "\n")
@@ -50,7 +50,7 @@ plot_declustered <- function(data, station_col_name, element_col_name, threshold
     }
   }
   else {
-    obj <- texmex::declust(y = na.exclude(data[, element_col_name]), r = r, threshold = threshold)
+    obj <- texmex::declust(y = stats::na.exclude(data[, element_col_name]), r = r, threshold = threshold)
     if (print_summary) {
       cat("Threshold", obj$threshold, "\n")
       cat("Declustering using the intervals method, run length", obj$r, "\n")

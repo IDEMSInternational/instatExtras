@@ -7,7 +7,7 @@
 yday_366(date)
 }
 \arguments{
-\item{x}{A Date object}
+\item{date}{A Date object}
 }
 \value{
 An integer between 1 and 366 representing the day of the year number of \code{x}.

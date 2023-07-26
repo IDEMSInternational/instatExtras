@@ -2,7 +2,7 @@
 % Please edit documentation in R/add_xy_point_range.R
 \name{add_xy_point_range}
 \alias{add_xy_point_range}
-\title{Create a File Path for XY Point Range Data}
+\title{add xy area range}
 \usage{
 add_xy_point_range(path, min_lon, min_lat, dim_x = "X", dim_y = "Y")
 }

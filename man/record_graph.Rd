@@ -2,11 +2,7 @@
 % Please edit documentation in R/record_graph.R
 \name{record_graph}
 \alias{record_graph}
-
-\title{Records a Graph}
-
 \title{Record a Graph}
-
 \usage{
 record_graph(x)
 }

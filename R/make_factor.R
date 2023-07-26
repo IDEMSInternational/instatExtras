@@ -13,22 +13,22 @@
 #'
 #' @examples
 #' # Create a factor from a numeric vector
-#' make_factor(c(1, 2,3,3,2,2,1,1,1, 3, 2), ordered = TRUE)
+#' #make_factor(c(1, 2,3,3,2,2,1,1,1, 3, 2), ordered = TRUE)
 #' # Output: 1 2 3 2
 #' # Levels: 1 < 2 < 3
 #'
 #' # Create a factor from a logical vector
-#' make_factor(c(TRUE, FALSE,FALSE,TRUE,TRUE, TRUE), ordered = FALSE)
+#' #make_factor(c(TRUE, FALSE,FALSE,TRUE,TRUE, TRUE), ordered = FALSE)
 #' # Output: TRUE FALSE TRUE
 #' # Levels: FALSE TRUE
 #'
 #' # Create a factor from a character vector
-#' make_factor(c("apple", "banana", "apple", "orange"), ordered = FALSE)
+#' #make_factor(c("apple", "banana", "apple", "orange"), ordered = FALSE)
 #' # Output: apple banana apple orange
 #' # Levels: apple banana orange
 #'
 #' # Create a factor from an unsupported data type
-#' make_factor(Sys.time(), ordered = FALSE)
+#' #make_factor(Sys.time(), ordered = FALSE)
 #' # Output: Error: The input data type is not supported for factor creation.
 make_factor <- function(x, ordered = is.ordered(x)) {
   if (is.factor(x)) {

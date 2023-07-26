@@ -152,7 +152,7 @@ plot.region <- function(lon, lat, product, time, time_point = as.Date("2002-01-0
   }
   #----------------------------------------------------------
   # Set the number of rows and columns of the plot
-  par(mfrow = c(1,1))
+  graphics::par(mfrow = c(1,1))
   
   colmin <- colmin0
   colmax <- colmax0
@@ -176,7 +176,7 @@ plot.region <- function(lon, lat, product, time, time_point = as.Date("2002-01-0
   zlim <- c(1,ncolor)
   
   colors <- colorRamps::matlab.like(ncolor-1)
-  if (plot.ano) colors[as.integer(ncolor/2)] <- rgb(1,1,1)
+  if (plot.ano) colors[as.integer(ncolor/2)] <- grDevices::rgb(1,1,1)
   
   # Generate the field to be plotted
   field.plot <- matrix(ncol=ny,nrow=nx)
@@ -197,10 +197,10 @@ plot.region <- function(lon, lat, product, time, time_point = as.Date("2002-01-0
   if (plotHighRes){  
     
     # TODO: For sets of data, set up a package to use lazy-loading of data.
-    data("worldMapEnv", package = "maps")
-    data("worldHiresMapEnv", package = "mapdata")
-    data("countriesHigh", package = "rworldxtra")
-    world <- as(countriesHigh,"SpatialLines")
+    utils::data("worldMapEnv", package = "maps")
+    utils::data("worldHiresMapEnv", package = "mapdata")
+    utils::data("countriesHigh", package = "rworldxtra")
+    world <- sf::as(countriesHigh,"SpatialLines")
     
     # add rivers
     if (plotRivers) {
@@ -228,7 +228,7 @@ plot.region <- function(lon, lat, product, time, time_point = as.Date("2002-01-0
     if (plotOwnLocations){
       if (length(loc_lon)==length(loc_lat)&length(loc_lon)==length(loc_name)){
         for (i in 1:length(loc_lon)){
-          points(loc_lon[i],loc_lat[i],pch=pch.cities)
+          sf::points(loc_lon[i],loc_lat[i],pch=pch.cities)
           text(loc_lon[i],loc_lat[i],loc_name[i], pos=label_pos)
         }
       }
@@ -236,7 +236,7 @@ plot.region <- function(lon, lat, product, time, time_point = as.Date("2002-01-0
     
   }else{
     
-    data("worldMapEnv", package = "maps")
+    utils::data("worldMapEnv", package = "maps")
     
     # add rivers
     if (plotRivers) {
@@ -250,8 +250,8 @@ plot.region <- function(lon, lat, product, time, time_point = as.Date("2002-01-0
     
     # add country borders
     if (plotCountries) {
-      data("countriesLow", package = "rworldmap")
-      world <- as(countriesLow,"SpatialLines")
+      utils::data("countriesLow", package = "rworldmap")
+      world <- sf::as(countriesLow,"SpatialLines")
       plot(world,add=TRUE)
     }
     
@@ -269,7 +269,7 @@ plot.region <- function(lon, lat, product, time, time_point = as.Date("2002-01-0
     if (plotOwnLocations){
       if (length(loc_lon)==length(loc_lat)&length(loc_lon)==length(loc_name)){
         for (i in 1:length(loc_lon)){
-          points(loc_lon[i],loc_lat[i],pch=pch.cities)
+          sf::points(loc_lon[i],loc_lat[i],pch=pch.cities)
           text(loc_lon[i],loc_lat[i],loc_name[i], pos=label_pos)
         }
       }
@@ -277,8 +277,8 @@ plot.region <- function(lon, lat, product, time, time_point = as.Date("2002-01-0
   }
   
   # Draw lines around the plot
-  axis(1,lwd=1,at=c(lonmin,lonmax),tick=TRUE,lwd.ticks=0,labels=FALSE)
-  axis(2,lwd=1,at=c(latmin,latmax), tick=TRUE,lwd.ticks=0,labels=FALSE)
-  axis(3,lwd=1,at=c(lonmin,lonmax),tick=TRUE,lwd.ticks=0,labels=FALSE)
-  axis(4,lwd=1,at=c(latmin,latmax), tick=TRUE,lwd.ticks=0,labels=FALSE)
+  graphics::axis(1,lwd=1,at=c(lonmin,lonmax),tick=TRUE,lwd.ticks=0,labels=FALSE)
+  graphics::axis(2,lwd=1,at=c(latmin,latmax), tick=TRUE,lwd.ticks=0,labels=FALSE)
+  graphics::axis(3,lwd=1,at=c(lonmin,lonmax),tick=TRUE,lwd.ticks=0,labels=FALSE)
+  graphics::axis(4,lwd=1,at=c(latmin,latmax), tick=TRUE,lwd.ticks=0,labels=FALSE)
 }

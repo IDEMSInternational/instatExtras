@@ -2,12 +2,12 @@
 % Please edit documentation in R/add_nc.R
 \name{add_nc}
 \alias{add_nc}
-\title{Add nc}
+\title{Modify a path}
 \usage{
 add_nc(path)
 }
 \arguments{
-\item{path:}{A character string representing the file path.}
+\item{path}{A character string representing the file path.}
 }
 \value{
 : A character string representing the modified file path with "data.nc" appended to it.

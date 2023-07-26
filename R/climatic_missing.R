@@ -29,24 +29,18 @@
 #' 
 climatic_missing <- function(data, date, elements = ..., stations,
                              start = TRUE, end = FALSE){
-  
-  
   if (missing(date)){
     stop('argument "date" is missing, with no default')
   }
-  
   if (missing(elements)){
     stop('argument "elements" is missing, with no default')
   }
-  
   # stack data
   data.stack <- data %>%
     tidyr::pivot_longer(cols = c({{ elements }}),
                         names_to = "Element",
                         values_to = "value")
-  
   # sort start/end times
-  
   # set start date
   if (start){
     data.stack <- data.stack %>%
@@ -58,7 +52,6 @@ climatic_missing <- function(data, date, elements = ..., stations,
       dplyr::group_by({{ stations }}) %>%
       dplyr::mutate(start = dplyr::first( {{ date }} ))
   }
-  
   # set end date
   if (end){
     data.stack <- data.stack %>%
@@ -69,7 +62,6 @@ climatic_missing <- function(data, date, elements = ..., stations,
       dplyr::group_by({{ stations }} ) %>%
       dplyr::mutate(end = dplyr::last({{ date }}))
   }
-  
   # number and percentage missing
   summary.data <- data.stack %>%
     dplyr::group_by({{ stations }}, Element) %>%

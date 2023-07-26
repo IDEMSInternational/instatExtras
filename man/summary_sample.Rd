@@ -2,7 +2,7 @@
 % Please edit documentation in R/summary_sample.R
 \name{summary_sample}
 \alias{summary_sample}
-\title{#' summary sample}
+\title{Calculate summary sample}
 \usage{
 summary_sample(x, size, replace = FALSE)
 }

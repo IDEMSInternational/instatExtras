@@ -15,7 +15,7 @@
 #' # Example 2: Generate a slopegraph theme with custom x-axis text size
 #' #theme <- slopegraph_theme(x_text_size = 14)
 slopegraph_theme <- function(x_text_size = 12){
-  list(scale_x_discrete(position = "top"), 
+  list(ggplot2::scale_x_discrete(position = "top"), 
        ggplot2::theme(legend.position = "none"),
        ggplot2::theme(axis.text.y = ggplot2::element_blank()),
        ggplot2::theme(panel.border = ggplot2::element_blank()), 

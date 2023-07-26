@@ -38,7 +38,7 @@ output_CPT <- function(data, lat_lon_data, station_latlondata, latitude, longitu
   
   if(missing(lat_lon_data)) {
     if(long.data) {
-      data <- data %>% dplyr::select(!!! quos(station, year, element, latitude, longitude))
+      data <- data %>% dplyr::select(!!! dplyr::quos(station, year, element, latitude, longitude))
       names(data)[1] <- "station"
       names(data)[2] <- "year"
       names(data)[3] <- "element"
@@ -53,12 +53,12 @@ output_CPT <- function(data, lat_lon_data, station_latlondata, latitude, longitu
     if(missing(station_latlondata)) stop("station must be provided for lat_lon_data")
     
     if(long.data) {
-      yearly_data <- data %>% dplyr::select(!!! quos(station, year, element))
+      yearly_data <- data %>% dplyr::select(!!! dplyr::quos(station, year, element))
       names(yearly_data)[1] <-  "station"
       names(yearly_data)[2] <-  "year"
       names(yearly_data)[3] <-  "element"
       
-      lat_lon_data <- lat_lon_data %>% dplyr::select(!!! quos(station_latlondata, latitude, longitude))
+      lat_lon_data <- lat_lon_data %>% dplyr::select(!!! dplyr::quos(station_latlondata, latitude, longitude))
       names(lat_lon_data)[1] <- "station"
       names(lat_lon_data)[2] <- "latitude"
       names(lat_lon_data)[3] <- "longitude"
@@ -73,7 +73,7 @@ output_CPT <- function(data, lat_lon_data, station_latlondata, latitude, longitu
       names(stacked_data)[2] <-  "station"
       names(stacked_data)[3] <- "element"
       
-      lat_lon_data <- lat_lon_data %>% dplyr::select(!!! quos(station_latlondata, latitude, longitude))
+      lat_lon_data <- lat_lon_data %>% dplyr::select(!!! dplyr::quos(station_latlondata, latitude, longitude))
       names(lat_lon_data)[1] <- "station"
       names(lat_lon_data)[2] <- "latitude"
       names(lat_lon_data)[3] <- "longitude"
@@ -85,7 +85,7 @@ output_CPT <- function(data, lat_lon_data, station_latlondata, latitude, longitu
   
   unstacked_data <- data %>% dplyr::select(station, year, element) %>% tidyr::spread(key = station, value = element)
   names(unstacked_data)[1] <- station_label
-  unstacked_data <- unstacked_data %>% mutate_all(funs(replace(., is.na(.), na_code)))
+  unstacked_data <- unstacked_data %>% dplyr::mutate_all(dplyr::funs(replace(., is.na(.), na_code)))
   
   lat_lon_data <- data %>% dplyr::group_by(station) %>% dplyr::summarise(latitude = min(latitude, na.rm = TRUE), longitude = min(longitude, na.rm = TRUE))
   if(anyNA(data$latitude) || anyNA(data$longitude)) warning("Missing values in latitude or longitude.")

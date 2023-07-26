@@ -20,17 +20,17 @@
 #' recorded_plot <- record_graph(2)
 record_graph <- function(x) {
   # store current device, which could be png
-  d <- dev.cur()
+  d <- grDevices::dev.cur()
   # create a new device, to ensure graph is displayed in a device that recordPlot() can capture
-  dev.new()
+  grDevices::dev.new()
   # store the new device, so it can be turned off later
-  d2 <- dev.cur()
+  d2 <- grDevices::dev.cur()
   # Display graph to be captured by recordPlot()
   x
   y <- grDevices::recordPlot()
   # set device back to the current one, to ensure code after this runs correctly
-  dev.set(d)
+  grDevices::dev.set(d)
   # turn off the new graphics device
-  dev.off(which = d2)
+  grDevices::dev.off(which = d2)
   return(y)
 }
