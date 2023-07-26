@@ -29,6 +29,6 @@
 
 is.logical.like <- function(x) {
   if(is.logical(x)) return(TRUE)
-  else if(is.numeric(x)) return(all(na.omit(x) %in% c(1,0)))
+  else if(is.numeric(x)) return(all(stats::na.omit(x) %in% c(1,0)))
   else return(FALSE)
 }

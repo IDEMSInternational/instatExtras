@@ -1,5 +1,6 @@
 #' Add xy area range
 #'
+#' @description
 #' A function that generates a string representing an XY area range to be added to a given path.
 #'
 #' @param path The base path to which the XY area range will be added.
@@ -15,14 +16,14 @@
 #' @export
 #'
 #' @examples
-#'
-#' # Example 2: Generate an XY area range string with custom dimensions
+#' #Example: Generate an XY area range string with custom dimensions
 #' #path <- "http://example.com"
 #' #min_lon <- -90
 #' #max_lon <- -80
 #' #min_lat <- 30
 #' #max_lat <- 40
-#' xy_range <- add_xy_area_range(path, min_lon, max_lon, min_lat, max_lat, dim_x = "LON", dim_y = "LAT")
+#' #xy_range <- add_xy_area_range(path, min_lon, max_lon, min_lat, max_lat,dim_x = "LON", dim_y = "LAT")
+#' 
 add_xy_area_range <- function(path, min_lon, max_lon, min_lat, max_lat, dim_x = "X", dim_y = "Y") {
   paste0(
     path, "/", dim_x, "/",

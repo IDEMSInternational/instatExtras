@@ -16,11 +16,11 @@ The function returns a logical value indicating whether the input object contain
 This function checks if an object contains a value label attribute. It determines whether the input object has an attribute with the name "labels_label".
 }
 \examples{
-df <- data.frame(x = 1:10, y = 11:20)
-attributes(df)$labels_label <- "Value Labels"
-is.containValueLabel(df)  # TRUE
+#df <- data.frame(x = 1:10, y = 11:20)
+#attributes(df)$labels_label <- "Value Labels"
+#is.containValueLabel(df)  # TRUE
 
-vec <- c(1, 2, 3, 4, 5)
-is.containValueLabel(vec)  # FALSE 
+#vec <- c(1, 2, 3, 4, 5)
+#is.containValueLabel(vec)  # FALSE 
 
 }

@@ -11,12 +11,12 @@
 #' @export
 #'
 #' @examples
-#' df <- data.frame(x = 1:10, y = 11:20)
-#' attributes(df)$labels_label <- "Value Labels"
-#' is.containValueLabel(df)  # TRUE
+#' #df <- data.frame(x = 1:10, y = 11:20)
+#' #attributes(df)$labels_label <- "Value Labels"
+#' #is.containValueLabel(df)  # TRUE
 #'
-#' vec <- c(1, 2, 3, 4, 5)
-#' is.containValueLabel(vec)  # FALSE 
+#' #vec <- c(1, 2, 3, 4, 5)
+#' #is.containValueLabel(vec)  # FALSE 
 #' 
 is.containValueLabel <- function(x){
   return(labels_label %in% names(attributes(x)))

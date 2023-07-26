@@ -2,7 +2,7 @@
 % Please edit documentation in R/add_t_range.R
 \name{add_t_range}
 \alias{add_t_range}
-\title{add t range}
+\title{add time range}
 \usage{
 add_t_range(path, min_date, max_date, dim_t = "T")
 }

@@ -4,12 +4,12 @@
 \alias{drop_unused_levels}
 \title{Drop unused levels}
 \usage{
-drop_unused_levels(dat, columns)
+drop_unused_levels(data, columns)
 }
 \arguments{
-\item{columns}{A character vector specifying the column names in \code{dat} from which unused levels should be dropped.}
-
 \item{data}{A data frame.}
+
+\item{columns}{A character vector specifying the column names in \code{data} from which unused levels should be dropped.}
 }
 \value{
 The modified data frame with unused levels dropped from the specified columns.

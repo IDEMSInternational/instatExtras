@@ -16,5 +16,5 @@
 #' # get_lat_from_data(data_file)
 #' 
 get_lat_from_data <- function(datafile){
-  return(unique(na.omit(as.numeric(as.character(datafile[5:nrow(datafile),1])))))
+  return(unique(stats::na.omit(as.numeric(as.character(datafile[5:nrow(datafile),1])))))
 }

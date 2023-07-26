@@ -26,7 +26,7 @@ spei_output <- function(x, data, station, year, month) {
   if (! inherits(x, "spei")) stop("x must be an object of class 'spei'")
   vals <- x$fitted
   # If is.mts then multiple stations. Need to unstack and merge to ensure correct values obtained.
-  if (is.mts(vals)) {
+  if (stats::is.mts(vals)) {
     df_spei <- as.data.frame(vals)
     # ind will be the year in fractions
     df_spei$ind <- zoo::index(x$fitted)

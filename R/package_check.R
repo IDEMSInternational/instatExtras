@@ -39,11 +39,11 @@ package_check <- function(package) {
   if (!exists("av_packs")) {
     create_av_packs()
   }
-  if (package %in% rownames(installed.packages())) {
+  if (package %in% rownames(utils::installed.packages())) {
     out[[1]] <- 1
-    v_machine <- as.character(packageVersion(package))
+    v_machine <- as.character(utils::packageVersion(package))
     v_web <- as.character(av_packs[av_packs$Package == package, "Version"])
-    out[[2]] <- compareVersion(v_machine, v_web)
+    out[[2]] <- utils::compareVersion(v_machine, v_web)
     out[[3]] <- v_machine
     out[[4]] <- v_web
     return(out)

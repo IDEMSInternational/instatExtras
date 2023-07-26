@@ -40,6 +40,7 @@ Imports:
     raster,
     dplyr,
     openair,
+    methods,
     httr,
     utils,
     jsonlite,

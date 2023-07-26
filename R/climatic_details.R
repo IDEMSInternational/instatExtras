@@ -1,8 +1,8 @@
 #' Climatic Details
-
+#' 
 #' @description
 #' This function extracts climatic details from a given dataset based on specified parameters such as date, elements, stations, and level. It provides information about the duration and frequency of missing values for each element at different levels (day, month, year).
-
+#' 
 #' @param data A dataset containing climatic data.
 #' @param date The date variable in the dataset.
 #' @param elements A character vector specifying the climatic elements to analyze.
@@ -12,11 +12,11 @@
 #' @param month A logical value indicating whether to include information at the month level.
 #' @param year A logical value indicating whether to include information at the year level.
 #' @param level A logical value indicating whether to include the level information in the output.
-
+#'
 #' @return A data frame containing climatic details such as start and end dates of missing values and the count of missing values for each element at the specified levels.
-
+#'
 #' @export
-
+#'
 #' @examples
 #' #climatic_details(data = climatic_data, 
 #' #                 date = "Date", 

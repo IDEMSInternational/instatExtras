@@ -2,7 +2,7 @@
 % Please edit documentation in R/add_xy_area_range.R
 \name{add_xy_area_range}
 \alias{add_xy_area_range}
-\title{add xy area range}
+\title{Add xy area range}
 \usage{
 add_xy_area_range(
   path,
@@ -36,12 +36,12 @@ A string representing the path with the XY area range added.
 A function that generates a string representing an XY area range to be added to a given path.
 }
 \examples{
-
-# Example 2: Generate an XY area range string with custom dimensions
+#Example: Generate an XY area range string with custom dimensions
 #path <- "http://example.com"
 #min_lon <- -90
 #max_lon <- -80
 #min_lat <- 30
 #max_lat <- 40
-xy_range <- add_xy_area_range(path, min_lon, max_lon, min_lat, max_lat, dim_x = "LON", dim_y = "LAT")
+#xy_range <- add_xy_area_range(path, min_lon, max_lon, min_lat, max_lat,dim_x = "LON", dim_y = "LAT")
+
 }

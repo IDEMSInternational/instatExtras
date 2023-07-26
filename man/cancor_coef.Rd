@@ -7,7 +7,7 @@
 cancor_coef(object)
 }
 \arguments{
-\item{object:}{An object containing "xcoef" and "ycoef" elements.}
+\item{object}{An object containing "xcoef" and "ycoef" elements.}
 }
 \value{
 : A subset of the object containing only the "xcoef" and "ycoef" elements.

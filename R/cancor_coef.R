@@ -2,7 +2,7 @@
 #' 
 #' @description: This function takes an object as input and returns the "xcoef" and "ycoef" elements from the object.
 #' 
-#' @param object: An object containing "xcoef" and "ycoef" elements.
+#' @param object An object containing "xcoef" and "ycoef" elements.
 #' 
 #' @return: A subset of the object containing only the "xcoef" and "ycoef" elements.
 #' 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/convert_to_dec_deg.R
 \name{convert_to_dec_deg}
 \alias{convert_to_dec_deg}
-\title{convert to dec deg}
+\title{convert to decimal degrees}
 \usage{
 convert_to_dec_deg(dd, mm = 0, ss = 0, dir)
 }

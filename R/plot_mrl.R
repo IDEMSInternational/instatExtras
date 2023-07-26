@@ -24,23 +24,23 @@
 #' @examples
 #' # Example 1: Single plot
 #' # Generate a data frame
-#' data <- data.frame(
-#'   station = c("A", "A", "B", "B", "C", "C"),
-#'   element = c(10, 15, 20, 25, 30, 35)
-#' )
+#' # data <- data.frame(
+#' #  station = c("A", "A", "B", "B", "C", "C"),
+#' #  element = c(10, 15, 20, 25, 30, 35)
+#' # )
 #'
 #' # Generate a plot for the element column with default settings
-#' plot_mrl(data, element_name = "element")
+#' # plot_mrl(data, element_name = "element")
 #'
 #' # Example 2: Grid of plots
 #' # Generate a data frame
-#' data <- data.frame(
-#'   station = c("A", "A", "B", "B", "C", "C"),
-#'   element = c(10, 15, 20, 25, 30, 35)
-#' )
+#' # data <- data.frame(
+#' #  station = c("A", "A", "B", "B", "C", "C"),
+#' #  element = c(10, 15, 20, 25, 30, 35)
+#' # )
 #'
 #' # Generate a grid of plots for each station
-#' plot_mrl(data, station_name = "station", element_name = "element", ncol = 2)
+#' # plot_mrl(data, station_name = "station", element_name = "element", ncol = 2)
 #' 
 plot_mrl <- function(data, station_name, element_name, umin, umax, ncol = 1,
                      xlab = "Threshold", ylab = "Mean excess", fill = "red",
@@ -58,7 +58,7 @@ plot_mrl <- function(data, station_name, element_name, umin, umax, ncol = 1,
       if (missing(umax)) {
         umax <- max(element_col, na.rm = TRUE)
       }
-      plts[[i]] <- texmex::mrl(na.exclude(element_col), umin = umin, umax = umax) %>%
+      plts[[i]] <- texmex::mrl(stats::na.exclude(element_col), umin = umin, umax = umax) %>%
         ggplot2::ggplot(xlab = xlab, ylab = ylab, main = stations[i], fill = fill,
                         col = col, rug = rug, addNexcesses = addNexcesses, textsize = textsize
         )
@@ -73,7 +73,7 @@ plot_mrl <- function(data, station_name, element_name, umin, umax, ncol = 1,
     if (missing(umax)) {
       umax <- max(element_col, na.rm = TRUE)
     }
-    texmex::mrl(data = na.exclude(element_col), umin = umin, umax = umax) %>%
+    texmex::mrl(data = stats::na.exclude(element_col), umin = umin, umax = umax) %>%
       ggplot2::ggplot(xlab = xlab, ylab = ylab, fill = fill, col = col, rug = rug, 
                       addNexcesses = addNexcesses, textsize = textsize
       )

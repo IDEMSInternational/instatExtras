@@ -1,8 +1,8 @@
-#'  Add nc
+#'  Modify a path
 #' 
 #' @description: This function takes a path as input and returns a modified path by appending "data.nc" to it.
 #' 
-#' @param path: A character string representing the file path.
+#' @param path A character string representing the file path.
 #' 
 #' @return: A character string representing the modified file path with "data.nc" appended to it.
 #' 

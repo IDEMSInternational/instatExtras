@@ -169,8 +169,8 @@ import_from_iri <- function(download_from, data_file, path, X1, X2,Y1,Y2, get_ar
   address <- paste(prexyaddress,xystuff,postxyaddress,sep="/")
   
   file.name <- paste(gaugelocdir,"tmp_iri.csv", sep="/")
-  download.file(address, file.name, quiet=FALSE)
-  dataout <- read.table(paste(gaugelocdir, "tmp_iri.csv", sep="/"), sep = ",", header = TRUE)
+  utils::download.file(address, file.name, quiet=FALSE)
+  dataout <- utils::read.table(paste(gaugelocdir, "tmp_iri.csv", sep="/"), sep = ",", header = TRUE)
   if(nrow(dataout) == 0) stop("There is no data for the selected point/area.")
   
   if(get_area_point == "point") {

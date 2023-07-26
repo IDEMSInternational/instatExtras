@@ -2,7 +2,7 @@
 % Please edit documentation in R/slopegraph_theme.R
 \name{slopegraph_theme}
 \alias{slopegraph_theme}
-\title{slopegraph theme}
+\title{Slope graph theme}
 \usage{
 slopegraph_theme(x_text_size = 12)
 }

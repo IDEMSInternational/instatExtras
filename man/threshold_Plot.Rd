@@ -10,7 +10,7 @@ threshold_Plot(
   type = c("GP", "PP", "Exponential"),
   nint = 10,
   alpha = 0.05,
-  na.action = na.omit,
+  na.action = stats::na.omit,
   xlb = "",
   main = NULL,
   verbose = FALSE,

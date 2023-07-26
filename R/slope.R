@@ -1,4 +1,3 @@
-
 #' Slope
 #'
 #' @description  Calculate the slope of a linear regression model.
@@ -18,6 +17,6 @@
 
 slope <- function(y, x) {
   x <- as.numeric(x)
-  lm(y ~ x)$coefficients[2]
+  stats::lm(y ~ x)$coefficients[2]
   
 }
