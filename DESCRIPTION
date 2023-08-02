@@ -46,6 +46,8 @@ Imports:
     jsonlite,
     magrittr,
     sf,
+    graphics,
+    methods,
     stats
 Remotes:
     pacificclimate/climdex.pcic

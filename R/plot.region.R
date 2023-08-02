@@ -200,7 +200,7 @@ plot.region <- function(lon, lat, product, time, time_point = as.Date("2002-01-0
     utils::data("worldMapEnv", package = "maps")
     utils::data("worldHiresMapEnv", package = "mapdata")
     utils::data("countriesHigh", package = "rworldxtra")
-    world <- sf::as(countriesHigh,"SpatialLines")
+    world <- methods::as(countriesHigh,"SpatialLines")
     
     # add rivers
     if (plotRivers) {
@@ -228,7 +228,7 @@ plot.region <- function(lon, lat, product, time, time_point = as.Date("2002-01-0
     if (plotOwnLocations){
       if (length(loc_lon)==length(loc_lat)&length(loc_lon)==length(loc_name)){
         for (i in 1:length(loc_lon)){
-          sf::points(loc_lon[i],loc_lat[i],pch=pch.cities)
+          graphics::points(loc_lon[i],loc_lat[i],pch=pch.cities)
           text(loc_lon[i],loc_lat[i],loc_name[i], pos=label_pos)
         }
       }
@@ -251,7 +251,7 @@ plot.region <- function(lon, lat, product, time, time_point = as.Date("2002-01-0
     # add country borders
     if (plotCountries) {
       utils::data("countriesLow", package = "rworldmap")
-      world <- sf::as(countriesLow,"SpatialLines")
+      world <- methods::as(countriesLow,"SpatialLines")
       plot(world,add=TRUE)
     }
     
@@ -269,7 +269,7 @@ plot.region <- function(lon, lat, product, time, time_point = as.Date("2002-01-0
     if (plotOwnLocations){
       if (length(loc_lon)==length(loc_lat)&length(loc_lon)==length(loc_name)){
         for (i in 1:length(loc_lon)){
-          sf::points(loc_lon[i],loc_lat[i],pch=pch.cities)
+          graphics::points(loc_lon[i],loc_lat[i],pch=pch.cities)
           text(loc_lon[i],loc_lat[i],loc_name[i], pos=label_pos)
         }
       }

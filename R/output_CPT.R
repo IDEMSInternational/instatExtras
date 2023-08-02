@@ -67,7 +67,7 @@ output_CPT <- function(data, lat_lon_data, station_latlondata, latitude, longitu
     }
     else {
       stations <- data.frame(data[station])
-      year <- data_unstacked %>% dplyr::select(!!! quos(year))
+      year <- data_unstacked %>% dplyr::select(!!! dplyr::quos(year))
       data <- data.frame(year, stations)
       stacked_data <- reshape2::melt(data, id.vars=c("year"))
       names(stacked_data)[2] <-  "station"
