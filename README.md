@@ -9,50 +9,46 @@
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
 
-The goal of IDEMSstandAloneFunctionsR is to …
+This is an R package containing assorted functions which are created for
+[R-Instat](https://r-instat.org/), a GUI-free front-end being developed
+for R. These functions are designed to provide standalone capabilities
+for various tasks within the R programming environment.
 
 ## Installation
 
-You can install the development version of IDEMSstandAloneFunctionsR
-from [GitHub](https://github.com/) with:
+You can install the development version of standAloneFunctionsR from
+[GitHub](https://github.com/) with:
 
 ``` r
-# install.packages("devtools")
+# Install devtools package if not already installed
+if (!requireNamespace("devtools", quietly = TRUE)) {
+  install.packages("devtools")
+}
+
+# Install standAloneFunctionsR
 devtools::install_github("IDEMSInternational/standAloneFunctionsR")
 ```
 
-## Example
+## Usage
 
-This is a basic example which shows you how to solve a common problem:
-
-``` r
-library(IDEMSstandAloneFunctionsR)
-## basic example code
-```
-
-What is special about using `README.Rmd` instead of just `README.md`?
-You can include R chunks like so:
+Once installed, you can load the package and start using its functions.
 
 ``` r
-summary(cars)
-#>      speed           dist       
-#>  Min.   : 4.0   Min.   :  2.00  
-#>  1st Qu.:12.0   1st Qu.: 26.00  
-#>  Median :15.0   Median : 36.00  
-#>  Mean   :15.4   Mean   : 42.98  
-#>  3rd Qu.:19.0   3rd Qu.: 56.00  
-#>  Max.   :25.0   Max.   :120.00
+# Load the standAloneFunctionsR package
+library(standAloneFunctionsR)
 ```
 
-You’ll still need to render `README.Rmd` regularly, to keep `README.md`
-up-to-date. `devtools::build_readme()` is handy for this. You could also
-use GitHub Actions to re-render `README.Rmd` every time you push. An
-example workflow can be found here:
-<https://github.com/r-lib/actions/tree/v1/examples>.
+For detailed documentation on individual functions and their usage,
+please refer to the function documentation within R.
 
-You can also embed plots, for example:
+## Contribution
 
-<img src="man/figures/README-pressure-1.png" width="100%" />
+Contributions to standAloneFunctionsR are welcome! If you find any
+issues or have suggestions for improvements, please open an issue on the
+GitHub repository.
 
-In that case, don’t forget to commit and push the resulting figure
-files, so they display on GitHub and CRAN.
+## Acknowledgments
+
+This package was developed as part of the R-Instat project. We
+acknowledge the contributions of all developers and contributors to the
+project.
