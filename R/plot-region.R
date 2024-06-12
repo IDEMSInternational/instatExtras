@@ -1,6 +1,6 @@
 #' Generate a map of the selected product
-#' @description
-#' This function generates a map of the selected product. It can plot either a certain year/month from a data file with multiple time steps or a single 2D field. The function requires the data to be prepared using the R script "Prep.Data.R" or "Apply.Function.R".
+#' 
+#' @description This function generates a map of the selected product. It can plot either a certain year/month from a data file with multiple time steps or a single 2D field. The function requires the data to be prepared using the R script "Prep.Data.R" or "Apply.Function.R".
 #' 
 #' @param lon Numeric vector representing the longitudes.
 #' @param lat Numeric vector representing the latitudes.
@@ -42,6 +42,7 @@
 #' @param CTY.type The data type for the "CTY" variable. Default is 4.
 #'
 #' @export
+#' @usage plot.region(...)
 #'
 #' @examples
 #' # Example usage
