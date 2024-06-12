@@ -10,8 +10,7 @@
 #'
 #' @param data a dataframe or an object that can be coerced to a dataframe.
 #' Basic error checking is performed, to include ensuring that the named columns
-#' exist in the dataframe. See the \code{\link{newcancer}} dataset for an example of
-#' how the dataframe should be organized.
+#' exist in the dataframe.
 #' @param x a column inside the dataframe that will be plotted on the x axis.
 #' Traditionally this is some measure of time.  The function accepts a column of class
 #' ordered, factor or character.  NOTE if your variable is currently a "date" class

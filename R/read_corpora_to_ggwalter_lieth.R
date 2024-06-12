@@ -586,13 +586,15 @@ convert_to_list <- function(x) {
 #' }
 #' @export
 getExample <- function (topic, package = NULL, lib.loc = NULL, character.only = TRUE, give.lines = FALSE, local = FALSE, echo = TRUE, verbose = getOption("verbose"), setRNG = FALSE, ask = getOption("example.ask"), prompt.prefix = abbreviate(topic, 6), run.dontrun = FALSE, run.donttest = interactive()) {
+  index.search < -utils::getFromNamespace("index.search", "utils")
+  `.getHelpFile` <- utils::getFromNamespace(".getHelpFile", "utils")
   if (!character.only) {
     topic <- substitute(topic)
     if (!is.character(topic))
       topic <- deparse(topic)[1L]
   }
   pkgpaths <- find.package(package, lib.loc, verbose = verbose)
-  file <- utils:::index.search(topic, pkgpaths, firstOnly = TRUE)
+  file <- index.search(topic, pkgpaths, firstOnly = TRUE)
   if (!length(file)) {
     warning(gettextf("no help found for %s", sQuote(topic)),
             domain = NA)
@@ -604,7 +606,7 @@ getExample <- function (topic, package = NULL, lib.loc = NULL, character.only = 
   pkgname <- basename(packagePath)
   lib <- dirname(packagePath)
   tf <- tempfile("Rex")
-  tools::Rd2ex(utils:::.getHelpFile(file), tf, commentDontrun = !run.dontrun,
+  tools::Rd2ex(.getHelpFile(file), tf, commentDontrun = !run.dontrun,
                commentDonttest = !run.donttest)
   if (!file.exists(tf)) {
     if (give.lines)
