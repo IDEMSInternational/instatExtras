@@ -66,7 +66,6 @@
 #' @export
 #'
 #' @author Chuck Powell
-#' @seealso \code{\link{newcancer}} and  \code{\link{newgdp}}
 #' @references Based on: Edward Tufte, Beautiful Evidence (2006), pages 174-176.
 #' This function and documentation are taken from the `"newggslopegraph"` function in the `CGPfunctions` R package.
 #' Full credit on this function goes to the authors of the `CGPfunctions` R package.

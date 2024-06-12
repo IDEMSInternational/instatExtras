@@ -577,8 +577,8 @@ convert_to_list <- function(x) {
 #' @param setRNG Logical indicating whether to set the random number generator. Defaults to FALSE.
 #' @param ask Logical indicating whether to ask before evaluating the example. Defaults to the value of the "example.ask" option.
 #' @param prompt.prefix A prefix for the prompt. Defaults to an abbreviated version of the topic.
-#' @param run.dontrun Logical indicating whether to run examples marked with \dontrun. Defaults to FALSE.
-#' @param run.donttest Logical indicating whether to run examples marked with \donttest. Defaults to the value of `interactive()`.
+#' @param run.dontrun Logical indicating whether to run examples marked with `\dontrun`. Defaults to FALSE.
+#' @param run.donttest Logical indicating whether to run examples marked with `\donttest`. Defaults to the value of `interactive()`.
 #' @return The example code as a character string if `give.lines` is TRUE, otherwise prints the example code.
 #' @examples
 #' \dontrun{

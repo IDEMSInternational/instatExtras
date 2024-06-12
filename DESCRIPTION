@@ -45,12 +45,15 @@ Imports:
     openair,
     methods,
     httr,
-    utils,
     jsonlite,
     magrittr,
     sf,
     graphics,
-    methods,
-    stats
+    stats,
+    forcats,
+    ggrepel,
+    gt,
+    htmlwidgets,
+    utils
 Remotes:
     pacificclimate/climdex.pcic
