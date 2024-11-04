@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# IDEMSstandAloneFunctionsR
+# IDEMSinstatExtras
 
 <!-- badges: start -->
 
@@ -16,7 +16,7 @@ for various tasks within the R programming environment.
 
 ## Installation
 
-You can install the development version of standAloneFunctionsR from
+You can install the development version of instatExtras from
 [GitHub](https://github.com/) with:
 
 ``` r
@@ -25,8 +25,8 @@ if (!requireNamespace("devtools", quietly = TRUE)) {
   install.packages("devtools")
 }
 
-# Install standAloneFunctionsR
-devtools::install_github("IDEMSInternational/standAloneFunctionsR")
+# Install instatExtras
+devtools::install_github("IDEMSInternational/instatExtras")
 ```
 
 ## Usage
@@ -34,8 +34,8 @@ devtools::install_github("IDEMSInternational/standAloneFunctionsR")
 Once installed, you can load the package and start using its functions.
 
 ``` r
-# Load the standAloneFunctionsR package
-library(standAloneFunctionsR)
+# Load the instatExtras package
+library(instatExtras)
 ```
 
 For detailed documentation on individual functions and their usage,
@@ -43,12 +43,12 @@ please refer to the function documentation within R.
 
 ## Contribution
 
-Contributions to standAloneFunctionsR are welcome! If you find any
-issues or have suggestions for improvements, please open an issue on the
-GitHub repository.
+Contributions to `instatExtras` are welcome! If you find any issues or
+have suggestions for improvements, please open an issue on the GitHub
+repository.
 
 ## Acknowledgments
 
-This package was developed as part of the R-Instat project. We
-acknowledge the contributions of all developers and contributors to the
-project.
+This package was developed as part of the
+[R-Instat](https://r-instat.org/) project. We acknowledge the
+contributions of all developers and contributors to the project.
