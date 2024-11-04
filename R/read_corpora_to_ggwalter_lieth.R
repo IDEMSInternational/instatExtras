@@ -163,7 +163,7 @@ view_graph_object <- function(graph_object){
   }else{
     print(graph_object)
   }
-  dev.off() #todo. use graphics.off() which one is better?
+  grDevices::dev.off() #todo. use graphics.off() which one is better?
   
   
   #todo. should we use respective package "convenience" functions to save the objects as image files depending on the class names?
@@ -312,7 +312,7 @@ check_graph <- function(graph_object){
   if (is.null(out)) {
     out <- tryCatch({
       message("Recording plot")
-      recordPlot()
+      grDevices::recordPlot()
     },
     error = function(cond) {
       message("Graph object does not exist:")

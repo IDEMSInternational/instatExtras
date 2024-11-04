@@ -104,7 +104,7 @@ slopegraph <- function(data, x, y, colour, data_label = NULL,
     Ndata_label <- deparse(substitute(data_label))
   }
   Ndata <- argList$data
-  if (!is(data, "data.frame")) {
+  if (!methods::is(data, "data.frame")) {
     stop(paste0("'", Ndata, "' does not appear to be a data frame"))
   }
   if (!Nx %in% names(data)) {
@@ -164,7 +164,7 @@ slopegraph <- function(data, x, y, colour, data_label = NULL,
       line_colour <- rep(line_colour, length.out = length(unique(data[[Ncolour]])))
     }
     LineGeom <- list(ggplot2::geom_line(ggplot2::aes(colour = {{colour}}), size = line_thickness), 
-                     scale_colour_manual(values = line_colour))
+                     ggplot2::scale_colour_manual(values = line_colour))
   }
   else {
     if (line_colour == "ByGroup") {
@@ -178,7 +178,7 @@ slopegraph <- function(data, x, y, colour, data_label = NULL,
   }
   if (anyNA(data[[Ny]])) {
     if (remove_missing) {
-      data <- data %>% group_by({{colour}}) %>% 
+      data <- data %>% dplyr::group_by({{colour}}) %>% 
         dplyr::filter(!anyNA({{y}})) %>% droplevels()
     }
     else {
