@@ -2,9 +2,18 @@
 % Please edit documentation in R/group_functions.R
 \name{frac10}
 \alias{frac10}
+\alias{frac20}
+\alias{frac100}
+\alias{frac_den}
 \title{Convert Decimal to Fraction}
 \usage{
 frac10(x)
+
+frac20(x)
+
+frac100(x)
+
+frac_den(x, den)
 }
 \arguments{
 \item{x}{A numeric value representing the decimal to convert.}

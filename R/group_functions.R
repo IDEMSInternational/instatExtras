@@ -163,7 +163,7 @@ view_graph_object <- function(graph_object){
   }else{
     print(graph_object)
   }
-  dev.off() #todo. use graphics.off() which one is better?
+  grDevices::dev.off() #todo. use graphics.off() which one is better?
   
   
   #todo. should we use respective package "convenience" functions to save the objects as image files depending on the class names?
@@ -312,7 +312,7 @@ check_graph <- function(graph_object){
   if (is.null(out)) {
     out <- tryCatch({
       message("Recording plot")
-      recordPlot()
+      grDevices::recordPlot()
     },
     error = function(cond) {
       message("Graph object does not exist:")
@@ -474,6 +474,7 @@ get_vignette <- function (package = NULL, lib.loc = NULL, all = TRUE)
 #' @param searchText The text to search for.
 #' @param ignore_case Logical indicating whether to ignore case. Defaults to TRUE.
 #' @param use_regex Logical indicating whether to use regular expressions. Defaults to FALSE.
+#' @param match_entire_cell Logical indicating whether to match the entire cell.
 #' @return A character vector of row headers where the search text is found.
 #' @examples
 #' \dontrun{
@@ -558,7 +559,7 @@ getExample <- function (topic, package = NULL, lib.loc = NULL, character.only = 
       topic <- deparse(topic)[1L]
   }
   pkgpaths <- find.package(package, lib.loc, verbose = verbose)
-  file <- utils:::index.search(topic, pkgpaths, firstOnly = TRUE)
+  file <- index.search(topic, pkgpaths, firstOnly = TRUE)
   if (!length(file)) {
     warning(gettextf("no help found for %s", sQuote(topic)),
             domain = NA)
@@ -570,7 +571,7 @@ getExample <- function (topic, package = NULL, lib.loc = NULL, character.only = 
   pkgname <- basename(packagePath)
   lib <- dirname(packagePath)
   tf <- tempfile("Rex")
-  tools::Rd2ex(utils:::.getHelpFile(file), tf, commentDontrun = !run.dontrun,
+  tools::Rd2ex(getHelpFile(file), tf, commentDontrun = !run.dontrun,
                commentDonttest = !run.donttest)
   if (!file.exists(tf)) {
     if (give.lines)
@@ -666,7 +667,7 @@ check_github_repo <- function(owner = NULL, repo = NULL, url = NULL) {
     repo <- basename(url)
   }
   if (requireNamespace(repo, quietly = TRUE)) {
-    local_sha <- packageDescription(repo)$GithubSHA1
+    local_sha <- utils::packageDescription(repo)$GithubSHA1
     if (!is.null(local_sha)) {
       latest_commit <- tryCatch({
         response <- gh::gh("/repos/:owner/:repo/commits", owner = owner, repo = repo, .limit = 1)
@@ -709,8 +710,14 @@ check_github_repo <- function(owner = NULL, repo = NULL, url = NULL) {
 #'
 #' @export
 frac10 <- function(x) { paste0(round(x * 10), "/", 10) }
+#' @rdname frac10
+#' @export
 frac20 <- function(x) { paste0(round(x * 20), "/", 20) }
+#' @rdname frac10
+#' @export
 frac100 <- function(x) { paste0(round(x * 100), "/", 100) }
+#' @rdname frac10
+#' @export
 frac_den <- function(x, den) { paste0(round(x * den), "/", den) }
 
 #' Monitor Memory Usage
@@ -727,7 +734,7 @@ frac_den <- function(x, den) { paste0(round(x * den), "/", den) }
 #' @export
 monitor_memory <- function() {
   if (.Platform$OS.type == "windows") {
-    mem_used <- memory.size()
+    mem_used <- utils::memory.size()
   } else {
     mem_used <- sum(gc()[, "used"]) / 1024
   }
