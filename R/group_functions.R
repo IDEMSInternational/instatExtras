@@ -163,7 +163,7 @@ view_graph_object <- function(graph_object){
   }else{
     print(graph_object)
   }
-  dev.off() #todo. use graphics.off() which one is better?
+  grDevices::dev.off() #todo. use graphics.off() which one is better?
   
   
   #todo. should we use respective package "convenience" functions to save the objects as image files depending on the class names?
@@ -312,7 +312,7 @@ check_graph <- function(graph_object){
   if (is.null(out)) {
     out <- tryCatch({
       message("Recording plot")
-      recordPlot()
+      grDevices::recordPlot()
     },
     error = function(cond) {
       message("Graph object does not exist:")
@@ -474,6 +474,7 @@ get_vignette <- function (package = NULL, lib.loc = NULL, all = TRUE)
 #' @param searchText The text to search for.
 #' @param ignore_case Logical indicating whether to ignore case. Defaults to TRUE.
 #' @param use_regex Logical indicating whether to use regular expressions. Defaults to FALSE.
+#' @param match_entire_cell Logical indicating whether to match the entire cell.
 #' @return A character vector of row headers where the search text is found.
 #' @examples
 #' \dontrun{
@@ -733,7 +734,7 @@ frac_den <- function(x, den) { paste0(round(x * den), "/", den) }
 #' @export
 monitor_memory <- function() {
   if (.Platform$OS.type == "windows") {
-    mem_used <- memory.size()
+    mem_used <- utils::memory.size()
   } else {
     mem_used <- sum(gc()[, "used"]) / 1024
   }

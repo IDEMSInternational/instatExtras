@@ -23,6 +23,8 @@ getRowHeadersWithText(
 \item{ignore_case}{Logical indicating whether to ignore case. Defaults to TRUE.}
 
 \item{use_regex}{Logical indicating whether to use regular expressions. Defaults to FALSE.}
+
+\item{match_entire_cell}{Logical indicating whether to match the entire cell.}
 }
 \value{
 A character vector of row headers where the search text is found.

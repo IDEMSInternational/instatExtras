@@ -19,6 +19,7 @@ Imports:
   getPass,
   ggplot2,
   ggrepel,
+  gh,
   grDevices,
   gt,
   htmlwidgets,
