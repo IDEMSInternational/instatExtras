@@ -150,7 +150,7 @@ view_graph_object <- function(graph_object){
       grid::grid.draw(graph_object)
     }
     return(graph_object)
-  }
+  } 
   
   
   #get a unique temporary file name from the tempdir path
@@ -163,7 +163,7 @@ view_graph_object <- function(graph_object){
   }else{
     print(graph_object)
   }
-  grDevices::dev.off() #todo. use graphics.off() which one is better?
+  dev.off() #todo. use graphics.off() which one is better?
   
   
   #todo. should we use respective package "convenience" functions to save the objects as image files depending on the class names?
@@ -312,7 +312,7 @@ check_graph <- function(graph_object){
   if (is.null(out)) {
     out <- tryCatch({
       message("Recording plot")
-      grDevices::recordPlot()
+      recordPlot()
     },
     error = function(cond) {
       message("Graph object does not exist:")
@@ -331,7 +331,7 @@ check_graph <- function(graph_object){
   }
   
   return(out)
-}
+} 
 
 #' Get Data Book Output Object Names
 #'
@@ -480,14 +480,23 @@ get_vignette <- function (package = NULL, lib.loc = NULL, all = TRUE)
 #'   getRowHeadersWithText(my_data, "column1", "search text", TRUE, FALSE)
 #' }
 #' @export
-getRowHeadersWithText <- function(data, column, searchText, ignore_case, use_regex) {
-  if(use_regex){
+getRowHeadersWithText <- function(data, column, searchText, ignore_case, use_regex, match_entire_cell) {
+  if (use_regex) {
+    # Adjust the search text to match the entire cell if required
+    if (match_entire_cell) {
+      searchText <- paste0("^", searchText, "$")
+    }
     # Find the rows that match the search text using regex
     matchingRows <- stringr::str_detect(data[[column]], stringr::regex(searchText, ignore_case = ignore_case))
-  }else if (is.na(searchText)){
+  } else if (is.na(searchText)) {
     matchingRows <- apply(data[, column, drop = FALSE], 1, function(row) any(is.na(row)))
-  }else{
-    matchingRows <- grepl(searchText, data[[column]], ignore.case = ignore_case)
+  } else {
+    # Adjust the search text to match the entire cell if required
+    if (match_entire_cell) {
+      searchText <- paste0("^", searchText, "$")
+    }
+    # Find the rows that match the search text
+    matchingRows <- grepl(searchText, data[[column]], ignore.case = ignore_case, perl = TRUE)
   }
   # Get the row headers where the search text is found
   rowHeaders <- rownames(data)[matchingRows]
@@ -543,15 +552,13 @@ convert_to_list <- function(x) {
 #' }
 #' @export
 getExample <- function (topic, package = NULL, lib.loc = NULL, character.only = TRUE, give.lines = FALSE, local = FALSE, echo = TRUE, verbose = getOption("verbose"), setRNG = FALSE, ask = getOption("example.ask"), prompt.prefix = abbreviate(topic, 6), run.dontrun = FALSE, run.donttest = interactive()) {
-  index.search < -utils::getFromNamespace("index.search", "utils")
-  `.getHelpFile` <- utils::getFromNamespace(".getHelpFile", "utils")
   if (!character.only) {
     topic <- substitute(topic)
     if (!is.character(topic))
       topic <- deparse(topic)[1L]
   }
   pkgpaths <- find.package(package, lib.loc, verbose = verbose)
-  file <- index.search(topic, pkgpaths, firstOnly = TRUE)
+  file <- utils:::index.search(topic, pkgpaths, firstOnly = TRUE)
   if (!length(file)) {
     warning(gettextf("no help found for %s", sQuote(topic)),
             domain = NA)
@@ -563,7 +570,7 @@ getExample <- function (topic, package = NULL, lib.loc = NULL, character.only = 
   pkgname <- basename(packagePath)
   lib <- dirname(packagePath)
   tf <- tempfile("Rex")
-  tools::Rd2ex(.getHelpFile(file), tf, commentDontrun = !run.dontrun,
+  tools::Rd2ex(utils:::.getHelpFile(file), tf, commentDontrun = !run.dontrun,
                commentDonttest = !run.donttest)
   if (!file.exists(tf)) {
     if (give.lines)
@@ -582,4 +589,166 @@ getExample <- function (topic, package = NULL, lib.loc = NULL, character.only = 
     cat(example_text)
   }
   return(example_text)
+}
+
+#' Get Scalar Names from Data Book
+#'
+#' @description
+#' Extracts scalar names from a given list, with the option to exclude specific items, 
+#' return the names as a list, and provide a label for the list.
+#'
+#' @param scalar_list A named list from which to extract scalar names.
+#' @param excluded_items A character vector of items to exclude from the output. Defaults to an empty vector.
+#' @param as_list A logical value indicating whether to return the result as a list. Defaults to `FALSE`.
+#' @param list_label A character string specifying the label for the list, if `as_list = TRUE`.
+#'
+#' @return A character vector of scalar names, or a named list if `as_list = TRUE`.
+#'
+#' @examples
+#' # Extract names excluding specific items
+#' get_data_book_scalar_names(list(a = 1, b = 2, c = 3), excluded_items = c("b"))
+#'
+#' # Return the names as a list with a label
+#' get_data_book_scalar_names(list(a = 1, b = 2), as_list = TRUE, list_label = "Scalars")
+#'
+#' @export
+get_data_book_scalar_names <- function(scalar_list,
+                                       excluded_items = c(), 
+                                       as_list = FALSE, 
+                                       list_label = NULL) {
+  out = names(scalar_list)
+  if (length(excluded_items) > 0) {
+    ex_ind = which(out %in% excluded_items)
+    if (length(ex_ind) != length(excluded_items)) warning("Some of the excluded_items were not found in the list of calculations")
+    if (length(ex_ind) > 0) out = out[-ex_ind]
+  }
+  if (!as_list) {
+    return(out)
+  }
+  lst = list()
+  lst[[list_label]] <- out
+  return(lst)
+}
+
+#' Check GitHub Repository
+#'
+#' @description
+#' Verifies the existence and status of a GitHub repository, including whether it is an R package, 
+#' and checks if a locally installed package is up-to-date with the latest commit on GitHub.
+#'
+#' @param owner A character string specifying the GitHub repository owner. Defaults to `NULL`.
+#' @param repo A character string specifying the repository name. Defaults to `NULL`.
+#' @param url A character string specifying the full GitHub URL of the repository. Defaults to `NULL`.
+#'
+#' @return An integer status code:
+#' \describe{
+#'   \item{0}{Package is installed and up-to-date.}
+#'   \item{1}{Package is installed but not the latest version.}
+#'   \item{2}{Unable to retrieve the latest commit from GitHub.}
+#'   \item{3}{Package is installed but not from GitHub.}
+#'   \item{4}{Repository exists and is an R package.}
+#'   \item{5}{Repository exists but is not an R package.}
+#'   \item{6}{Repository does not exist or an error occurred.}
+#' }
+#'
+#' @examples
+#' # Check a repository using owner and repo
+#' check_github_repo(owner = "hadley", repo = "ggplot2")
+#'
+#' # Check a repository using a URL
+#' check_github_repo(url = "https://github.com/hadley/ggplot2")
+#'
+#' @export
+check_github_repo <- function(owner = NULL, repo = NULL, url = NULL) {
+  if (!is.null(url)) {
+    url <- sub(".*github.com/", "", url)
+    owner <- dirname(url)
+    repo <- basename(url)
+  }
+  if (requireNamespace(repo, quietly = TRUE)) {
+    local_sha <- packageDescription(repo)$GithubSHA1
+    if (!is.null(local_sha)) {
+      latest_commit <- tryCatch({
+        response <- gh::gh("/repos/:owner/:repo/commits", owner = owner, repo = repo, .limit = 1)
+        response[[1]]$sha
+      }, error = function(e) {
+        return(NULL)
+      })
+      if (!is.null(latest_commit)) {
+        if (local_sha == latest_commit) return(0)
+        else return(1)
+      } else return(2)
+    } else return(3)
+  } else {
+    tryCatch({
+      response <- gh::gh("/repos/:owner/:repo", owner = owner, repo = repo, verb = "GET", silent = TRUE)
+      if (response$language == "R") return(4)
+      else return(5)
+    }, error = function(e) {
+      return(6)
+    })
+  }
+}
+
+#' Convert Decimal to Fraction
+#'
+#' @description
+#' Converts a decimal value into a fraction with a specified denominator or common denominators (10, 20, or 100).
+#'
+#' @param x A numeric value representing the decimal to convert.
+#' @param den An integer specifying the denominator for the fraction. (Only for `frac_den`.)
+#'
+#' @return A character string representing the fraction.
+#'
+#' @examples
+#' # Convert decimals to fractions
+#' frac10(0.75)  # "8/10"
+#' frac20(0.25)  # "5/20"
+#' frac100(0.123) # "12/100"
+#' frac_den(0.333, 3) # "1/3"
+#'
+#' @export
+frac10 <- function(x) { paste0(round(x * 10), "/", 10) }
+frac20 <- function(x) { paste0(round(x * 20), "/", 20) }
+frac100 <- function(x) { paste0(round(x * 100), "/", 100) }
+frac_den <- function(x, den) { paste0(round(x * den), "/", den) }
+
+#' Monitor Memory Usage
+#'
+#' @description
+#' Monitors and returns the current memory usage in megabytes (MB).
+#'
+#' @return A numeric value representing the memory usage in MB.
+#'
+#' @examples
+#' # Check memory usage
+#' monitor_memory()
+#'
+#' @export
+monitor_memory <- function() {
+  if (.Platform$OS.type == "windows") {
+    mem_used <- memory.size()
+  } else {
+    mem_used <- sum(gc()[, "used"]) / 1024
+  }
+  return(mem_used)
+}
+
+#' Time an Operation
+#'
+#' @description
+#' Measures and prints the time taken to execute an expression.
+#'
+#' @param expr An R expression to evaluate and time.
+#'
+#' @return Prints the time taken for the operation.
+#'
+#' @examples
+#' # Time a simple operation
+#' time_operation({ Sys.sleep(1); mean(1:100) })
+#'
+#' @export
+time_operation <- function(expr) {
+  timing <- system.time(expr)
+  print(timing)
 }

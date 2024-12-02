@@ -27,6 +27,7 @@ Imports:
   magrittr,
   methods,
   plyr,
+  pingr,
   rlang,
   sjlabelled,
   stringr,
