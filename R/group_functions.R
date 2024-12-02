@@ -559,7 +559,7 @@ getExample <- function (topic, package = NULL, lib.loc = NULL, character.only = 
       topic <- deparse(topic)[1L]
   }
   pkgpaths <- find.package(package, lib.loc, verbose = verbose)
-  file <- utils:::index.search(topic, pkgpaths, firstOnly = TRUE)
+  file <- index.search(topic, pkgpaths, firstOnly = TRUE)
   if (!length(file)) {
     warning(gettextf("no help found for %s", sQuote(topic)),
             domain = NA)
@@ -571,7 +571,7 @@ getExample <- function (topic, package = NULL, lib.loc = NULL, character.only = 
   pkgname <- basename(packagePath)
   lib <- dirname(packagePath)
   tf <- tempfile("Rex")
-  tools::Rd2ex(utils:::.getHelpFile(file), tf, commentDontrun = !run.dontrun,
+  tools::Rd2ex(getHelpFile(file), tf, commentDontrun = !run.dontrun,
                commentDonttest = !run.donttest)
   if (!file.exists(tf)) {
     if (give.lines)
@@ -667,7 +667,7 @@ check_github_repo <- function(owner = NULL, repo = NULL, url = NULL) {
     repo <- basename(url)
   }
   if (requireNamespace(repo, quietly = TRUE)) {
-    local_sha <- packageDescription(repo)$GithubSHA1
+    local_sha <- utils::packageDescription(repo)$GithubSHA1
     if (!is.null(local_sha)) {
       latest_commit <- tryCatch({
         response <- gh::gh("/repos/:owner/:repo/commits", owner = owner, repo = repo, .limit = 1)
