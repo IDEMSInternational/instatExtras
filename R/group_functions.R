@@ -709,8 +709,14 @@ check_github_repo <- function(owner = NULL, repo = NULL, url = NULL) {
 #'
 #' @export
 frac10 <- function(x) { paste0(round(x * 10), "/", 10) }
+#' @rdname frac10
+#' @export
 frac20 <- function(x) { paste0(round(x * 20), "/", 20) }
+#' @rdname frac10
+#' @export
 frac100 <- function(x) { paste0(round(x * 100), "/", 100) }
+#' @rdname frac10
+#' @export
 frac_den <- function(x, den) { paste0(round(x * den), "/", den) }
 
 #' Monitor Memory Usage
