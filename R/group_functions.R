@@ -497,7 +497,7 @@ getRowHeadersWithText <- function(data, column, searchText, ignore_case, use_reg
       searchText <- paste0("^", searchText, "$")
     }
     # Find the rows that match the search text
-    matchingRows <- grepl(searchText, data[[column]], ignore.case = ignore_case, perl = TRUE)
+    matchingRows <- grepl(searchText, data[[column]], ignore.case = ignore_case, fixed  = TRUE)
   }
   # Get the row headers where the search text is found
   rowHeaders <- rownames(data)[matchingRows]
@@ -759,3 +759,31 @@ time_operation <- function(expr) {
   timing <- system.time(expr)
   print(timing)
 }
+
+#' Set Library Paths
+#'
+#' This function updates the R library paths by adding a new library path at the beginning of the existing paths.
+#' If there are more than two library paths, it retains only the first and third paths (if they exist).
+#'
+#' @param library_path A character string specifying the path to the library to be added.
+#'
+#' @return This function does not return a value but modifies the `.libPaths()` environment variable.
+#'
+#' @export
+set_library_paths <- function(library_path) {
+  # Update the library paths
+  .libPaths(c(library_path, .libPaths()))
+  
+  # Check if there are more than 2 library paths
+  if (length(.libPaths()) > 2) {
+    # Get the current library paths
+    current_paths <- .libPaths()
+    
+    # Select valid indices (1 and 3) only if they exist
+    valid_indices <- c(1, 3)[c(1, 3) <= length(current_paths)]
+    
+    # Set the library paths to the valid ones
+    .libPaths(current_paths[valid_indices])
+  }
+}
+
