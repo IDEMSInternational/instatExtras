@@ -29,8 +29,10 @@ Imports:
   methods,
   plyr,
   pingr,
+  raster,
   rlang,
   sjlabelled,
+  sp,
   stringr,
   tidyr,
   tidyselect
