@@ -31,9 +31,9 @@ read_corpora <- function(data){
       data_unlist[[i]] <- data.frame(list = data[[i]])
     } else if ("matrix" %in% class(data[[i]])){
       data_unlist[[i]] <- data.frame(list = do.call(paste, c(data.frame(data[[i]]), sep="-")))
-    } else if (class(data[[i]]) == "data.frame"){
+    } else if (inherits(data[[i]], "data.frame")){
       data_unlist[[i]] <- data.frame(list = data[[i]])
-    } else if (class(data[[i]]) == "list"){
+    } else if (inherits(data[[i]], "list")){
       if (length(data[[i]]) == 0) {
         data_unlist[[i]] <- data.frame(NA)
       } else {
