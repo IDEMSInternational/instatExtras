@@ -33,6 +33,7 @@ Imports:
   PCICt,
   plyr,
   pingr,
+  purrr,
   raster,
   rlang,
   sjlabelled,
