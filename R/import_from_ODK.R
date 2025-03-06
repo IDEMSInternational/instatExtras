@@ -15,7 +15,7 @@ import_from_ODK = function(username, form_name, platform) {
     url <- "https://api.ona.io/api/v1/data"
   }
   else stop("Unrecognised platform.")
-  password <- getPass::getPass(paste0(username, " password:"))
+  password <- getPass(paste0(username, " password:"))
   if(!missing(username) && !missing(password)) {
     has_authentication <- TRUE
     user <- httr::authenticate(username, password)
@@ -37,7 +37,7 @@ import_from_ODK = function(username, form_name, platform) {
   
   if(has_authentication) curr_form <- httr::GET(paste0(url,"/", form_id), user)
   else curr_form <- httr::GET(paste0(url,"/", form_id))
-  
+
   form_data <- httr::content(curr_form, "text")
   #TODO Look at how to convert columns that are lists
   #     maybe use tidyr::unnest

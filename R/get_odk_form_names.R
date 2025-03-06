@@ -30,7 +30,7 @@ get_odk_form_names = function(username, platform) {
     url <- "https://api.ona.io/api/v1/data"
   }
   else stop("Unrecognised platform.")
-  password <- getPass::getPass(paste0(username, " password:"))
+  password <- getPass(paste0(username, " password:"))
   if(!missing(username) && !missing(password)) {
     has_authentication <- TRUE
     user <- httr::authenticate(username, password)
@@ -40,7 +40,6 @@ get_odk_form_names = function(username, platform) {
     has_authentication <- FALSE
     odk_data <- httr::GET(url)
   }
-  
   forms <- httr::content(odk_data, "parse")
   form_names <- sapply(forms, function(x) x$title)
   return(form_names)
