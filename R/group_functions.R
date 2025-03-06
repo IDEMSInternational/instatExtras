@@ -672,8 +672,16 @@ time_operation <- function(expr) {
 #' @return This function does not return a value but modifies the `.libPaths()` environment variable.
 #'
 #' @export
-set_library_paths <- function(library_path) {
-  # Update the library paths
+set_library_paths <- function(version) {
+  # Construct the library path inside the Roaming folder
+  library_path <- file.path(Sys.getenv("APPDATA"), "R-Instat", version, "library")
+  
+  # Create the directory if it doesn't exist
+  if (!dir.exists(library_path)) {
+    dir.create(library_path, recursive = TRUE, showWarnings = FALSE)
+  }
+  
+  # Update the library paths, setting the new path as the primary one
   .libPaths(c(library_path, .libPaths()))
   
   # Check if there are more than 2 library paths
@@ -688,4 +696,3 @@ set_library_paths <- function(library_path) {
     .libPaths(current_paths[valid_indices])
   }
 }
-
