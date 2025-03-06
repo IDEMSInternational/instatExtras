@@ -58,8 +58,7 @@
 #' Full credit to Drew Schmidt for the original implementation.
 #' 
 #' @export
-getPass <- function(msg="PASSWORD: ", noblank=FALSE, forcemask=FALSE)
-{
+getPass <- function(msg="PASSWORD: ", noblank=FALSE, forcemask=FALSE){
   if (!is.character(msg) || length(msg) != 1 || is.na(msg))
     stop("argument 'msg' must be a single string")
   if (!is.logical(noblank) || length(noblank) != 1 || is.na(noblank))
