@@ -44,3 +44,64 @@ test_that("summary_sample handles empty input", {
 test_that("summary_sample handles single-element input", {
   expect_equal(summary_sample(c(5), 1), 5)
 })
+
+test_that("slopegraph handles valid input correctly", {
+  data <- data.frame(
+    x = factor(c("A", "B"), ordered = TRUE),
+    y = c(10, 20),
+    colour = c("Group1", "Group2"),
+    data_label = c("10", "20")
+  )
+  
+  plot <- slopegraph(data, x, y, colour, data_label)
+  expect_s3_class(plot, "gg")  # Check if it returns a ggplot object
+})
+
+test_that("slopegraph throws error for missing required arguments", {
+  data <- data.frame(
+    x = factor(c("A", "B"), ordered = TRUE),
+    y = c(10, 20),
+    colour = c("Group1", "Group2")
+  )
+  
+  expect_error(slopegraph(), "Not enough arguments passed requires a dataframe")
+  expect_error(slopegraph(data, y, colour), "Not enough arguments passed requires a dataframe")
+})
+
+test_that("slopegraph throws error for incorrect data types", {
+  data_invalid <- data.frame(
+    x = c("A", "B"),  # Not a factor
+    y = c("High", "Low"),  # Not numeric
+    colour = c("Group1", "Group2")
+  )
+  
+  expect_error(slopegraph(data_invalid, x, y, colour), "Variable 'y' needs to be numeric")
+})
+
+test_that("slopegraph throws error for missing values in x or colour", {
+  data_na_x <- data.frame(
+    x = factor(c("A", NA), ordered = TRUE),
+    y = c(10, 20),
+    colour = c("Group1", "Group2")
+  )
+  
+  expect_error(slopegraph(data_na_x, x, y, colour), "'x' can not have missing data please remove those rows")
+  
+  data_na_colour <- data.frame(
+    x = factor(c("A", "B"), ordered = TRUE),
+    y = c(10, 20),
+    colour = c("Group1", NA)
+  )
+  
+  expect_error(slopegraph(data_na_colour, x, y, colour), "'colour' can not have missing data please remove those rows")
+})
+
+test_that("slopegraph converts factor x to ordered", {
+  data_factor <- data.frame(
+    x = factor(c("A", "B")),  # Not ordered initially
+    y = c(10, 20),
+    colour = c("Group1", "Group2")
+  )
+  
+  expect_message(slopegraph(data_factor, x, y, colour), "Converting 'x' to an ordered factor")
+})

@@ -8,9 +8,9 @@ getRowHeadersWithText(
   data,
   column,
   searchText,
-  ignore_case,
-  use_regex,
-  match_entire_cell
+  ignore_case = TRUE,
+  use_regex = FALSE,
+  match_entire_cell = FALSE
 )
 }
 \arguments{
