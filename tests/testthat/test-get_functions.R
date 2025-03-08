@@ -70,3 +70,21 @@ test_that("getPass errors", {
   expect_error(getPass(msg = "Hello", noblank = 1:5))
   expect_error(getPass(msg = "Hello", forcemask = 1:5))
 })
+
+# Test readline_masked_tcltk without user interaction
+test_that("readline_masked_tcltk handles input correctly", {
+  skip_if_not(requireNamespace("tcltk", quietly = TRUE))
+  
+  with_mocked_bindings(
+    readline_masked_tcltk_window = function(...) "tk_password",
+    expect_equal(readline_masked_tcltk("Enter password:"), "tk_password")
+  )
+})
+
+# Test readline_nomask without user interaction
+test_that("readline_nomask handles input correctly", {
+  local_mocked_bindings(
+    readline = function(...) "test_password"
+  )
+  expect_equal(readline_nomask("Enter password: ", noblank = TRUE), "test_password")
+})
