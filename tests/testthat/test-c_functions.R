@@ -41,3 +41,30 @@ test_that("create_av_packs retrieves package data correctly", {
   expect_true("Package" %in% colnames(av_packs), info = "Data frame should contain a 'Package' column.")
   expect_true("Version" %in% colnames(av_packs), info = "Data frame should contain a 'Version' column.")
 })
+
+test_that("convert_SST works correctly", {
+  # Create a mock data file
+  mock_data <- data.frame(
+    X2 = c("Year", "Lon", -5, -5, -5),
+    X3 = c("2020", 5, 25, 30, 35),
+    X4 = c("2021", 10, 30, 35, 40)
+  )
+  
+  # Run convert_SST
+  converted_data <- convert_SST(mock_data, data_from = 5)
+  
+  # Extract outputs
+  my_data <- converted_data[[1]]
+  lat_lon_df <- converted_data[[2]]
+  
+  # Check output structure
+  expect_true(is.data.frame(my_data))
+  expect_true(is.data.frame(lat_lon_df))
+  
+  # Check column names
+  expect_equal(colnames(my_data), c("period", "lat", "lon", "station", "SST_value"))
+  expect_equal(colnames(lat_lon_df), c("lat", "lon", "station"))
+  
+  # Check that SST values are numeric
+  expect_true(is.numeric(my_data$SST_value))
+})
