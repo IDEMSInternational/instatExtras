@@ -63,3 +63,10 @@ test_that("get_years_from_data extracts correct years", {
   result <- get_years_from_data(mock_data)
   expect_equal(rownames(result), c("Age", "X2019", "X2020", "X2021"))
 })
+
+# For getPass
+test_that("getPass errors", {
+  expect_error(getPass(1:5))
+  expect_error(getPass(msg = "Hello", noblank = 1:5))
+  expect_error(getPass(msg = "Hello", forcemask = 1:5))
+})
