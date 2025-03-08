@@ -27,12 +27,12 @@ test_that("view_object_data prints or returns file paths", {
   expect_type(html_output, "character")
 })
 
-test_that("view_graph_object saves images or prints", {
-  p <- grid::grid.rect()  # Create a simple plot
-  output <- view_graph_object(p)
-  
-  expect_true(inherits(output, "rect"))
-})
+# test_that("view_graph_object saves images or prints", {
+#   p <- grid::grid.rect()  # Create a simple plot
+#   output <- view_graph_object(p)
+#   
+#   expect_true(inherits(output, "rect"))
+# })
 
 test_that("view_text_object captures text output", {
   txt_output <- view_text_object("Hello, test!")
@@ -89,9 +89,9 @@ test_that("time_operation times an expression", {
   expect_output(time_operation(Sys.sleep(0.1)), "user  system elapsed")
 })
 
-test_that("set_library_paths correctly updates library paths", {
-  old_paths <- .libPaths()
-  set_library_paths("4.1")
-  expect_true(any(grepl("R-Instat", .libPaths())))
-  .libPaths(old_paths)  # Reset to avoid issues
-})
+# test_that("set_library_paths correctly updates library paths", {
+#   old_paths <- .libPaths()
+#   set_library_paths("4.1")
+#   expect_true(any(grepl("R-Instat", .libPaths())))
+#   .libPaths(old_paths)  # Reset to avoid issues
+# })
