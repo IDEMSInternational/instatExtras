@@ -23,7 +23,6 @@
 duplicated_cases <- function(col_name, ignore = NULL, tolerance=0.01) {
   col_name <- as.vector(col_name)
   col_data1 <- c(1, rep(NA, length(col_name) - 1))
-  
   if(is.numeric(col_name)) {
     for(i in 2:length(col_name)) {
       if(!is.na(col_data1[i-1])) col_data1[i] <- ifelse((col_name[i] >= (col_name[i-1] - tolerance)) & (col_name[i] <= (col_name[i-1] + tolerance)) & !(col_name[i] %in% ignore), col_data1[i-1] + 1, 1)

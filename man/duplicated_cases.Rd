@@ -23,12 +23,9 @@ This function identifies duplicated cases in a column and assigns a unique ident
 #' # Example 1: Numeric column
 col <- c(1, 2, 2.01, 3, 4, 4.005, 4.01, 4.02, 4.03)
 duplicated_cases(col)
-# Output: 1 1 2 1 1 2 3 4 5
 
 # Example 2: Non-numeric column
 col <- c("A", "A", "B", "C", "C", "D", "E")
-duplicated_cases(col)
-# Output: 1 1 1 1 2 1 1
-
+duplicated_cases(col) 
 
 }
