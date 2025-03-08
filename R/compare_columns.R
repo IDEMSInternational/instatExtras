@@ -1,5 +1,4 @@
-
-#' compare columns
+#' Compare Columns
 #' Compare two columns and provide information about their values
 #' @param x The first column to compare.
 #' @param y The second column to compare.
@@ -59,9 +58,3 @@ compare_columns <- function(x, y, use_unique = TRUE, sort_values = TRUE, firstno
     if(display_union) cat(paste0("Union (Values that appear in either column): ", paste0("'", dplyr::union(x, y), "'", collapse = ", ")))
   }
 }
-
-
-
-
-
-

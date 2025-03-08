@@ -10,11 +10,9 @@
 #'
 #' @examples
 #' consecutive_sum(c(1, 2, 3, 4, 5))
-#' # Output: 1 3 6 10 15
-#'
-#' consecutive_sum(c(1, NA, 3, 0, 5), initial_value = 10)
-#' # Output: 11 NA 14 14 19
-consecutive_sum <- function(x, initial_value = NA){
+#' 
+#' consecutive_sum(c(1, NA, 3, 0, 5, 6), initial_value = 10)
+consecutive_sum <- function(x, initial_value = 0){
   out = x
   for(i in 1:length(x)){
     if(!is.na(x[i])){

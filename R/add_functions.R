@@ -106,8 +106,7 @@ add_xy_area_range <- function(path, min_lon, max_lon, min_lat, max_lat, dim_x = 
 #' @examples
 #' add_xy_point_range("data", -90, 30, "X", "Y")
 #'
-add_xy_point_range <- function(path, min_lon, min_lat,
-                               dim_x = "X", dim_y = "Y") {
+add_xy_point_range <- function(path, min_lon, min_lat, dim_x = "X", dim_y = "Y"){
   paste0(
     path, "/", dim_x, "/", "(",
     ifelse(min_lon < 0, paste0(abs(min_lon), "W"), paste0(min_lon, "E")),

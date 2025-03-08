@@ -12,4 +12,3 @@ create_av_packs <- function() {
   av_packs <<- utils::available.packages(repos = "https://cran.rstudio.com/")
   av_packs <<- data.frame(av_packs)
 }
-
