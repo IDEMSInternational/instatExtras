@@ -42,18 +42,17 @@ test_that("create_av_packs retrieves package data correctly", {
   expect_true("Version" %in% colnames(av_packs), info = "Data frame should contain a 'Version' column.")
 })
 
-# Create a mock data file
-mock_data <- data.frame(
-  X1 = c("", "", "", "", "Lat", 10, 20, 30),
-  X2 = c("", "", "", "Year", "Lon", -5, -5, -5),
-  X3 = c("", "", "", "2020", 5, 25, 30, 35),
-  X4 = c("", "", "", "2021", 10, 30, 35, 40)
-)
-
-# Run convert_SST
-converted_data <- convert_SST(mock_data, data_from = 5)
-
 test_that("convert_SST works correctly", {
+  # Create a mock data file
+  mock_data <- data.frame(
+    X2 = c("Year", "Lon", -5, -5, -5),
+    X3 = c("2020", 5, 25, 30, 35),
+    X4 = c("2021", 10, 30, 35, 40)
+  )
+  
+  # Run convert_SST
+  converted_data <- convert_SST(mock_data, data_from = 5)
+  
   # Extract outputs
   my_data <- converted_data[[1]]
   lat_lon_df <- converted_data[[2]]
