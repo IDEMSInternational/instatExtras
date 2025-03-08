@@ -7,7 +7,7 @@
 set_library_paths(version)
 }
 \arguments{
-\item{library_path}{A character string specifying the path to the library to be added.}
+\item{version}{A character string specifying the version}
 }
 \value{
 This function does not return a value but modifies the \code{.libPaths()} environment variable.

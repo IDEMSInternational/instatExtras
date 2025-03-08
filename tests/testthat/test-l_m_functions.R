@@ -35,6 +35,16 @@ test_that("make_factor correctly converts data types", {
   expect_error(make_factor(Sys.time(), ordered = FALSE))
 })
 
+test_that("make_factor changes ordering status correctly", {
+  x <- factor(c("A", "B", "C"))  # Not ordered initially
+  
+  x_ordered <- make_factor(x, ordered = TRUE)
+  expect_true(is.ordered(x_ordered))  # Should now be ordered
+  
+  x_unordered <- make_factor(x_ordered, ordered = FALSE)
+  expect_false(is.ordered(x_unordered))  # Should now be unordered
+})
+
 test_that("max_consecutive_sum computes correct maximum consecutive sum", {
   x <- c(1, -2, 3, 4, -1, 2, 1, -5, 4)
   result <- max_consecutive_sum(x)

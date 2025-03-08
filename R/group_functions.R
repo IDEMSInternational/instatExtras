@@ -667,7 +667,7 @@ time_operation <- function(expr) {
 #' This function updates the R library paths by adding a new library path at the beginning of the existing paths.
 #' If there are more than two library paths, it retains only the first and third paths (if they exist).
 #'
-#' @param library_path A character string specifying the path to the library to be added.
+#' @param version A character string specifying the version
 #'
 #' @return This function does not return a value but modifies the `.libPaths()` environment variable.
 #'
