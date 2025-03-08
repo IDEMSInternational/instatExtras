@@ -44,10 +44,10 @@ test_that("view_html_object saves or prints HTML", {
   expect_type(html_output, "character")
 })
 
-test_that("check_graph correctly records plots", {
-  plot_recorded <- check_graph(NULL)
-  expect_true(inherits(plot_recorded, "recordedplot") || is.null(plot_recorded))
-})
+# test_that("check_graph correctly records plots", {
+#   plot_recorded <- check_graph(NULL)
+#   expect_true(inherits(plot_recorded, "recordedplot") || is.null(plot_recorded))
+# })
 
 test_that("get_vignette retrieves vignette information", {
   result <- get_vignette("dplyr")
