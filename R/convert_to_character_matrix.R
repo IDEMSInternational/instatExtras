@@ -25,8 +25,7 @@ convert_to_character_matrix <- function(data, format_decimal_places = TRUE, deci
   if(nrow(data) == 0) {
     out <- matrix(nrow = 0, ncol = ncol(data))
     colnames(out) <- colnames(data)
-  }
-  else {
+  } else {
     out = matrix(nrow = nrow(data), ncol = ncol(data))
     if(!format_decimal_places) decimal_places=rep(NA, ncol(data))
     else if(missing(decimal_places)) decimal_places = sapply(data, instatExtras::get_default_significant_figures)
@@ -34,18 +33,13 @@ convert_to_character_matrix <- function(data, format_decimal_places = TRUE, deci
     for (curr_col in colnames(data)) {
       #if its a geometry list-column then convert to text using sf package.
       #see issue #7165
-      if ("sfc" %in% class(data[[i]])) {
-        out[, i] <- sf::st_as_text(data[[i]])
-      } else if (is.na(decimal_places[i])) {
-        #use as.character() for non numeric column vales because format() adds extra spaces to the text
-        #which are recognised oddly by the R.Net
-        out[, i] <- as.character(data[[i]])
-      } else {
-        out[,i] <- format(data[[i]], digits = decimal_places[i], scientific = is_scientific[i])
-      }
-      if (!is.null(na_display)) {
-        out[is.na(data[[i]]), i] <- na_display
-      }
+      if ("sfc" %in% class(data[[i]])) out[, i] <- sf::st_as_text(data[[i]])
+      else if (is.na(decimal_places[i])) out[, i] <- as.character(data[[i]])
+      #use as.character() for non numeric column vales because format() adds extra spaces to the text
+      #which are recognised oddly by the R.Net
+      else out[,i] <- format(data[[i]], digits = decimal_places[i], scientific = is_scientific[i])
+      
+      if (!is.null(na_display)) out[is.na(data[[i]]), i] <- na_display
       i = i + 1
     }
     colnames(out) <- colnames(data)
