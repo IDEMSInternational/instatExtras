@@ -17,5 +17,6 @@
 #' @export
 n_non_numeric <- function(x) {
   x <- as.character(x)
-  sum(is.na(x) != is.na(suppressWarnings(as.numeric(x))))
+  is.na_custom <- function(x) is.na(x) | x == "NA" | x == "NaN"
+  sum(is.na_custom(x) != is.na(suppressWarnings(as.numeric(x))))
 }
