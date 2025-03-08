@@ -4,7 +4,7 @@
 \alias{consecutive_sum}
 \title{Consecutive Sum}
 \usage{
-consecutive_sum(x, initial_value = NA)
+consecutive_sum(x, initial_value = 0)
 }
 \arguments{
 \item{x}{A numeric vector.}
@@ -19,8 +19,6 @@ This function calculates the consecutive sum of a given vector.
 }
 \examples{
 consecutive_sum(c(1, 2, 3, 4, 5))
-# Output: 1 3 6 10 15
 
-consecutive_sum(c(1, NA, 3, 0, 5), initial_value = 10)
-# Output: 11 NA 14 14 19
+consecutive_sum(c(1, NA, 3, 0, 5, 6), initial_value = 10)
 }

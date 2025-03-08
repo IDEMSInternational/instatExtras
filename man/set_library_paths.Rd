@@ -4,7 +4,7 @@
 \alias{set_library_paths}
 \title{Set Library Paths}
 \usage{
-set_library_paths(library_path)
+set_library_paths(version)
 }
 \arguments{
 \item{library_path}{A character string specifying the path to the library to be added.}
