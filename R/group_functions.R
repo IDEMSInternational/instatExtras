@@ -422,7 +422,7 @@ get_vignette <- function (package = NULL, lib.loc = NULL, all = TRUE)
 #'   getRowHeadersWithText(my_data, "column1", "search text", TRUE, FALSE)
 #' }
 #' @export
-getRowHeadersWithText <- function(data, column, searchText, ignore_case, use_regex, match_entire_cell) {
+getRowHeadersWithText <- function(data, column, searchText, ignore_case = TRUE, use_regex = FALSE, match_entire_cell = FALSE) {
   if (use_regex) {
     # Adjust the search text to match the entire cell if required
     if (match_entire_cell) {

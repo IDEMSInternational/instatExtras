@@ -1,6 +1,6 @@
 Package: instatExtras
 Title: A set of functions used in R-Instat
-Version: 0.2.2
+Version: 0.2.21
 Authors@R: c(
     person("Danny", "Parsons", , role = "aut"),
     person("Lily", "Clements", , "lily@idems.international", role = c("aut", "cre"),
@@ -42,3 +42,6 @@ Imports:
   stringr,
   tidyr,
   tidyselect
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
