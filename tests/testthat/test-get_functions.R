@@ -73,6 +73,37 @@ test_that("getPass errors", {
   expect_error(getPass(noblank = "yes"), "argument 'noblank' must be one of 'TRUE' or 'FALSE'")
   expect_error(getPass(forcemask = 1), "argument 'forcemask' must be one of 'TRUE' or 'FALSE'")
 })
+
+test_that("get_odk_form_names works for Kobo", {
+  # Mock getPass to return a dummy password
+  mock_getPass <- function(...) "dummy_password"
+  
+  # Mock httr::GET to return a fake response
+  mock_GET <- function(url, ...) {
+    response <- list(
+      status_code = 200,
+      content = function(...) list(
+        list(title = "Form 1"),
+        list(title = "Form 2")
+      )
+    )
+    class(response) <- "response"
+    return(response)
+  }
+  
+  # Use local_mocked_bindings to override functions within this test
+  local_mocked_bindings(
+    getPass = mock_getPass,
+    GET = mock_GET
+  )
+  
+  # Call the function and check results
+  forms <- get_odk_form_names("testuser", "kobo")
+  expect_equal(forms, c("Form 1", "Form 2"))
+})
+
+
+
 # 
 # # Test readline_masked_tcltk without user interaction
 # test_that("readline_masked_tcltk handles input correctly", {
