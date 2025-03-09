@@ -107,11 +107,10 @@ test_that("slopegraph throws error for missing data or values in x or colour", {
   expect_error(slopegraph(data = data_na_colour, x = X, y = y, colour = colour), "'X' is not the name of a variable in the dataframe")
   expect_error(slopegraph(data = data_na_colour, x = x, y = Y, colour = colour), "'Y' is not the name of a variable in the dataframe")
   expect_error(slopegraph(data = data_na_colour, x = x, y = y, colour = COLOUR), "'COLOUR' is not the name of a variable in the dataframe")
-  expect_error(slopegraph(data = data_na_colour, x = x, y = y, colour = x), "Variable 'x' needs to be of class character, factor or ordered")
 
   # incorrect variable type
   data_na_colour$x <- as.numeric(data_na_colour$x)
-  expect_error(slopegraph(data = data_na_colour, x = x, y = y, colour = colour), "'X' is not the name of a variable in the dataframe")
+  expect_error(slopegraph(data = data_na_colour, x = x, y = y, colour = x), "Variable 'x' needs to be of class character, factor or ordered")
   
   })
 
@@ -124,3 +123,4 @@ test_that("slopegraph converts factor x to ordered", {
   
   expect_message(slopegraph(data_factor, x, y, colour), "Converting 'x' to an ordered factor")
 })
+
