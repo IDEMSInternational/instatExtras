@@ -58,19 +58,29 @@
 #' Full credit to Drew Schmidt for the original implementation.
 #' 
 #' @export
-getPass <- function(msg="PASSWORD: ", noblank=FALSE, forcemask=FALSE){
-  if (!is.character(msg) || length(msg) != 1 || is.na(msg)) stop("argument 'msg' must be a single string")
-  if (!is.logical(noblank) || length(noblank) != 1 || is.na(noblank)) stop("argument 'noblank' must be one of 'TRUE' or 'FALSE'")
-  if (!is.logical(forcemask) || length(forcemask) != 1 || is.na(forcemask)) stop("argument 'forcemask' must be one of 'TRUE' or 'FALSE'")
+getPass <- function(msg = "PASSWORD: ", noblank = FALSE, forcemask = FALSE) {
+  if (!is.character(msg) || length(msg) != 1 || is.na(msg)) {
+    stop("argument 'msg' must be a single string")
+  }
+  if (!is.logical(noblank) || length(noblank) != 1 || is.na(noblank)) {
+    stop("argument 'noblank' must be one of 'TRUE' or 'FALSE'")
+  }
+  if (!is.logical(forcemask) || length(forcemask) != 1 || is.na(forcemask)) {
+    stop("argument 'forcemask' must be one of 'TRUE' or 'FALSE'")
+  }
   
-  if (tolower(.Platform$GUI) == "rstudio") pw <- readline_masked_rstudio(msg=msg, noblank=noblank, forcemask=forcemask)
-  else if (isaterm()) pw <- readline_masked_term(msg=msg, showstars=TRUE, noblank=noblank)
-  else if (hastcltk()) pw <- readline_masked_tcltk(msg=msg, noblank=noblank)
-  else if (!forcemask) pw <- readline_nomask(msg, noblank=noblank)
+  if (tolower(.Platform$GUI) == "rstudio") pw <- readline_masked_rstudio(msg = msg, noblank = noblank, forcemask = forcemask)
+  else if (isaterm()) pw <- readline_masked_term(msg = msg, showstars = TRUE, noblank = noblank)
+  else if (hastcltk()) pw <- readline_masked_tcltk(msg = msg, noblank = noblank)
+  else if (!forcemask) pw <- getPass_readline(msg)
   else stop("Masking is not supported on your platform!")
   
   if (is.null(pw)) invisible()
   else pw
+}
+
+getPass_readline <- function(...) {
+  readline(...)
 }
 
 # other functions used in this
@@ -85,6 +95,31 @@ readline_masked_rstudio <- function(msg, forcemask, noblank=FALSE){
     pw <- readline_masked_rstudio_window(msg, forcemask)
   }
   return(pw)
+}
+
+isaterm <- function(){
+  gui <- .Platform$GUI
+  
+  if (!isatty(stdin())) return(FALSE)
+  # ban emacs: here and everywhere else in life
+  else if (Sys.getenv("EMACS") == "t" || identical(getOption("STERM"), "iESS")) return(FALSE)
+  else if (gui == "RTerm" || gui == "X11") return(TRUE)
+  else if (gui == "unknown" && .Platform$OS.type == "unix" && Sys.getenv("RSTUDIO") != 1 && Sys.getenv("R_GUI_APP_VERSION") == "") return(TRUE) # I think?
+  else return(FALSE)
+}
+
+
+
+hastcltk <- function(){
+  test <- tryCatch(requireNamespace("tcltk", quietly=TRUE), warning=identity)
+  if (!is.logical(test)) test <- FALSE
+  test
+}
+
+
+
+os_windows = function(){
+  .Platform$OS.type == tolower("windows")
 }
 
 readline_masked_rstudio_window <- function(msg, forcemask){

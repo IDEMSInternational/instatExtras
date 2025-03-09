@@ -73,31 +73,77 @@ test_that("getPass errors", {
   expect_error(getPass(noblank = "yes"), "argument 'noblank' must be one of 'TRUE' or 'FALSE'")
   expect_error(getPass(forcemask = 1), "argument 'forcemask' must be one of 'TRUE' or 'FALSE'")
 })
-# 
-# # Test readline_masked_tcltk without user interaction
-# test_that("readline_masked_tcltk handles input correctly", {
-#   skip_if_not(requireNamespace("tcltk", quietly = TRUE))
-#   
-#   with_mocked_bindings(
-#     readline_masked_tcltk_window = function(...) "tk_password",
-#     expect_equal(readline_masked_tcltk("Enter password:"), "tk_password")
-#   )
-# })
-# 
-# # Test readline_masked_tcltk without user interaction
-# test_that("readline_masked_tcltk handles input correctly", {
-#   with_mocked_bindings(
-#     readline_masked_tcltk_window = function(...) "tk_password",
-#     expect_equal(readline_masked_tcltk_window("Enter password:"), "tk_password")
-#   )
-# })
-# 
-# # Test readline_nomask without user interaction
-# test_that("readline_nomask handles input correctly", {
-#   local_mocked_bindings(
-#     readline = function(...) "test_password"
-#   )
-#   expect_equal(readline_nomask("Enter password: ", noblank = TRUE), "test_password")
-# })
-# 
-# 
+
+test_that("getPass correctly captures user input", {
+  local_mocked_bindings(
+    getPass_readline = function(...) "my_password"
+  )
+  expect_equal(getPass("Enter password: "), "my_password")
+})
+
+test_that("getPass returns NULL if user cancels input", {
+  local_mocked_bindings(
+    getPass_readline = function(...) NULL
+  )
+  
+  expect_null(getPass("Enter password: "))
+})
+
+test_that("getPass uses Tcl/Tk window when available", {
+  local_mocked_bindings(
+    readline_masked_tcltk_window = function(...) "tcltk_password",
+    hastcltk = function() TRUE
+  )
+
+  expect_equal(getPass("Enter password: "), "tcltk_password")
+})
+
+test_that("getPass works in terminal mode", {
+  local_mocked_bindings(
+    readline_masked_term = function(...) "terminal_password",
+    isaterm = function() TRUE
+  )
+
+  expect_equal(getPass("Enter password: "), "terminal_password")
+})
+
+test_that("getPass stops when masking is required but unsupported", {
+  local_mocked_bindings(
+    isaterm = function() FALSE,
+    hastcltk = function() FALSE
+  )
+
+  expect_error(getPass("Enter password:", forcemask = TRUE), "Masking is not supported")
+})
+
+test_that("get_odk_form_names handles authentication and API request correctly", {
+  
+  # Mock `getPass()` to avoid user input
+  local_mocked_bindings(
+    getPass = function(...) "mock_password",
+    
+    # Mock our custom wrapper function instead of `httr::GET`
+    get_odk_http_get = function(url, auth = NULL) {
+      # Simulated JSON response structure
+      fake_response <- list(
+        list(title = "Form A", id = 1),
+        list(title = "Form B", id = 2)
+      )
+      structure(
+        list(content = fake_response, status_code = 200),
+        class = "response"
+      )
+    },
+    
+    # Mock our custom wrapper function instead of `httr::content`
+    get_odk_http_content = function(response, type) {
+      response$content
+    }
+  )
+  
+  # Test function with mock responses
+  form_names <- get_odk_form_names("mock_user", "kobo")
+  
+  # Expected output
+  expect_equal(form_names, c("Form A", "Form B"))
+})

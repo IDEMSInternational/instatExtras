@@ -115,12 +115,7 @@ view_object_data <- function(object, object_format = NULL) {
 #' }
 #' @export
 view_object <- function(data_book_object) {
-  return(
-    view_object_data(
-      object = data_book_object$object,
-      object_format = data_book_object$object_format
-    )
-  )
+  return(view_object_data(object = data_book_object$object, object_format = data_book_object$object_format))
 }
 
 #' View Graph Object
@@ -145,26 +140,19 @@ view_graph_object <- function(graph_object){
     #TODO. When print command is called in R-Studio, a temp file is automatically created
     #Investigate how that can be done in R-Instat
     #as of 07/09/2022 just return the object. Important for RStudio to display the object
-    if ("grob" %in% object_class_names){
-      #for grob objects draw them first
-      grid::grid.draw(graph_object)
-    }
+    #for grob objects draw them first
+    if ("grob" %in% object_class_names) grid::grid.draw(graph_object)
     return(graph_object)
-  } 
-  
+  }
   
   #get a unique temporary file name from the tempdir path
   file_name <- tempfile(pattern = "viewgraph", fileext = ".png")
   
   #save the object as a graph file depending on the object type
   grDevices::png(file = file_name, width = 4000, height = 4000, res = 500)
-  if ("grob" %in% object_class_names) {
-    grid::grid.draw(graph_object)
-  }else{
-    print(graph_object)
-  }
+  if ("grob" %in% object_class_names) grid::grid.draw(graph_object)
+  else print(graph_object)
   grDevices::dev.off() #todo. use graphics.off() which one is better?
-  
   
   #todo. should we use respective package "convenience" functions to save the objects as image files depending on the class names?
   #investigate if it will help with resolution and scaling?
@@ -306,30 +294,24 @@ process_html_object <- function(html_object) {
 #' }
 #' @export
 check_graph <- function(graph_object){
-  
   out <- graph_object
   
-  if (is.null(out)) {
-    out <- tryCatch({
+  if (is.null(out)) { out <- tryCatch({
       message("Recording plot")
       grDevices::recordPlot()
-    },
-    error = function(cond) {
-      message("Graph object does not exist:")
-      message(cond)
-      # Choose a return value in case of error
-      return(NULL)
-    },
-    warning = function(cond) {
-      message("Warning message:")
-      message(cond)
-      return(NULL)
-    },
-    finally = {
-      message("Plot recorded")
-    })
+      }, error = function(cond) {
+        message("Graph object does not exist:")
+        message(cond)
+        # Choose a return value in case of error
+        return(NULL)
+        },
+      warning = function(cond) {
+        message("Warning message:")
+        message(cond)
+        return(NULL)
+        },
+    finally = { message("Plot recorded") })
   }
-  
   return(out)
 } 
 
@@ -346,8 +328,7 @@ check_graph <- function(graph_object){
 #'   get_vignette("dplyr")
 #' }
 #' @export
-get_vignette <- function (package = NULL, lib.loc = NULL, all = TRUE) 
-{   
+get_vignette <- function (package = NULL, lib.loc = NULL, all = TRUE){   
   oneLink <- function(s) {
     if (length(s) == 0L) 
       return(character(0L))
@@ -382,8 +363,7 @@ get_vignette <- function (package = NULL, lib.loc = NULL, all = TRUE)
                "browseVignettes(all = TRUE)")
   if (port > 0L) 
     css_file <- "/doc/html/R.css"
-  else css_file <- file.path(R.home("doc"), "html", 
-                             "R.css")
+  else css_file <- file.path(R.home("doc"), "html", "R.css")
   cat(sprintf("<!DOCTYPE html PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN'>\n<html>\n<head>\n<title>R Vignettes</title>\n<meta http-equiv='Content-Type' content='text/html; charset=iso-8859-1'>\n<meta name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=yes' />\n<link rel='stylesheet' type='text/css' href='%s'>\n</head><body><div class='container'>\n", 
               css_file))
   
@@ -425,18 +405,14 @@ get_vignette <- function (package = NULL, lib.loc = NULL, all = TRUE)
 getRowHeadersWithText <- function(data, column, searchText, ignore_case = TRUE, use_regex = FALSE, match_entire_cell = FALSE) {
   if (use_regex) {
     # Adjust the search text to match the entire cell if required
-    if (match_entire_cell) {
-      searchText <- paste0("^", searchText, "$")
-    }
+    if (match_entire_cell) searchText <- paste0("^", searchText, "$")
     # Find the rows that match the search text using regex
     matchingRows <- stringr::str_detect(data[[column]], stringr::regex(searchText, ignore_case = ignore_case))
   } else if (is.na(searchText)) {
     matchingRows <- apply(data[, column, drop = FALSE], 1, function(row) any(is.na(row)))
   } else {
     # Adjust the search text to match the entire cell if required
-    if (match_entire_cell) {
-      searchText <- paste0("^", searchText, "$")
-    }
+    if (match_entire_cell) searchText <- paste0("^", searchText, "$")
     # Find the rows that match the search text
     matchingRows <- grepl(searchText, data[[column]], ignore.case = ignore_case, fixed  = TRUE)
   }
@@ -487,49 +463,67 @@ convert_to_list <- function(x) {
 #' @param prompt.prefix A prefix for the prompt. Defaults to an abbreviated version of the topic.
 #' @param run.dontrun Logical indicating whether to run examples marked with `\dontrun`. Defaults to FALSE.
 #' @param run.donttest Logical indicating whether to run examples marked with `\donttest`. Defaults to the value of `interactive()`.
+#'
 #' @return The example code as a character string if `give.lines` is TRUE, otherwise prints the example code.
+#'
 #' @examples
 #' \dontrun{
 #'   getExample("filter", "dplyr")
 #' }
 #' @export
-getExample <- function (topic, package = NULL, lib.loc = NULL, character.only = TRUE, give.lines = FALSE, local = FALSE, echo = TRUE, verbose = getOption("verbose"), setRNG = FALSE, ask = getOption("example.ask"), prompt.prefix = abbreviate(topic, 6), run.dontrun = FALSE, run.donttest = interactive()) {
+getExample <- function(topic, package = NULL, lib.loc = NULL,  character.only = TRUE, 
+    give.lines = FALSE, local = FALSE, echo = TRUE, verbose = getOption("verbose"), 
+    setRNG = FALSE, ask = getOption("example.ask"), prompt.prefix = abbreviate(topic, 6), 
+    run.dontrun = FALSE, run.donttest = interactive()) {
   if (!character.only) {
     topic <- substitute(topic)
-    if (!is.character(topic))
-      topic <- deparse(topic)[1L]
+    if (!is.character(topic)) topic <- deparse(topic)[1L]
   }
+  
   pkgpaths <- find.package(package, lib.loc, verbose = verbose)
   file <- index.search(topic, pkgpaths, firstOnly = TRUE)
+  
   if (!length(file)) {
-    warning(gettextf("no help found for %s", sQuote(topic)),
-            domain = NA)
+    warning(gettextf("No help found for %s", sQuote(topic)), domain = NA)
     return(character())
   }
-  if (verbose)
+  
+  if (verbose) {
     cat("Found file =", sQuote(file), "\n")
+  }
+  
   packagePath <- dirname(dirname(file))
   pkgname <- basename(packagePath)
   lib <- dirname(packagePath)
+  
   tf <- tempfile("Rex")
-  tools::Rd2ex(getHelpFile(file), tf, commentDontrun = !run.dontrun,
-               commentDonttest = !run.donttest)
+  
+  tools::Rd2ex(
+    getHelpFile(file), 
+    tf, 
+    commentDontrun = !run.dontrun,
+    commentDonttest = !run.donttest
+  )
+  
   if (!file.exists(tf)) {
-    if (give.lines)
-      return(character())
-    warning(gettextf("%s has a help file but no examples",
-                     sQuote(topic)), domain = NA)
+    if (give.lines) return(character())
+    warning(gettextf("%s has a help file but no examples", sQuote(topic)), domain = NA)
     return(character())
   }
+  
   on.exit(unlink(tf))
+  
   example_text <- readLines(tf)
   example_text <- paste(example_text, collapse = "\n")
+  
   if (give.lines) {
     return(example_text)
   }
-  if (echo) {
+  
+  if (echo){
     cat(example_text)
   }
+  
   return(example_text)
 }
 
@@ -635,11 +629,8 @@ frac_den <- function(x, den) { paste0(round(x * den), "/", den) }
 #'
 #' @export
 monitor_memory <- function() {
-  if (.Platform$OS.type == "windows") {
-    mem_used <- utils::memory.size()
-  } else {
-    mem_used <- sum(gc()[, "used"]) / 1024
-  }
+  if (.Platform$OS.type == "windows") mem_used <- utils::memory.size()
+  else mem_used <- sum(gc()[, "used"]) / 1024
   return(mem_used)
 }
 
@@ -677,9 +668,7 @@ set_library_paths <- function(version) {
   library_path <- file.path(Sys.getenv("APPDATA"), "R-Instat", version, "library")
   
   # Create the directory if it doesn't exist
-  if (!dir.exists(library_path)) {
-    dir.create(library_path, recursive = TRUE, showWarnings = FALSE)
-  }
+  if (!dir.exists(library_path)) dir.create(library_path, recursive = TRUE, showWarnings = FALSE)
   
   # Update the library paths, setting the new path as the primary one
   .libPaths(c(library_path, .libPaths()))

@@ -1,6 +1,6 @@
 Package: instatExtras
 Title: A set of functions used in R-Instat
-Version: 0.2.21
+Version: 0.2.22
 Authors@R: c(
     person("Danny", "Parsons", , role = "aut"),
     person("Lily", "Clements", , "lily@idems.international", role = c("aut", "cre"),

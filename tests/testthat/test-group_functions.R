@@ -70,6 +70,9 @@ test_that("convert_to_list properly converts character strings to numeric vector
 test_that("getExample retrieves example code", {
   result <- getExample("filter", "dplyr", give.lines = TRUE)
   expect_type(result, "character")
+  
+  result <- getExample("filter", "dplyr", give.lines = TRUE, echo = TRUE)
+  expect_type(result, "character")
 })
 
 test_that("frac10, frac20, frac100, frac_den convert decimals to fractions", {
