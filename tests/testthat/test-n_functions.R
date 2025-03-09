@@ -33,3 +33,55 @@ test_that("Not-in operator works as expected", {
   expect_false("a" %notin% c("a", "b", "c"))
   expect_true("z" %notin% c("a", "b", "c"))
 })
+
+test_that("nc_get_dim_min_max retrieves correct min and max for a valid dimension", {
+  # Mock a NetCDF file structure
+  mock_nc <- list(
+    dim = list(
+      x = list(vals = c(1, 2, 3, 4, 5)), 
+      y = list(vals = c(10, 20, 30, 40, 50))
+    )
+  )
+  
+  # Test min-max retrieval
+  expect_equal(nc_get_dim_min_max(mock_nc, "x"), c(1, 5))
+  expect_equal(nc_get_dim_min_max(mock_nc, "y"), c(10, 50))
+})
+
+test_that("nc_get_dim_min_max throws an error for an invalid dimension", {
+  mock_nc <- list(
+    dim = list(x = list(vals = c(1, 2, 3, 4, 5)))
+  )
+  
+  expect_error(nc_get_dim_min_max(mock_nc, "z"), "z not found in file.")
+})
+
+test_that("nc_get_dim_min_max handles time conversion correctly", {
+  mock_nc <- list(
+    dim = list(time = list(vals = c(0, 1, 2, 3, 4, 5))),
+    att = list(time = list(units = "julian_day"))
+  )
+  
+  local_mocked_bindings(
+    `ncdf4::ncatt_get` = function(nc, dimension, attr) {
+      if (dimension == "time" && attr == "units") {
+        return(list(hasatt = TRUE, value = "julian_day"))
+      } else {
+        return(list(hasatt = FALSE))
+      }
+    }
+  )
+  
+  expect_equal(
+    nc_get_dim_min_max(mock_nc, "time", time_as_date = TRUE),
+    as.character(as.Date(c(0, 5), origin = structure(-2440588, class = "Date")))
+  )
+})
+
+test_that("nc_get_dim_min_max handles missing values correctly", {
+  mock_nc <- list(
+    dim = list(x = list(vals = c(1, 2, NA, 4, 5)))
+  )
+  
+  expect_equal(nc_get_dim_min_max(mock_nc, "x"), c(1, 5))
+})
