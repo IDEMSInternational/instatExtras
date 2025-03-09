@@ -115,3 +115,35 @@ test_that("getPass stops when masking is required but unsupported", {
 
   expect_error(getPass("Enter password:", forcemask = TRUE), "Masking is not supported")
 })
+
+test_that("get_odk_form_names handles authentication and API request correctly", {
+  
+  # Mock `getPass()` to avoid user input
+  local_mocked_bindings(
+    getPass = function(...) "mock_password",
+    
+    # Mock `httr::GET()` to return a fake response
+    httr::GET = function(url, auth = NULL) {
+      # Simulated JSON response structure
+      fake_response <- list(
+        list(title = "Form A", id = 1),
+        list(title = "Form B", id = 2)
+      )
+      structure(
+        list(content = fake_response, status_code = 200),
+        class = "response"
+      )
+    },
+    
+    # Mock `httr::content()` to return our fake response
+    httr::content = function(response, type) {
+      response$content
+    }
+  )
+  
+  # Test function with mock responses
+  form_names <- get_odk_form_names("mock_user", "kobo")
+  
+  # Expected output
+  expect_equal(form_names, c("Form A", "Form B"))
+})
