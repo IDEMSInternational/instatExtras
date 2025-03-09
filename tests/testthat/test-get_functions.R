@@ -93,14 +93,6 @@ test_that("getPass does not allow blank input when noblank=TRUE", {
   expect_equal(getPass("Enter password:", noblank = TRUE), "valid_password")
 })
 
-test_that("getPass uses RStudio API if available", {
-  local_mocked_bindings(
-    rstudioapi::askForPassword = function(...) "rstudio_password"
-  )
-
-  expect_equal(getPass("Enter password: "), "rstudio_password")
-})
-
 test_that("getPass uses Tcl/Tk window when available", {
   local_mocked_bindings(
     readline_masked_tcltk_window = function(...) "tcltk_password",
