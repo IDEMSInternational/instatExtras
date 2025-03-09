@@ -59,83 +59,61 @@
 #' 
 #' @export
 getPass <- function(msg="PASSWORD: ", noblank=FALSE, forcemask=FALSE){
-  if (!is.character(msg) || length(msg) != 1 || is.na(msg))
-    stop("argument 'msg' must be a single string")
-  if (!is.logical(noblank) || length(noblank) != 1 || is.na(noblank))
-    stop("argument 'noblank' must be one of 'TRUE' or 'FALSE'")
-  if (!is.logical(forcemask) || length(forcemask) != 1 || is.na(forcemask))
-    stop("argument 'forcemask' must be one of 'TRUE' or 'FALSE'")
+  if (!is.character(msg) || length(msg) != 1 || is.na(msg)) stop("argument 'msg' must be a single string")
+  if (!is.logical(noblank) || length(noblank) != 1 || is.na(noblank)) stop("argument 'noblank' must be one of 'TRUE' or 'FALSE'")
+  if (!is.logical(forcemask) || length(forcemask) != 1 || is.na(forcemask)) stop("argument 'forcemask' must be one of 'TRUE' or 'FALSE'")
   
-  if (tolower(.Platform$GUI) == "rstudio")
-    pw <- readline_masked_rstudio(msg=msg, noblank=noblank, forcemask=forcemask)
-  else if (isaterm())
-    pw <- readline_masked_term(msg=msg, showstars=TRUE, noblank=noblank)
-  else if (hastcltk())
-    pw <- readline_masked_tcltk(msg=msg, noblank=noblank)
-  else if (!forcemask)
-    pw <- readline_nomask(msg, noblank=noblank)
-  else
-    stop("Masking is not supported on your platform!")
+  if (tolower(.Platform$GUI) == "rstudio") pw <- readline_masked_rstudio(msg=msg, noblank=noblank, forcemask=forcemask)
+  else if (isaterm()) pw <- readline_masked_term(msg=msg, showstars=TRUE, noblank=noblank)
+  else if (hastcltk()) pw <- readline_masked_tcltk(msg=msg, noblank=noblank)
+  else if (!forcemask) pw <- readline_nomask(msg, noblank=noblank)
+  else stop("Masking is not supported on your platform!")
   
-  if (is.null(pw))
-    invisible()
-  else
-    pw
+  if (is.null(pw)) invisible()
+  else pw
 }
 
 # other functions used in this
 readline_masked_rstudio <- function(msg, forcemask, noblank=FALSE){
-  if (noblank)
-  {
-    while (TRUE)
-    {
+  if (noblank){
+    while (TRUE){
       pw <- readline_masked_rstudio_window(msg, forcemask)
       if (is.null(pw) || pw != "")
         break
     }
-  }
-  else
+  } else{
     pw <- readline_masked_rstudio_window(msg, forcemask)
-  pw
+  }
+  return(pw)
 }
 
-readline_masked_rstudio_window <- function(msg, forcemask)
-{
-  if (!rstudioapi::hasFun("askForPassword"))
-  {
+readline_masked_rstudio_window <- function(msg, forcemask){
+  if (!rstudioapi::hasFun("askForPassword")){
     stopmsg <- "Masked input is not supported in your version of RStudio; please update to version >= 0.99.879"
-    if (!forcemask)
-    {
+    if (!forcemask){
       message(paste0("NOTE: ", stopmsg, "\n"))
       pw <- readline_nomask(msg, silent=TRUE)
-    }
-    else
+    } else {
       stop(stopmsg)
-  }
-  else
+    }
+  } else {
     pw <- rstudioapi::askForPassword(msg)
-  
-  pw
+  }
+  return(pw)
 }
 
 
 readline_nomask <- function(msg, noblank, silent=FALSE){
-  if (!silent)
-    message("WARNING: your platform is not supported. Input is not masked!")
-  
+  if (!silent) message("WARNING: your platform is not supported. Input is not masked!")
   message(msg, appendLF=FALSE)
   pw <- readline()
-  while (interactive() && isTRUE(noblank) && pw == "")
-  {
+  while (interactive() && isTRUE(noblank) && pw == "") {
     message("No blank input, please!", appendLF=FALSE)
     pw <- readline()
   }
-  
-  pw
+  return(pw)
 }
 
-
-#' @importFrom utils flush.console
 readline_masked_tcltk <- function(msg, noblank=FALSE){
   msg.console <- "Please enter password in TK window (Alt+Tab)\n"
   cat(msg.console)
@@ -145,33 +123,24 @@ readline_masked_tcltk <- function(msg, noblank=FALSE){
 
 readline_masked_tcltk_window <- function(msg, noblank=FALSE){
   # Add noblank to msg
-  if (noblank)
-    msg <- paste0(msg, "\n(no blank)")
+  if (noblank) msg <- paste0(msg, "\n(no blank)")
   
   # Define event actions
   # (This should be in this function because window "tt" is local.)
-  tcreset <- function()
-  {
-    tcltk::tclvalue(pwdvar) <- ""
-  }
+  tcreset <- function(){ tcltk::tclvalue(pwdvar) <- "" }
   
-  tcsubmit <- function()
-  {
-    if (noblank && tcltk::tclvalue(pwdvar) == "")
-    {
+  tcsubmit <- function(){
+    if (noblank && tcltk::tclvalue(pwdvar) == ""){
       tcltk::tkmessageBox(title = "getPass noblank = TRUE",
                           message = "No blank input please!",
                           parent = textbox)
-    }
-    else
-    {
+    } else {
       tcltk::tclvalue(flagvar) <- 1
       tcltk::tkdestroy(tt)
     }
   }
   
-  tccleanup <- function()
-  {
+  tccleanup <- function(){
     tcltk::tclvalue(flagvar) <- 0
     tcltk::tkdestroy(tt)
   }
@@ -191,10 +160,8 @@ readline_masked_tcltk_window <- function(msg, noblank=FALSE){
   textbox <- tcltk::tkentry(f1, textvariable = pwdvar, show = "*")
   tcltk::tkpack(textbox, side = "left")
   tcltk::tkbind(textbox, "<Return>", tcsubmit)
-  if (.Platform$OS.type == "windows")
-    tcltk::tkbind(textbox, "<Escape>", tccleanup)
-  else
-    tcltk::tkbind(textbox, "<Control-c>", tccleanup)
+  if (.Platform$OS.type == "windows") tcltk::tkbind(textbox, "<Escape>", tccleanup)
+  else tcltk::tkbind(textbox, "<Control-c>", tccleanup)
   
   # Buttons for submit and reset
   reset.but <- tcltk::tkbutton(f1, text = "Reset", command = tcreset)
@@ -214,8 +181,7 @@ readline_masked_tcltk_window <- function(msg, noblank=FALSE){
   
   # Check for return
   flag <- tcltk::tclvalue(flagvar)
-  if (flag == 0)
-    pw <- NULL
+  if (flag == 0) pw <- NULL
   
   return(pw)
 }

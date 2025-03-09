@@ -63,3 +63,41 @@ test_that("get_years_from_data extracts correct years", {
   result <- get_years_from_data(mock_data)
   expect_equal(rownames(result), c("Age", "X2019", "X2020", "X2021"))
 })
+
+# For getPass
+test_that("getPass errors", {
+  expect_error(getPass(1:5))
+  expect_error(getPass(msg = "Hello", noblank = 1:5))
+  expect_error(getPass(msg = "Hello", forcemask = 1:5))
+  expect_error(getPass(msg = NULL), "argument 'msg' must be a single string")
+  expect_error(getPass(noblank = "yes"), "argument 'noblank' must be one of 'TRUE' or 'FALSE'")
+  expect_error(getPass(forcemask = 1), "argument 'forcemask' must be one of 'TRUE' or 'FALSE'")
+})
+# 
+# # Test readline_masked_tcltk without user interaction
+# test_that("readline_masked_tcltk handles input correctly", {
+#   skip_if_not(requireNamespace("tcltk", quietly = TRUE))
+#   
+#   with_mocked_bindings(
+#     readline_masked_tcltk_window = function(...) "tk_password",
+#     expect_equal(readline_masked_tcltk("Enter password:"), "tk_password")
+#   )
+# })
+# 
+# # Test readline_masked_tcltk without user interaction
+# test_that("readline_masked_tcltk handles input correctly", {
+#   with_mocked_bindings(
+#     readline_masked_tcltk_window = function(...) "tk_password",
+#     expect_equal(readline_masked_tcltk_window("Enter password:"), "tk_password")
+#   )
+# })
+# 
+# # Test readline_nomask without user interaction
+# test_that("readline_nomask handles input correctly", {
+#   local_mocked_bindings(
+#     readline = function(...) "test_password"
+#   )
+#   expect_equal(readline_nomask("Enter password: ", noblank = TRUE), "test_password")
+# })
+# 
+# 

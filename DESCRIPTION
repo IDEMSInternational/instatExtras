@@ -43,5 +43,6 @@ Imports:
   tidyr,
   tidyselect
 Suggests: 
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    mockr
 Config/testthat/edition: 3

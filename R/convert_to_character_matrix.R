@@ -25,11 +25,13 @@ convert_to_character_matrix <- function(data, format_decimal_places = TRUE, deci
   if(nrow(data) == 0) {
     out <- matrix(nrow = 0, ncol = ncol(data))
     colnames(out) <- colnames(data)
-  }
-  else {
+  } else {
     out = matrix(nrow = nrow(data), ncol = ncol(data))
-    if(!format_decimal_places) decimal_places=rep(NA, ncol(data))
-    else if(missing(decimal_places)) decimal_places = sapply(data, instatExtras::get_default_significant_figures)
+    if(!format_decimal_places){
+      decimal_places=rep(NA, ncol(data)) 
+    } else if(missing(decimal_places)){
+      decimal_places = sapply(data, instatExtras::get_default_significant_figures)
+    } 
     i = 1
     for (curr_col in colnames(data)) {
       #if its a geometry list-column then convert to text using sf package.
@@ -51,6 +53,8 @@ convert_to_character_matrix <- function(data, format_decimal_places = TRUE, deci
     colnames(out) <- colnames(data)
     rownames(out) <- rownames(data)
   }
-  if(return_data_frame) out <- data.frame(out, stringsAsFactors = FALSE, check.names = check.names)
+  if(return_data_frame){
+    out <- data.frame(out, stringsAsFactors = FALSE, check.names = check.names)
+  } 
   return(out)
 }
