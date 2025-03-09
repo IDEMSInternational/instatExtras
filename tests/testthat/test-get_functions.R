@@ -84,13 +84,21 @@ test_that("getPass correctly captures user input", {
 test_that("getPass does not allow blank input when noblank=TRUE", {
   counter <- 0
   local_mocked_bindings(
-    readline = function(...) {
+    getPass_readline = function(...) {
       counter <<- counter + 1
       if (counter == 1) return("") else return("valid_password")
     }
   )
 
   expect_equal(getPass("Enter password:", noblank = TRUE), "valid_password")
+})
+
+test_that("getPass returns NULL if user cancels input", {
+  local_mocked_bindings(
+    getPass_readline = function(...) NULL
+  )
+  
+  expect_null(getPass("Enter password: "))
 })
 
 test_that("getPass uses Tcl/Tk window when available", {
@@ -119,14 +127,6 @@ test_that("getPass works in terminal mode", {
   )
 
   expect_equal(getPass("Enter password: "), "terminal_password")
-})
-
-test_that("getPass returns NULL if user cancels input", {
-  local_mocked_bindings(
-    readline = function(...) NULL
-  )
-
-  expect_null(getPass("Enter password: "))
 })
 
 test_that("getPass stops when masking is required but unsupported", {
