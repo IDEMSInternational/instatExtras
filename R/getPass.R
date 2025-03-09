@@ -97,13 +97,29 @@ readline_masked_rstudio <- function(msg, forcemask, noblank=FALSE){
   return(pw)
 }
 
-isaterm <- function() {
-  # This function checks if R is running in an interactive terminal.
-  interactive() && (Sys.getenv("TERM") != "")
+isaterm <- function(){
+  gui <- .Platform$GUI
+  
+  if (!isatty(stdin())) return(FALSE)
+  # ban emacs: here and everywhere else in life
+  else if (Sys.getenv("EMACS") == "t" || identical(getOption("STERM"), "iESS")) return(FALSE)
+  else if (gui == "RTerm" || gui == "X11") return(TRUE)
+  else if (gui == "unknown" && .Platform$OS.type == "unix" && Sys.getenv("RSTUDIO") != 1 && Sys.getenv("R_GUI_APP_VERSION") == "") return(TRUE) # I think?
+  else return(FALSE)
 }
 
-hastcltk <- function() {
-  requireNamespace("tcltk", quietly = TRUE) && capabilities("tcltk")
+
+
+hastcltk <- function(){
+  test <- tryCatch(requireNamespace("tcltk", quietly=TRUE), warning=identity)
+  if (!is.logical(test)) test <- FALSE
+  test
+}
+
+
+
+os_windows = function(){
+  .Platform$OS.type == tolower("windows")
 }
 
 readline_masked_rstudio_window <- function(msg, forcemask){
