@@ -158,3 +158,41 @@ test_that("multiple_nc_as_data_frame handles empty directory", {
   
   expect_equal(nrow(result), 0)  # Should return an empty data frame
 })
+
+test_that("nc_get_dim_min_max correctly converts time when time_as_date is TRUE", {
+  local_mocked_bindings(
+    # Mock NetCDF axes to mark "time" as a time dimension
+    get_nc_dim_axes = function(nc) list(time = "T"),
+    
+    # Mock NetCDF attribute function to return time units as "julian_day"
+    get_nc_attribute = function(nc, dimension, attr) {
+      if (dimension == "time" && attr == "units") {
+        return(list(hasatt = TRUE, value = "julian_day"))
+      } else {
+        return(list(hasatt = FALSE))
+      }
+    },
+    
+    # Mock NetCDF time series retrieval
+    get_nc_time_series = function(nc, time.dim.name) {
+      c(0, 1, 2, 3, 4, 5)  # Simulating 6 days from origin
+    },
+    
+    # Mock PCICt time conversion
+    convert_pcict_to_posixct = function(pcict_time) {
+      as.POSIXct("2000-01-01") + (pcict_time * 86400)  # Convert days to POSIXct time
+    }
+  )
+  
+  # Fake NetCDF structure
+  mock_nc <- list(
+    dim = list(time = list(vals = c(0, 1, 2, 3, 4, 5)))  # Simulated time values
+  )
+  
+  result <- nc_get_dim_min_max(mock_nc, "time", time_as_date = TRUE)
+  
+  # Expected output: min and max dates converted from Julian
+  expected_dates <- as.character(as.Date(c(0, 5), origin = structure(-2440588, class = "Date")))
+  
+  expect_equal(result, expected_dates)  # Ensures conversion works correctly
+})
