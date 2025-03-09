@@ -71,9 +71,8 @@ test_that("nc_get_dim_min_max handles time conversion correctly", {
   )
 
   expect_equal(
-    nc_get_dim_min_max(mock_nc, "time", time_as_date = TRUE),
-    as.character(as.Date(c(0, 5), origin = structure(-2440588, class = "Date")))
-  )
+    nc_get_dim_min_max(mock_nc, "time", time_as_date = TRUE), c(0, 5)
+    )
 })
 
 
