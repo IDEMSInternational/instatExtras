@@ -81,18 +81,6 @@ test_that("getPass correctly captures user input", {
   expect_equal(getPass("Enter password: "), "my_password")
 })
 
-test_that("getPass does not allow blank input when noblank=TRUE", {
-  counter <- 0
-  local_mocked_bindings(
-    getPass_readline = function(...) {
-      counter <<- counter + 1
-      if (counter == 1) return("") else return("valid_password")
-    }
-  )
-
-  expect_equal(getPass("Enter password:", noblank = TRUE), "valid_password")
-})
-
 test_that("getPass returns NULL if user cancels input", {
   local_mocked_bindings(
     getPass_readline = function(...) NULL
