@@ -123,7 +123,7 @@ test_that("get_odk_form_names handles authentication and API request correctly",
     getPass = function(...) "mock_password",
     
     # Mock `httr::GET()` to return a fake response
-    httr::GET = function(url, auth = NULL) {
+    `httr::GET` = function(url, auth = NULL) {
       # Simulated JSON response structure
       fake_response <- list(
         list(title = "Form A", id = 1),
@@ -136,7 +136,7 @@ test_that("get_odk_form_names handles authentication and API request correctly",
     },
     
     # Mock `httr::content()` to return our fake response
-    httr::content = function(response, type) {
+    `httr::content` = function(response, type) {
       response$content
     }
   )
