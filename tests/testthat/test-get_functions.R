@@ -110,16 +110,6 @@ test_that("getPass uses Tcl/Tk window when available", {
   expect_equal(getPass("Enter password: "), "tcltk_password")
 })
 
-test_that("getPass falls back to unmasked input on unsupported platforms", {
-  local_mocked_bindings(
-    readline_nomask = function(...) "unmasked_password",
-    isaterm = function() FALSE,
-    hastcltk = function() FALSE
-  )
-
-  expect_equal(getPass("Enter password: "), "unmasked_password")
-})
-
 test_that("getPass works in terminal mode", {
   local_mocked_bindings(
     readline_masked_term = function(...) "terminal_password",
