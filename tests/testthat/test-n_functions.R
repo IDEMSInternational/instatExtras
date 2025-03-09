@@ -148,3 +148,13 @@ test_that("nc_as_data_frame correctly filters by boundary", {
   
   expect_equal(nrow(result), 3)  # Should contain only x=2 and x=3
 })
+
+test_that("multiple_nc_as_data_frame handles empty directory", {
+  local_mocked_bindings(
+    list_nc_files = function(path) character(0)
+  )
+  
+  result <- multiple_nc_as_data_frame("mock_path", vars = c("var1"))
+  
+  expect_equal(nrow(result), 0)  # Should return an empty data frame
+})

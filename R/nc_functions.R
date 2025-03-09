@@ -312,17 +312,17 @@ nc_as_data_frame <- function(nc, vars, keep_raw_time = TRUE, include_metadata = 
 #' #         great_circle_dist = FALSE, id = "station_id")
 #' 
 multiple_nc_as_data_frame <- function(path, vars, keep_raw_time = TRUE, include_metadata = TRUE, boundary = NULL, lon_points = NULL, lat_points = NULL, id_points = NULL, show_requested_points = TRUE, great_circle_dist = TRUE, id = "id") {
-  filepaths <- list.files(path = path, pattern="*\\.nc", full.names = TRUE)
+  filepaths <- list_nc_files(path = path)
   filenames <- basename(filepaths)
   nc_list <- list()
   n_files <- length(filepaths)
   is_win <- Sys.info()['sysname'] == "Windows"
   if (is_win) pb <- utils::winProgressBar(title = "Reading files", min = 0, max = n_files)
   for(i in seq_along(filepaths)) {
-    nc <- ncdf4::nc_open(filename = filepaths[i])
+    nc <- open_nc_file(filename = filepaths[i])
     dat <- nc_as_data_frame(nc = nc, vars = vars, keep_raw_time = keep_raw_time, include_metadata = include_metadata, boundary = boundary, lon_points = lon_points, lat_points = lat_points, id_points = id_points, show_requested_points = show_requested_points, great_circle_dist = great_circle_dist)
     nc_list[[length(nc_list) + 1]] <- dat
-    ncdf4::nc_close(nc)
+    close_nc_file(nc)
     info <- paste0("Reading file ", i, " of ", n_files, " - ", round(100*i/n_files), "%")
     if (is_win) utils::setWinProgressBar(pb, value = i, title = info, label = info)
   }
@@ -359,4 +359,24 @@ get_nc_dim_axes <- function(nc, var) {
 # Wrapper for getting variable values
 get_ncvar_values <- function(nc, var, start, count) {
   ncdf4::ncvar_get(nc, var, start, count)
+}
+
+# Wrapper for listing NetCDF files
+list_nc_files <- function(path) {
+  list.files(path = path, pattern = "*\\.nc", full.names = TRUE)
+}
+
+# Wrapper for opening NetCDF files
+open_nc_file <- function(filename) {
+  ncdf4::nc_open(filename)
+}
+
+# Wrapper for closing NetCDF files
+close_nc_file <- function(nc) {
+  ncdf4::nc_close(nc)
+}
+
+# Wrapper for processing an individual NetCDF file
+process_nc_file <- function(nc, vars, keep_raw_time, include_metadata, boundary, lon_points, lat_points, id_points, show_requested_points, great_circle_dist) {
+  nc_as_data_frame(nc, vars, keep_raw_time, include_metadata, boundary, lon_points, lat_points, id_points, show_requested_points, great_circle_dist)
 }
