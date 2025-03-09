@@ -92,7 +92,7 @@ nc_as_data_frame <- function(nc, vars, keep_raw_time = TRUE, include_metadata = 
   for(dim_name in dim_names) {
     #why no wrapper for this in ncdf4.helper?
     #(as.numeric ensures vectors no not have array class)
-    dim_values[[dim_name]] <- as.numeric(get_nc_dim_values)
+    dim_values[[dim_name]] <- as.numeric(get_nc_dim_values(nc, dim_name))
     #This is not recommended but appears in tutorials
     #get_ncvar_values(nc, dim_name)
   }
