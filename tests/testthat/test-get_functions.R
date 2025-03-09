@@ -122,8 +122,8 @@ test_that("get_odk_form_names handles authentication and API request correctly",
   local_mocked_bindings(
     getPass = function(...) "mock_password",
     
-    # Mock `httr::GET()` to return a fake response
-    `httr::GET` = function(url, auth = NULL) {
+    # Mock our custom wrapper function instead of `httr::GET`
+    get_odk_http_get = function(url, auth = NULL) {
       # Simulated JSON response structure
       fake_response <- list(
         list(title = "Form A", id = 1),
@@ -135,8 +135,8 @@ test_that("get_odk_form_names handles authentication and API request correctly",
       )
     },
     
-    # Mock `httr::content()` to return our fake response
-    `httr::content` = function(response, type) {
+    # Mock our custom wrapper function instead of `httr::content`
+    get_odk_http_content = function(response, type) {
       response$content
     }
   )

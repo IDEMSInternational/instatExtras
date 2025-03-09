@@ -22,25 +22,37 @@
 #' 
 #'  
 get_odk_form_names = function(username, platform) {
-  #TODO This should not be repeated
-  if(platform == "kobo") {
+  if (platform == "kobo") {
     url <- "https://kc.kobotoolbox.org/api/v1/data"
-  }
-  else if(platform == "ona") {
+  } else if (platform == "ona") {
     url <- "https://api.ona.io/api/v1/data"
+  } else {
+    stop("Unrecognised platform.")
   }
-  else stop("Unrecognised platform.")
+  
   password <- getPass(paste0(username, " password:"))
-  if(!missing(username) && !missing(password)) {
+  
+  if (!missing(username) && !missing(password)) {
     has_authentication <- TRUE
     user <- httr::authenticate(username, password)
-    odk_data <- httr::GET(url, user)
-  }
-  else {
+    odk_data <- get_odk_http_get(url, user)  # Use wrapper function
+  } else {
     has_authentication <- FALSE
-    odk_data <- httr::GET(url)
+    odk_data <- get_odk_http_get(url)  # Use wrapper function
   }
-  forms <- httr::content(odk_data, "parse")
+  
+  forms <- get_odk_http_content(odk_data, "parse")  # Use wrapper function
   form_names <- sapply(forms, function(x) x$title)
+  
   return(form_names)
+}
+
+# Wrapper function for `httr::GET`
+get_odk_http_get <- function(url, auth = NULL) {
+  httr::GET(url, auth)
+}
+
+# Wrapper function for `httr::content`
+get_odk_http_content <- function(response, type) {
+  httr::content(response, type)
 }
