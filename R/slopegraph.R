@@ -99,33 +99,27 @@ slopegraph <- function(data, x, y, colour, data_label = NULL,
   if (is.null(argList$data_label)) {
     Ndata_label <- deparse(substitute(y))
     data_label <- argList$y
-  }
-  else {
+  } else {
     Ndata_label <- deparse(substitute(data_label))
   }
   Ndata <- argList$data
-  if (!methods::is(data, "data.frame")) {
-    stop(paste0("'", Ndata, "' does not appear to be a data frame"))
-  }
+  if (!methods::is(data, "data.frame")) stop(paste0("'", Ndata, "' does not appear to be a data frame"))
   if (!Nx %in% names(data)) {
-    stop(paste0("'", Nx, "' is not the name of a variable in the dataframe"), 
-         call. = FALSE)
+    stop(paste0("'", Nx, "' is not the name of a variable in the dataframe"), call. = FALSE)
   }
   if (anyNA(data[[Nx]])) {
     stop(paste0("'", Nx, "' can not have missing data please remove those rows"), 
          call. = FALSE)
   }
   if (!Ny %in% names(data)) {
-    stop(paste0("'", Ny, "' is not the name of a variable in the dataframe"), 
-         call. = FALSE)
+    stop(paste0("'", Ny, "' is not the name of a variable in the dataframe"), call. = FALSE)
   }
   if (!Ncolour %in% names(data)) {
     stop(paste0("'", Ncolour, "' is not the name of a variable in the dataframe"), 
          call. = FALSE)
   }
   if (!Ndata_label %in% names(data)) {
-    stop(paste0("'", Ndata_label, "' is not the name of a variable in the dataframe"), 
-         call. = FALSE)
+    stop(paste0("'", Ndata_label, "' is not the name of a variable in the dataframe"), call. = FALSE)
   }
   if (anyNA(data[[Ncolour]])) {
     stop(paste0("'", Ncolour, "' can not have missing data please remove those rows"), 
@@ -142,11 +136,8 @@ slopegraph <- function(data, x, y, colour, data_label = NULL,
                        "' to an ordered factor\n"))
         data[[Nx]] <- factor(data[[Nx]], 
                              ordered = TRUE)
-      }
-      else {
-        stop(paste0("Variable '", 
-                    Nx, "' needs to be of class character, factor or ordered"), 
-             call. = FALSE)
+      } else {
+        stop(paste0("Variable '", Nx, "' needs to be of class character, factor or ordered"), call. = FALSE)
       }
     }
   }
@@ -157,47 +148,47 @@ slopegraph <- function(data, x, y, colour, data_label = NULL,
   NumbOfLevels <- nlevels(factor(data[[Nx]]))
   if (length(line_colour) > 1) {
     if (length(line_colour) < length(unique(data[[Ncolour]]))) {
-      message(paste0("\nGiven ", length(line_colour), 
-                     " colours. Recycling colours because there are ", 
-                     length(unique(data[[Ncolour]])), " ", 
-                     Ncolour, "s\n"))
+      message(paste0("\nGiven ", length(line_colour), " colours. Recycling colours because there are ", length(unique(data[[Ncolour]])), " ", Ncolour, "s\n"))
       line_colour <- rep(line_colour, length.out = length(unique(data[[Ncolour]])))
     }
-    LineGeom <- list(ggplot2::geom_line(ggplot2::aes(colour = {{colour}}), size = line_thickness), 
+    LineGeom <- list(ggplot2::geom_line(ggplot2::aes(colour = {{colour}}), linewidth = line_thickness), 
                      ggplot2::scale_colour_manual(values = line_colour))
   }
   else {
     if (line_colour == "ByGroup") {
       LineGeom <- list(ggplot2::geom_line(ggplot2::aes(colour = {{colour}}, 
-                                                       alpha = 1), size = line_thickness))
+                                                       alpha = 1), linewidth = line_thickness))
     }
     else {
-      LineGeom <- list(ggplot2::geom_line(ggplot2::aes_(), size = line_thickness, 
+      LineGeom <- list(ggplot2::geom_line(ggplot2::aes_(), linewidth = line_thickness, 
                                           colour = line_colour))
     }
   }
   if (anyNA(data[[Ny]])) {
-    if (remove_missing) {
-      data <- data %>% dplyr::group_by({{colour}}) %>% 
-        dplyr::filter(!anyNA({{y}})) %>% droplevels()
-    }
-    else {
-      data <- data %>% dplyr::filter(!is.na({{y}}))
-    }
+    if (remove_missing) data <- data %>% dplyr::group_by({{colour}}) %>% dplyr::filter(!anyNA({{y}})) %>% droplevels()
+    else data <- data %>% dplyr::filter(!is.na({{y}}))
   }
   data %>% ggplot2::ggplot(ggplot2::aes(group = {{colour}}, y = {{y}}, x = {{x}})) +
     LineGeom +
     # note: this may conflict with other label in R, in which case we need to rewrite this
-    ggrepel::geom_text_repel(data = . %>% dplyr::filter({{x}} == min({{x}})), ggplot2::aes(label = {{colour}}),
-                             hjust = "left", box.padding = 0.1, point.padding = 0.1, 
-                             segment.colour = "gray", segment.alpha = 0.6, fontface = "bold", 
-                             size = y_text_size, nudge_x = -1.95, direction = "y", 
-                             force = 0.5, max.iter = 3000) +
-    ggrepel::geom_text_repel(data = . %>% dplyr::filter({{x}} == max({{x}})), ggplot2::aes(label = {{colour}}),
-                             hjust = "right", box.padding = 0.1, point.padding = 0.1, 
-                             segment.colour = "gray", segment.alpha = 0.6, fontface = "bold", 
-                             size = y_text_size, nudge_x = 1.95, direction = "y",
-                             force = 0.5, max.iter = 3000) +
-    ggplot2::geom_label(ggplot2::aes_string(label = Ndata_label), size = data_text_size, label.padding = ggplot2::unit(data_label_padding, "lines"),
-                        label.size = data_label_line_size, colour = data_text_colour, fill = data_label_fill_colour)
+    ggrepel::geom_text_repel(data = . %>% dplyr::filter({{x}} == min({{x}})),
+                             ggplot2::aes(label = {{colour}}), hjust = "left",
+                             box.padding = 0.1, point.padding = 0.1, 
+                             segment.colour = "gray", segment.alpha = 0.6, 
+                             fontface = "bold", size = y_text_size,
+                             nudge_x = -1.95, direction = "y", force = 0.5,
+                             max.iter = 3000) +
+    ggrepel::geom_text_repel(data = . %>% dplyr::filter({{x}} == max({{x}})), 
+                             ggplot2::aes(label = {{colour}}), hjust = "right", 
+                             box.padding = 0.1, point.padding = 0.1, 
+                             segment.colour = "gray", segment.alpha = 0.6,
+                             fontface = "bold", size = y_text_size,
+                             nudge_x = 1.95, direction = "y", force = 0.5,
+                             max.iter = 3000) +
+    ggplot2::geom_label(ggplot2::aes(label = !!rlang::sym(Ndata_label)), 
+                        size = data_text_size, 
+                        label.padding = ggplot2::unit(data_label_padding, "lines"),
+                        label.size = data_label_line_size, 
+                        colour = data_text_colour, 
+                        fill = data_label_fill_colour)
 }
