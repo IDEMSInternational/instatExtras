@@ -137,7 +137,10 @@ test_that("nc_as_data_frame correctly filters by boundary", {
     get_nc_variable_list = function(nc) c("var1"),
     get_nc_dim_names = function(nc, var) c("x"),
     get_nc_dim_values = function(nc, dim_name) c(1, 2, 3),
-    get_ncvar_values = function(nc, var, start, count) c(10, 20, 30)
+    get_ncvar_values = function(nc, var, start, count) c(10, 20, 30),
+    get_nc_attribute = function(nc, var) {
+      list(unit = "degrees")  # Fake metadata response
+    }
   )
   
   boundary <- list(x = c(2, 3))
