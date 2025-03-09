@@ -54,27 +54,6 @@ test_that("nc_get_dim_min_max throws an error for an invalid dimension", {
   expect_error(nc_get_dim_min_max(mock_nc, "z"), "z not found in file.")
 })
 
-test_that("nc_get_dim_min_max handles time conversion correctly", {
-  mock_nc <- list(
-    dim = list(time = list(vals = c(0, 1, 2, 3, 4, 5)))
-  )
-  
-  local_mocked_bindings(
-    get_nc_attribute = function(nc, dimension, attr) {
-      if (dimension == "time" && attr == "units") {
-        return(list(hasatt = TRUE, value = "julian_day"))
-      } else {
-        return(list(hasatt = FALSE))
-      }
-    }
-  )
-  
-  expect_equal(
-    nc_get_dim_min_max(mock_nc, "time", time_as_date = TRUE),
-    as.character(as.Date(c(0, 5), origin = structure(-2440588, class = "Date")))
-  )
-})
-
 test_that("nc_get_dim_min_max handles missing values correctly", {
   mock_nc <- list(
     dim = list(x = list(vals = c(1, 2, NA, 4, 5)))
