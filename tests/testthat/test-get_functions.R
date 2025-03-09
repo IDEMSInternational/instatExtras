@@ -76,10 +76,11 @@ test_that("getPass errors", {
 
 test_that("getPass correctly captures user input", {
   local_mocked_bindings(
-    readline = function(...) "my_password"
+    getPass_readline = function(...) "my_password"
   )
   expect_equal(getPass("Enter password: "), "my_password")
 })
+
 
 # test_that("getPass does not allow blank input when noblank=TRUE", {
 #   counter <- 0
