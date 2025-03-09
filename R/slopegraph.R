@@ -105,21 +105,24 @@ slopegraph <- function(data, x, y, colour, data_label = NULL,
   Ndata <- argList$data
   if (!methods::is(data, "data.frame")) stop(paste0("'", Ndata, "' does not appear to be a data frame"))
   if (!Nx %in% names(data)) {
-    stop(paste0("'", Nx, "' is not the name of a variable in the dataframe"), call. = FALSE)
+    stop(paste0("'", Nx, "' is not the name of a variable in the dataframe"), 
+         call. = FALSE)
   }
   if (anyNA(data[[Nx]])) {
     stop(paste0("'", Nx, "' can not have missing data please remove those rows"), 
          call. = FALSE)
   }
   if (!Ny %in% names(data)) {
-    stop(paste0("'", Ny, "' is not the name of a variable in the dataframe"), call. = FALSE)
+    stop(paste0("'", Ny, "' is not the name of a variable in the dataframe"), 
+         call. = FALSE)
   }
   if (!Ncolour %in% names(data)) {
     stop(paste0("'", Ncolour, "' is not the name of a variable in the dataframe"), 
          call. = FALSE)
   }
   if (!Ndata_label %in% names(data)) {
-    stop(paste0("'", Ndata_label, "' is not the name of a variable in the dataframe"), call. = FALSE)
+    stop(paste0("'", Ndata_label, "' is not the name of a variable in the dataframe"), 
+         call. = FALSE)
   }
   if (anyNA(data[[Ncolour]])) {
     stop(paste0("'", Ncolour, "' can not have missing data please remove those rows"), 
