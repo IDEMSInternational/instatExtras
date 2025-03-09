@@ -93,55 +93,55 @@ test_that("getPass does not allow blank input when noblank=TRUE", {
   expect_equal(getPass("Enter password:", noblank = TRUE), "valid_password")
 })
 
-# test_that("getPass uses RStudio API if available", {
-#   local_mocked_bindings(
-#     rstudioapi::askForPassword = function(...) "rstudio_password"
-#   )
-#
-#   expect_equal(getPass("Enter password: "), "rstudio_password")
-# })
-#
-# test_that("getPass uses Tcl/Tk window when available", {
-#   local_mocked_bindings(
-#     readline_masked_tcltk_window = function(...) "tcltk_password",
-#     hastcltk = function() TRUE
-#   )
-#
-#   expect_equal(getPass("Enter password: "), "tcltk_password")
-# })
-#
-# test_that("getPass falls back to unmasked input on unsupported platforms", {
-#   local_mocked_bindings(
-#     readline_nomask = function(...) "unmasked_password",
-#     isaterm = function() FALSE,
-#     hastcltk = function() FALSE
-#   )
-#
-#   expect_equal(getPass("Enter password: "), "unmasked_password")
-# })
-#
-# test_that("getPass works in terminal mode", {
-#   local_mocked_bindings(
-#     readline_masked_term = function(...) "terminal_password",
-#     isaterm = function() TRUE
-#   )
-#
-#   expect_equal(getPass("Enter password: "), "terminal_password")
-# })
-#
-# test_that("getPass returns NULL if user cancels input", {
-#   local_mocked_bindings(
-#     readline = function(...) NULL
-#   )
-#
-#   expect_null(getPass("Enter password: "))
-# })
-#
-# test_that("getPass stops when masking is required but unsupported", {
-#   local_mocked_bindings(
-#     isaterm = function() FALSE,
-#     hastcltk = function() FALSE
-#   )
-#
-#   expect_error(getPass("Enter password:", forcemask = TRUE), "Masking is not supported")
-# })
+test_that("getPass uses RStudio API if available", {
+  local_mocked_bindings(
+    rstudioapi::askForPassword = function(...) "rstudio_password"
+  )
+
+  expect_equal(getPass("Enter password: "), "rstudio_password")
+})
+
+test_that("getPass uses Tcl/Tk window when available", {
+  local_mocked_bindings(
+    readline_masked_tcltk_window = function(...) "tcltk_password",
+    hastcltk = function() TRUE
+  )
+
+  expect_equal(getPass("Enter password: "), "tcltk_password")
+})
+
+test_that("getPass falls back to unmasked input on unsupported platforms", {
+  local_mocked_bindings(
+    readline_nomask = function(...) "unmasked_password",
+    isaterm = function() FALSE,
+    hastcltk = function() FALSE
+  )
+
+  expect_equal(getPass("Enter password: "), "unmasked_password")
+})
+
+test_that("getPass works in terminal mode", {
+  local_mocked_bindings(
+    readline_masked_term = function(...) "terminal_password",
+    isaterm = function() TRUE
+  )
+
+  expect_equal(getPass("Enter password: "), "terminal_password")
+})
+
+test_that("getPass returns NULL if user cancels input", {
+  local_mocked_bindings(
+    readline = function(...) NULL
+  )
+
+  expect_null(getPass("Enter password: "))
+})
+
+test_that("getPass stops when masking is required but unsupported", {
+  local_mocked_bindings(
+    isaterm = function() FALSE,
+    hastcltk = function() FALSE
+  )
+
+  expect_error(getPass("Enter password:", forcemask = TRUE), "Masking is not supported")
+})
