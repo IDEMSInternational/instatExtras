@@ -97,6 +97,15 @@ readline_masked_rstudio <- function(msg, forcemask, noblank=FALSE){
   return(pw)
 }
 
+isaterm <- function() {
+  # This function checks if R is running in an interactive terminal.
+  interactive() && (Sys.getenv("TERM") != "")
+}
+
+hastcltk <- function() {
+  requireNamespace("tcltk", quietly = TRUE) && capabilities("tcltk")
+}
+
 readline_masked_rstudio_window <- function(msg, forcemask){
   if (!rstudioapi::hasFun("askForPassword")){
     stopmsg <- "Masked input is not supported in your version of RStudio; please update to version >= 0.99.879"
