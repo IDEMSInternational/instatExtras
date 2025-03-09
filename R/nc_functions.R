@@ -31,8 +31,8 @@ nc_get_dim_min_max <- function(nc, dimension, time_as_date = TRUE) {
       if (units$hasatt && units$value == "julian_day") {
         time_vals <- as.character(as.Date(vals, origin = structure(-2440588, class = "Date")))
       } else {
-        pcict_time <- ncdf4.helpers::nc.get.time.series(nc, time.dim.name = dimension)
-        posixct_time <- PCICt::as.POSIXct.PCICt(pcict_time)
+        pcict_time <- get_nc_time_series(nc, time.dim.name = dimension)
+        posixct_time <- convert_pcict_to_posixct(pcict_time)
         time_vals <- as.character(as.Date(posixct_time))
       }
     })
@@ -122,8 +122,8 @@ nc_as_data_frame <- function(nc, vars, keep_raw_time = TRUE, include_metadata = 
                   time_vals <- as.Date(curr_dim_values, origin = structure(-2440588, class = "Date"))
                 }
                 else {
-                  pcict_time <- ncdf4.helpers::nc.get.time.series(nc, time.dim.name = dim_var)
-                  posixct_time <- PCICt::as.POSIXct.PCICt(pcict_time)
+                  pcict_time <- get_nc_time_series(nc, time.dim.name = dim_var)
+                  posixct_time <- convert_pcict_to_posixct(pcict_time)
                   time_vals <- as.Date(posixct_time)
                 }
                 ind <- which(time_vals >= boundary[[dim_var]][[1]] & time_vals <= boundary[[dim_var]][[2]])
@@ -236,9 +236,9 @@ nc_as_data_frame <- function(nc, vars, keep_raw_time = TRUE, include_metadata = 
           time_df[["date"]] <- as.Date(raw_time, origin = structure(-2440588, class = "Date"))
         }
         else {
-          pcict_time <- ncdf4.helpers::nc.get.time.series(nc, time.dim.name = time_var)
+          pcict_time <- get_nc_time_series(nc, time.dim.name = time_var)
           pcict_time <- pcict_time[time_ind]
-          posixct_time <- PCICt::as.POSIXct.PCICt(pcict_time)
+          posixct_time <- convert_pcict_to_posixct(pcict_time)
           time_df[["date"]] <- as.Date(posixct_time)
           time_df[["datetime"]] <- posixct_time
         }
@@ -379,4 +379,14 @@ close_nc_file <- function(nc) {
 # Wrapper for processing an individual NetCDF file
 process_nc_file <- function(nc, vars, keep_raw_time, include_metadata, boundary, lon_points, lat_points, id_points, show_requested_points, great_circle_dist) {
   nc_as_data_frame(nc, vars, keep_raw_time, include_metadata, boundary, lon_points, lat_points, id_points, show_requested_points, great_circle_dist)
+}
+
+# Wrapper for getting time series
+get_nc_time_series <- function(nc, time.dim.name) {
+  ncdf4.helpers::nc.get.time.series(nc, time.dim.name)
+}
+
+# Wrapper for converting PCICt time to POSIXct
+convert_pcict_to_posixct <- function(pcict_time) {
+  PCICt::as.POSIXct.PCICt(pcict_time)
 }
