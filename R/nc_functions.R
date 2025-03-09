@@ -21,7 +21,7 @@ nc_get_dim_min_max <- function(nc, dimension, time_as_date = TRUE) {
   if(!dimension %in% names(nc$dim)) stop(dimension, " not found in file.")
   
   vals <- nc$dim[[dimension]]$vals
-  dim_axes <- ncdf4.helpers::nc.get.dim.axes(nc)
+  dim_axes <- get_nc_dim_axes(nc)
   time_dims <- names(dim_axes[which(dim_axes == "T")])
   
   if (dimension %in% time_dims && time_as_date) {
@@ -81,22 +81,22 @@ nc_get_dim_min_max <- function(nc, dimension, time_as_date = TRUE) {
 #' #         great_circle_dist = FALSE)
 
 nc_as_data_frame <- function(nc, vars, keep_raw_time = TRUE, include_metadata = TRUE, boundary = NULL, lon_points = NULL, lat_points = NULL, id_points = NULL, show_requested_points = TRUE, great_circle_dist = TRUE) {
-  if(missing(vars)) vars <- ncdf4.helpers::nc.get.variable.list(nc)
+  if(missing(vars)) vars <- get_nc_variable_list(nc)
   if(sum(is.null(lon_points), is.null(lat_points)) == 1) stop("You must specificy both lon_points and lat_points")
   has_points <- (sum(is.null(lon_points), is.null(lat_points)) == 0)
   if(has_points && length(lon_points) != length(lat_points)) stop("lon_points and lat_points have unequal lengths.")
   if(has_points && !is.null(id_points) && length(id_points) != length(lat_points)) stop("id_points (if specified) must have the same length as lon_points and lat_points.")
-  dim_names <- ncdf4.helpers::nc.get.dim.names(nc, vars[1])
+  dim_names <- get_nc_dim_names(nc, vars[1])
   dim_values <- list()
   requested_points_added <- FALSE
   for(dim_name in dim_names) {
     #why no wrapper for this in ncdf4.helper?
     #(as.numeric ensures vectors no not have array class)
-    dim_values[[dim_name]] <- as.numeric(nc$dim[[dim_name]]$vals)
+    dim_values[[dim_name]] <- as.numeric(get_nc_dim_values)
     #This is not recommended but appears in tutorials
-    #ncdf4::ncvar_get(nc, dim_name)
+    #get_ncvar_values(nc, dim_name)
   }
-  dim_axes <- ncdf4.helpers::nc.get.dim.axes(nc, vars[1])
+  dim_axes <- get_nc_dim_axes(nc, vars[1])
   if(!is.null(boundary)) {
     if(!all(names(boundary) %in% dim_names)) stop("boundary contains dimensions not associated with", vars[1])
     if(anyNA(dim_axes)) {
@@ -116,7 +116,7 @@ nc_as_data_frame <- function(nc, vars, keep_raw_time = TRUE, include_metadata = 
               ind <- integer(0)
               try({
                 print(dim_var)
-                units <- ncdf4::ncatt_get(nc, dim_var, "units")
+                units <- get_nc_attribute(nc, dim_var, "units")
                 if(units$hasatt && units$value == "julian_day") {
                   # RDotNet interprets Date class as numeric so character needed to preserve date
                   time_vals <- as.Date(curr_dim_values, origin = structure(-2440588, class = "Date"))
@@ -161,7 +161,7 @@ nc_as_data_frame <- function(nc, vars, keep_raw_time = TRUE, include_metadata = 
   count_list <- list()
   dim_values_list <- list()
   if(has_points) {
-    dim_axes <- ncdf4.helpers::nc.get.dim.axes(nc, vars[1])
+    dim_axes <- get_nc_dim_axes(nc, vars[1])
     x_var <- names(dim_axes)[which(dim_axes == "X")]
     y_var <- names(dim_axes)[which(dim_axes == "Y")]
     if(length(x_var) == 0 || length(y_var) == 0) stop("Cannot select points because dimensions are not labelled correctly in the nc file. Modify the nc file or remove the points to import all data.")
@@ -199,7 +199,7 @@ nc_as_data_frame <- function(nc, vars, keep_raw_time = TRUE, include_metadata = 
     dim_values_list[[1]] <- dim_values
   }
   
-  dim_axes <- ncdf4.helpers::nc.get.dim.axes(nc)
+  dim_axes <- get_nc_dim_axes(nc)
   time_dims <- names(dim_axes[which(dim_axes == "T" & names(dim_axes) %in% dim_names)])
   var_data_list <- list()
   for(i in seq_along(start_list)) {
@@ -211,13 +211,13 @@ nc_as_data_frame <- function(nc, vars, keep_raw_time = TRUE, include_metadata = 
     names(curr_var_data) <- names(curr_dim_values)
     included_vars <- dim_names
     for(var in vars) {
-      curr_dim_names <- ncdf4.helpers::nc.get.dim.names(nc, var)
+      curr_dim_names <- get_nc_dim_names(nc, var)
       if(!setequal(curr_dim_names, dim_names)) {
         warning("The dimensions of", var, "do not match the other variables.", var, "will be dropped.")
       }
       else {
         included_vars <- c(included_vars, var)
-        curr_var_data[[var]] <- as.vector(ncdf4::ncvar_get(nc, var, start = start_list[[i]], count = count_list[[i]]))
+        curr_var_data[[var]] <- as.vector(get_ncvar_values(nc, var, start = start_list[[i]], count = count_list[[i]]))
       }
     }
     if(length(time_dims) == 1) {
@@ -231,7 +231,7 @@ nc_as_data_frame <- function(nc, vars, keep_raw_time = TRUE, include_metadata = 
       try({
         # need to subset this if time var has been subsetted
         time_ind <- which(raw_time_full %in% raw_time)
-        units <- ncdf4::ncatt_get(nc, time_var, "units")
+        units <- get_nc_attribute(nc, time_var, "units")
         if(units$hasatt && units$value == "julian_day") {
           time_df[["date"]] <- as.Date(raw_time, origin = structure(-2440588, class = "Date"))
         }
@@ -259,12 +259,12 @@ nc_as_data_frame <- function(nc, vars, keep_raw_time = TRUE, include_metadata = 
   
   if(include_metadata) {
     for(col_name in included_vars) {
-      col_attr <- ncdf4::ncatt_get(nc, col_name)
+      col_attr <- get_nc_attribute(nc, col_name)
       for(i in seq_along(col_attr)) {
         attr(var_data[[col_name]], names(col_attr)[i]) <- col_attr[[i]]
       }
     }
-    global_attr <- ncdf4::ncatt_get(nc, 0)
+    global_attr <- get_nc_attribute(nc, 0)
     for(i in seq_along(global_attr)) {
       attr(var_data, names(global_attr)[i]) <- global_attr[[i]]
     }
@@ -334,4 +334,29 @@ multiple_nc_as_data_frame <- function(path, vars, keep_raw_time = TRUE, include_
 
 get_nc_attribute <- function(nc, dimension, attr) {
   ncdf4::ncatt_get(nc, dimension, attr)
+}
+
+# Wrapper for getting variable list from NetCDF
+get_nc_variable_list <- function(nc) {
+  ncdf4.helpers::nc.get.variable.list(nc)
+}
+
+# Wrapper for getting dimension names
+get_nc_dim_names <- function(nc, var) {
+  ncdf4.helpers::nc.get.dim.names(nc, var)
+}
+
+# Wrapper for getting dimension values
+get_nc_dim_values <- function(nc, dim_name) {
+  nc$dim[[dim_name]]$vals
+}
+
+# Wrapper for getting dimension axes
+get_nc_dim_axes <- function(nc, var) {
+  ncdf4.helpers::nc.get.dim.axes(nc, var)
+}
+
+# Wrapper for getting variable values
+get_ncvar_values <- function(nc, var, start, count) {
+  ncdf4::ncvar_get(nc, var, start, count)
 }

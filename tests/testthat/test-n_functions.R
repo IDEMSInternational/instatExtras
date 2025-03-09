@@ -61,3 +61,75 @@ test_that("nc_get_dim_min_max handles missing values correctly", {
   
   expect_equal(nc_get_dim_min_max(mock_nc, "x"), c(1, 5))
 })
+
+test_that("nc_as_data_frame correctly extracts variables", {
+  # Mock NetCDF object
+  mock_nc <- list(
+    dim = list(
+      x = list(vals = c(1, 2, 3)),
+      y = list(vals = c(10, 20, 30))
+    )
+  )
+  
+  local_mocked_bindings(
+    get_nc_variable_list = function(nc) c("var1", "var2"),
+    get_nc_dim_names = function(nc, var) c("x", "y"),
+    get_nc_dim_values = function(nc, dim_name) {
+      if (dim_name == "x") return(c(1, 2, 3))
+      if (dim_name == "y") return(c(10, 20, 30))
+    },
+    get_nc_dim_axes = function(nc, var) list(x = "X", y = "Y"),
+    get_ncvar_values = function(nc, var, start, count) {
+      if (var == "var1") return(matrix(c(1, 2, 3, 4, 5, 6), nrow = 3))
+      if (var == "var2") return(matrix(c(7, 8, 9, 10, 11, 12), nrow = 3))
+    },
+    get_nc_attribute = function(nc, var) list(unit = "m")
+  )
+  
+  result <- nc_as_data_frame(mock_nc, vars = c("var1", "var2"))
+  
+  expect_equal(ncol(result), 2)  # Should have 2 variables
+  expect_equal(nrow(result), 3)  # Should match dimensions
+})
+
+test_that("nc_as_data_frame handles missing variables", {
+  mock_nc <- list(dim = list(x = list(vals = c(1, 2, 3))))
+  
+  local_mocked_bindings(
+    get_nc_variable_list = function(nc) character(0)  # No variables
+  )
+  
+  expect_error(nc_as_data_frame(mock_nc), "argument \"vars\" is missing, with no default")
+})
+
+test_that("nc_as_data_frame includes metadata when requested", {
+  mock_nc <- list(dim = list(x = list(vals = c(1, 2, 3))))
+  
+  local_mocked_bindings(
+    get_nc_variable_list = function(nc) c("var1"),
+    get_nc_dim_names = function(nc, var) c("x"),
+    get_ncvar_values = function(nc, var, start, count) c(10, 20, 30),
+    get_nc_attribute = function(nc, var) list(unit = "degrees")
+  )
+  
+  result <- nc_as_data_frame(mock_nc, vars = c("var1"), include_metadata = TRUE)
+  
+  expect_true("unit" %in% names(attributes(result$var1)))  # Metadata should be present
+  expect_equal(attr(result$var1, "unit"), "degrees")  # Check correct value
+})
+
+test_that("nc_as_data_frame correctly filters by boundary", {
+  mock_nc <- list(dim = list(x = list(vals = c(1, 2, 3))))
+  
+  local_mocked_bindings(
+    get_nc_variable_list = function(nc) c("var1"),
+    get_nc_dim_names = function(nc, var) c("x"),
+    get_nc_dim_values = function(nc, dim_name) c(1, 2, 3),
+    get_ncvar_values = function(nc, var, start, count) c(10, 20, 30)
+  )
+  
+  boundary <- list(x = c(2, 3))
+  result <- nc_as_data_frame(mock_nc, vars = c("var1"), boundary = boundary)
+  
+  expect_equal(nrow(result), 2)  # Should contain only x=2 and x=3
+})
