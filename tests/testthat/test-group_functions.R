@@ -1,13 +1,15 @@
 test_that("read_corpora processes different data formats correctly", {
   df <- data.frame(A = c("apple", "banana", "cherry"))
   list_data <- list(meta = "metadata", description = "test data", data = df)
-  
   result_df <- read_corpora(df)
   expect_s3_class(result_df, "data.frame")
   
   result_list <- read_corpora(list_data)
   expect_s3_class(result_list, "data.frame")
   expect_true("description" %in% colnames(result_list))
+
+  df_list <- read_corpora(rcorpora::corpora("foods/pizzaToppings"))
+  expect_s3_class(df_list, "data.frame")
 })
 
 test_that("cbind_unique binds data and removes duplicates", {
@@ -44,6 +46,37 @@ test_that("view_html_object saves or prints HTML", {
   expect_type(html_output, "character")
 })
 
+test_that("view_graph_object handles different graph types correctly", {
+  skip_if_not(Sys.getenv("GITHUB_ACTIONS") == "true")
+  
+  # Create different types of graph objects
+  ggplot_obj <- ggplot2::ggplot(mtcars, ggplot2::aes(x = mpg, y = hp)) + ggplot2::geom_point()
+  grob_obj <- grid::rectGrob()
+  
+  # Fix for `recordPlot()` issue: Open a device first
+  png(filename = tempfile())  # Open a graphics device
+  plot(1:10, 1:10)  # Create a simple base R plot
+  base_plot_obj <- recordPlot()  # Now record it
+  dev.off()  # Close the temporary device
+  
+  # Mock getOption("viewer") to simulate no RStudio viewer available
+  mockery::stub(view_graph_object, "getOption", function(x) NULL)
+  
+  # Case 1: No viewer available (should return a file path)
+  file_path <- view_graph_object(ggplot_obj)
+  expect_type(file_path, "character")  # Ensure it's a string
+  expect_match(file_path, "viewgraph.*\\.png")  # Ensure correct file naming
+
+  # Case 3: Base R plot handling
+  file_path_base <- view_graph_object(base_plot_obj)
+  expect_type(file_path_base, "character")  # Ensure it's a string
+  expect_match(file_path_base, "viewgraph.*\\.png")  # Ensure correct file naming
+
+  # Cleanup: Remove saved files
+  if (file.exists(file_path)) file.remove(file_path)
+  if (file.exists(file_path_base)) file.remove(file_path_base)
+})
+
 # test_that("check_graph correctly records plots", {
 #   plot_recorded <- check_graph(NULL)
 #   expect_true(inherits(plot_recorded, "recordedplot") || is.null(plot_recorded))
@@ -59,6 +92,24 @@ test_that("getRowHeadersWithText retrieves correct row names", {
   
   result <- getRowHeadersWithText(df, "Name", "banana", FALSE, FALSE, FALSE)
   expect_equal(result, "Row2")
+})
+
+test_that("getRowHeadersWithText handles regex and exact match cases correctly", {
+  # Create a test data frame
+  data <- data.frame(
+    ID = c("A101", "B202", "C303", "D404", "E505"),
+    Name = c("Alice", "Bob", "Charlie", "David", "Alice"),
+    stringsAsFactors = FALSE
+  )
+  rownames(data) <- c("Row1", "Row2", "Row3", "Row4", "Row5")
+  
+  # Case 1: use_regex = TRUE and match_entire_cell = TRUE
+  result1 <- getRowHeadersWithText(data, column = "Name", searchText = "Alice", use_regex = TRUE, match_entire_cell = TRUE)
+  expect_equal(result1, c("Row1", "Row5"))
+  
+  # Case 2: use_regex = FALSE and match_entire_cell = TRUE
+  result2 <- getRowHeadersWithText(data, column = "Name", searchText = "Alice", use_regex = FALSE, match_entire_cell = TRUE)
+  expect_equal(result2, c("Row1", "Row5"))
 })
 
 test_that("convert_to_list properly converts character strings to numeric vectors", {

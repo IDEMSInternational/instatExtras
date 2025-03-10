@@ -7,7 +7,9 @@
 #' @return A data frame with the processed data, including metadata and descriptions if available.
 #' @examples
 #' \dontrun{
-#'   read_corpora(my_data)
+#'   library(rcorpora)
+#'   read_corpora(corpora(category = "animals"))
+#'   read_corpora(corpora("foods/pizzaToppings"))
 #' }
 #' @export
 read_corpora <- function(data){
@@ -412,9 +414,14 @@ getRowHeadersWithText <- function(data, column, searchText, ignore_case = TRUE, 
     matchingRows <- apply(data[, column, drop = FALSE], 1, function(row) any(is.na(row)))
   } else {
     # Adjust the search text to match the entire cell if required
-    if (match_entire_cell) searchText <- paste0("^", searchText, "$")
+    if (match_entire_cell){
+      searchText <- paste0("^", searchText, "$")
+      fixed <- FALSE
+    } else {
+      fixed <- TRUE
+    }
     # Find the rows that match the search text
-    matchingRows <- grepl(searchText, data[[column]], ignore.case = ignore_case, fixed  = TRUE)
+    matchingRows <- grepl(searchText, data[[column]], ignore.case = ignore_case, fixed  = fixed)
   }
   # Get the row headers where the search text is found
   rowHeaders <- rownames(data)[matchingRows]
