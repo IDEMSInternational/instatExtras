@@ -20,8 +20,8 @@
 #'
 #' @examples
 #' # Import area data from CHIRPS_V2P0 source
-#' # import_from_iri(download_from = "CHIRPS_V2P0", data_file = "daily_0p05",
-#' #                 path = "data", X1 = -10, X2 = 10, Y1 = -10, Y2 = 10,
+#' # import_from_iri(download_from = "CHIRPS_V2P0", data_file = "monthly_prcp",
+#' #                 path = "data", X1 = 10.0, X2 = 10.03, Y1 = 10.0, Y2 = 10.06,
 #' #                 get_area_point = "area")
 #'
 #' # Import point data from TAMSAT source
@@ -40,34 +40,51 @@ import_from_iri <- function(download_from, data_file, path, X1, X2,Y1,Y2, get_ar
   
   if(download_from == "CHIRPS_V2P0"){
     prexyaddress <- "https://iridl.ldeo.columbia.edu/SOURCES/.UCSB/.CHIRPS/.v2p0"
-    if(data_file == "daily_0p05") extension <- ".daily/.global/.0p05/.prcp"
-    else if(data_file == "daily_0p25") extension <- ".daily/.global/.0p25/.prcp"
-    else if(data_file == "daily_improved_0p05") extension <- ".daily-improved/.global/.0p05/.prcp"
-    else if(data_file == "daily_improved_0p25") extension <- ".daily-improved/.global/.0p25/.prcp"
-    else if(data_file == "dekad") extension <- ".dekad/.prcp"
-    else if(data_file == "monthly_c8113") extension <- ".monthly/.global/.c8113/.precipitation"
-    else if(data_file == "monthly_deg1p0") extension <- ".monthly/.global/.deg1p0/.precipitation"
-    else if(data_file == "monthly_NMME_deg1p0") extension <- ".monthly/.global/.NMME_deg1p0/.precipitation"
-    else if(data_file == "monthly_prcp") extension <- ".monthly/.global/.precipitation"
-    else stop("Data file does not exist for CHIRPS V2P0 data")
+    chirps_extensions <- c(
+      "daily_0p05" = ".daily/.global/.0p05/.prcp",
+      "daily_0p25" = ".daily/.global/.0p25/.prcp",
+      "daily_improved_0p05" = ".daily-improved/.global/.0p05/.prcp",
+      "daily_improved_0p25" = ".daily-improved/.global/.0p25/.prcp",
+      "dekad" = ".dekad/.prcp",
+      "monthly_c8113" = ".monthly/.global/.c8113/.precipitation",
+      "monthly_deg1p0" = ".monthly/.global/.deg1p0/.precipitation",
+      "monthly_NMME_deg1p0" = ".monthly/.global/.NMME_deg1p0/.precipitation",
+      "monthly_prcp" = ".monthly/.global/.precipitation"
+    )
+    extension <- chirps_extensions[data_file]
+    if (is.na(extension)) stop("Data file does not exist for CHIRPS V2P0 data")
     #Annual and 2Monthly and 3monthly does not exist for CHIRPS_V2P0
   } else if(download_from == "TAMSAT") {
     prexyaddress <- "http://iridl.ldeo.columbia.edu/home/.remic/.Reading/.Meteorology/.TAMSAT"
-    if(data_file == "rainfall_estimates") extension <- ".TAMSAT-RFE/.rfe"
-    else if(data_file == "reconstructed_rainfall_anomaly") extension <- ".TAMSAT-RFE/.rfediff"
-    else if(data_file == "sahel_dry_mask") extension <- ".TAMSAT-RFE/.sahel_drymask"
-    else if(data_file == "SPI_1_dekad") extension <- ".TAMSAT-RFE/.SPI-rfe_1-dekad_Sahel"
-    #monthly,climatology and TAMSAT RFE 0p1 are yet to be implemented.
-    else stop("Data file does not exist for TAMSAT data")
+    
+    tamsat_extensions <- c(
+      "rainfall_estimates"              = ".TAMSAT-RFE/.rfe",
+      "reconstructed_rainfall_anomaly"  = ".TAMSAT-RFE/.rfediff",
+      "sahel_dry_mask"                  = ".TAMSAT-RFE/.sahel_drymask",
+      "SPI_1_dekad"                     = ".TAMSAT-RFE/.SPI-rfe_1-dekad_Sahel"
+      # monthly, climatology, and TAMSAT RFE 0p1 are yet to be implemented
+    )
+    
+    extension <- tamsat_extensions[data_file]
+    
+    if (is.na(extension)) stop("Data file does not exist for TAMSAT data")
+    
   } else if(download_from=="NOAA_ARC2") {
-    prexyaddress<-paste("http://iridl.ldeo.columbia.edu/SOURCES/.NOAA/.NCEP/.CPC/.FEWS/.Africa/.DAILY/.ARC2")
-    if(data_file == "daily_estimated_prcp") extension <- ".daily/.est_prcp"
-    else if(data_file == "monthly_average_estimated_prcp") extension <- ".monthly/.est_prcp"
-    else stop("Data file does not exist for NOAA ARC2 data")
+    prexyaddress <- "http://iridl.ldeo.columbia.edu/SOURCES/.NOAA/.NCEP/.CPC/.FEWS/.Africa/.DAILY/.ARC2"
+    
+    arc2_extensions <- c(
+      "daily_estimated_prcp" = ".daily/.est_prcp",
+      "monthly_average_estimated_prcp" = ".monthly/.est_prcp"
+    )
+    
+    extension <- arc2_extensions[data_file]
+    
+    if (is.na(extension)) stop("Data file does not exist for NOAA ARC2 data")
   } else if(download_from=="NOAA_RFE2") {
     prexyaddress <- "http://iridl.ldeo.columbia.edu/SOURCES/.NOAA/.NCEP/.CPC/.FEWS/.Africa"
-    if(data_file == "daily_estimated_prcp") extension <- ".DAILY/.RFEv2/.est_prcp"
-    else stop("Data file does not exist for NOAA RFE2 data")
+    rfe2_extensions <- c("daily_estimated_prcp" = ".DAILY/.RFEv2/.est_prcp")
+    extension <- rfe2_extensions[data_file]
+    if (is.na(extension)) stop("Data file does not exist for NOAA RFE2 data")
   } else if(download_from=="NOAA_CMORPH_DAILY" || download_from=="NOAA_CMORPH_3HOURLY" || download_from=="NOAA_CMORPH_DAILY_CALCULATED") {
     if(download_from=="NOAA_CMORPH_DAILY") prexyaddress <- "http://iridl.ldeo.columbia.edu/SOURCES/.NOAA/.NCEP/.CPC/.CMORPH/.daily"
     else if(download_from == "NOAA_CMORPH_3HOURLY") prexyaddress <- "http://iridl.ldeo.columbia.edu/SOURCES/.NOAA/.NCEP/.CPC/.CMORPH/.3-hourly"
@@ -85,11 +102,17 @@ import_from_iri <- function(download_from, data_file, path, X1, X2,Y1,Y2, get_ar
     else stop("Data file does not exist for NOAA CMORPH data")
   } else if(download_from=="NASA_TRMM_3B42") {
     prexyaddress <- "https://iridl.ldeo.columbia.edu/SOURCES/.NASA/.GES-DAAC/.TRMM_L3/.TRMM_3B42/.v7"
-    if(data_file == "daily_estimated_prcp")  extension <- ".daily/.precipitation"
-    else if(data_file == "3_hourly_estimated_prcp") extension <- ".three-hourly/.precipitation"
-    else if(data_file == "3_hourly_pre_gauge_adjusted_infrared_est_prcp") extension <- ".three-hourly/.IRprecipitation"
-    else if(data_file == "3_hourly_pre_gauge_adjusted_microwave_est_prcp") extension <- ".three-hourly/.HQprecipitation"
-    else stop("Data file does not exist for NASA TRMM 3B42 data")
+    
+    trmm_extensions <- c(
+      "daily_estimated_prcp" = ".daily/.precipitation",
+      "3_hourly_estimated_prcp" = ".three-hourly/.precipitation",
+      "3_hourly_pre_gauge_adjusted_infrared_est_prcp" = ".three-hourly/.IRprecipitation",
+      "3_hourly_pre_gauge_adjusted_microwave_est_prcp" = ".three-hourly/.HQprecipitation"
+    )
+    
+    extension <- trmm_extensions[data_file]
+    
+    if (is.na(extension)) stop("Data file does not exist for NASA TRMM 3B42 data")
   } else{
     stop("Source not specified correctly.")
   }
@@ -98,6 +121,7 @@ import_from_iri <- function(download_from, data_file, path, X1, X2,Y1,Y2, get_ar
   #we need to add time range to get the data
   if(get_area_point == "area") {
     xystuff <- paste("X", X1, X2, "RANGEEDGES/Y", Y1, Y2, "RANGEEDGES", sep = "/")
+    #if (!is.null(date_from) & !is.null(date_to)) xystuff <- paste0(xystuff, "T/", date_from, "/", date_to, "/RANGEEDGES/")
     postxyaddress <- "ngridtable+table-+skipanyNaN+4+-table+.csv" 
   } else if(get_area_point == "point") {
     xystuff <- paste("X", X1, "VALUES/Y", Y1, "VALUES", sep = "/")
@@ -107,6 +131,7 @@ import_from_iri <- function(download_from, data_file, path, X1, X2,Y1,Y2, get_ar
   address <- paste(prexyaddress,xystuff,postxyaddress,sep="/")
   
   file.name <- paste(gaugelocdir,"tmp_iri.csv", sep="/")
+  
   utils::download.file(address, file.name, quiet=FALSE)
   dataout <- utils::read.table(paste(gaugelocdir, "tmp_iri.csv", sep="/"), sep = ",", header = TRUE)
   if(nrow(dataout) == 0) stop("There is no data for the selected point/area.")

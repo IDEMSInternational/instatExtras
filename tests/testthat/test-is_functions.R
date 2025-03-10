@@ -13,6 +13,25 @@ test_that("import_from_iri handles incorrect source gracefully", {
   expect_error(import_from_iri("INVALID_SOURCE", "daily_0p05", "data", -10, 10, -10, 10, "area"))
 })
 
+# test_that("import_from_iri correctly imports minimal monthly area data from CHIRPS_V2P0", {
+#   result <- import_from_iri(
+#     download_from = "CHIRPS_V2P0",
+#     data_file = "monthly_prcp",
+#     path = "data",
+#     X1 = 10.0,
+#     X2 = 10.03,
+#     Y1 = 10.0,
+#     Y2 = 10.06,
+#     get_area_point = "area"
+#   )
+#   
+#   expect_type(result, "list")
+#   expect_s3_class(result[[1]], "data.frame")
+#   expect_s3_class(result[[2]], "data.frame")
+#   expect_true(nrow(result[[1]]) > 0 && nrow(result[[1]]) <= 10)  # Small number of points expected
+#   expect_equal(names(result[[2]]), c("X", "Y"))
+# })
+
 test_that("import_from_iri handles incorrect source gracefully", {
   expect_error(
     import_from_iri(
@@ -44,6 +63,71 @@ test_that("import_from_iri handles incorrect data_file gracefully", {
     "Data file does not exist for CHIRPS V2P0 data"
   )
 })
+
+test_that("import_from_iri handles incorrect data_file gracefully", {
+  expect_error(
+    import_from_iri(
+      download_from = "TAMSAT",
+      data_file = "invalid_data_file",
+      path = "",
+      X1 = 35,
+      X2 = 36,
+      Y1 = -1,
+      Y2 = 0,
+      get_area_point = "area"
+    ),
+    "Data file does not exist for TAMSAT data"
+  )
+})
+
+test_that("import_from_iri handles incorrect data_file gracefully", {
+  expect_error(
+    import_from_iri(
+      download_from = "NOAA_ARC2",
+      data_file = "invalid_data_file",
+      path = "",
+      X1 = 35,
+      X2 = 36,
+      Y1 = -1,
+      Y2 = 0,
+      get_area_point = "area"
+    ),
+    "Data file does not exist for NOAA ARC2 data"
+  )
+})
+
+test_that("import_from_iri handles incorrect data_file gracefully", {
+  expect_error(
+    import_from_iri(
+      download_from = "NOAA_RFE2",
+      data_file = "invalid_data_file",
+      path = "",
+      X1 = 35,
+      X2 = 36,
+      Y1 = -1,
+      Y2 = 0,
+      get_area_point = "area"
+    ),
+    "Data file does not exist for NOAA RFE2 data"
+  )
+})
+
+test_that("import_from_iri handles incorrect data_file gracefully", {
+  expect_error(
+    import_from_iri(
+      download_from = "NASA_TRMM_3B42",
+      data_file = "invalid_data_file",
+      path = "",
+      X1 = 35,
+      X2 = 36,
+      Y1 = -1,
+      Y2 = 0,
+      get_area_point = "area"
+    ),
+    "Data file does not exist for NASA TRMM 3B42 data"
+  )
+})
+
 test_that("in_top_n correctly identifies top N values", {
   x <- c(10, 5, 7, 12, 3)
   result <- in_top_n(x, 3)

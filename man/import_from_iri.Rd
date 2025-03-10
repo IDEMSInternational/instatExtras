@@ -35,8 +35,8 @@ This function imports data from various sources at the International Research In
 }
 \examples{
 # Import area data from CHIRPS_V2P0 source
-# import_from_iri(download_from = "CHIRPS_V2P0", data_file = "daily_0p05",
-#                 path = "data", X1 = -10, X2 = 10, Y1 = -10, Y2 = 10,
+# import_from_iri(download_from = "CHIRPS_V2P0", data_file = "monthly_prcp",
+#                 path = "data", X1 = 10.0, X2 = 10.03, Y1 = 10.0, Y2 = 10.06,
 #                 get_area_point = "area")
 
 # Import point data from TAMSAT source
