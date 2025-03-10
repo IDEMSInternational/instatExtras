@@ -8,7 +8,7 @@ test_that("read_corpora processes different data formats correctly", {
   expect_s3_class(result_list, "data.frame")
   expect_true("description" %in% colnames(result_list))
 
-  df_list <- read_corpora(corpora("foods/pizzaToppings"))
+  df_list <- read_corpora(rcorpora::corpora("foods/pizzaToppings"))
   expect_s3_class(df_list, "data.frame")
 })
 
