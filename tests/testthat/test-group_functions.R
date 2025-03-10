@@ -98,3 +98,46 @@ test_that("time_operation times an expression", {
 #   expect_true(any(grepl("R-Instat", .libPaths())))
 #   .libPaths(old_paths)  # Reset to avoid issues
 # })
+
+test_that("check_github_repo handles various scenarios", {
+  # Mock `gh::gh` to return a specific response
+  mock_gh <- mockery::mock(
+    list(list(sha = "latest_sha")),  # Mock response for latest commit
+    list(language = "R"),            # Mock response for repo language
+    cycle = TRUE                      # Cycle through responses
+  )
+  
+  stub(check_github_repo, "gh::gh", mock_gh)
+  
+  # Mock `requireNamespace` to simulate installed or missing packages
+  mock_requireNamespace <- mock(TRUE, FALSE, cycle = TRUE)
+  stub(check_github_repo, "requireNamespace", mock_requireNamespace)
+  
+  # Mock `utils::packageDescription` to return a fake SHA
+  mock_packageDescription <- function(pkg) {
+    list(GithubSHA1 = if (pkg == "installed_repo") "latest_sha" else "old_sha")
+  }
+  stub(check_github_repo, "utils::packageDescription", mock_packageDescription)
+  
+  # Case 1: Installed package, latest commit matches
+  expect_equal(check_github_repo(owner = "user", repo = "installed_repo"), 0)
+  
+  # Case 2: Installed package, latest commit differs
+  expect_equal(check_github_repo(owner = "user", repo = "outdated_repo"), 4)
+  
+  # Case 3: Installed package but no local SHA
+  mock_packageDescription_no_sha <- function(pkg) list(GithubSHA1 = NULL)
+  stub(check_github_repo, "utils::packageDescription", mock_packageDescription_no_sha)
+  expect_equal(check_github_repo(owner = "user", repo = "no_sha_repo"), 3)
+  
+  # Case 4: Not installed, R language repo
+  expect_equal(check_github_repo(owner = "user", repo = "r_project"), 6)
+  
+  # Case 5: Not installed, non-R repo
+  stub(check_github_repo, "gh::gh", mock(list(language = "Python")))
+  expect_equal(check_github_repo(owner = "user", repo = "python_project"), 3)
+  
+  # Case 6: Non-existent repo
+  stub(check_github_repo, "gh::gh", function(...) stop("Not Found"))
+  expect_equal(check_github_repo(owner = "user", repo = "non_existent"), 6)
+})
