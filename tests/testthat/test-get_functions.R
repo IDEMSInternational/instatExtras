@@ -94,7 +94,7 @@ test_that("getPass uses Tcl/Tk window when available", {
     readline_masked_tcltk_window = function(...) "tcltk_password",
     hastcltk = function() TRUE
   )
-
+  
   expect_equal(getPass("Enter password: "), "tcltk_password")
 })
 
@@ -103,7 +103,7 @@ test_that("getPass works in terminal mode", {
     readline_masked_term = function(...) "terminal_password",
     isaterm = function() TRUE
   )
-
+  
   expect_equal(getPass("Enter password: "), "terminal_password")
 })
 
@@ -112,7 +112,7 @@ test_that("getPass stops when masking is required but unsupported", {
     isaterm = function() FALSE,
     hastcltk = function() FALSE
   )
-
+  
   expect_error(getPass("Enter password:", forcemask = TRUE), "Masking is not supported")
 })
 
@@ -148,6 +148,9 @@ test_that("get_odk_form_names handles authentication and API request correctly",
   expect_equal(form_names, c("Form A", "Form B"))
 })
 
+
+###
+
 test_that("readline_masked_rstudio_window correctly calls askForPassword()", {
   local_mocked_bindings(
     has_fun = function(fun) TRUE,  # Pretend askForPassword exists
@@ -175,5 +178,46 @@ test_that("readline_masked_rstudio_window errors if forcemask = TRUE and masking
   
   expect_error(readline_masked_rstudio_window("Enter password:", forcemask = TRUE),
                "Masked input is not supported in your version of RStudio")
+})
 
+test_that("readline_masked_tcltk_window captures user input correctly", {
+  skip_if_not_installed("tcltk")  
+  skip_if(Sys.getenv("DISPLAY") == "", "No DISPLAY environment set for Tk")
+  
+  # Create a mock password variable
+  mock_pwd_var <- tcltk::tclVar("user_password")  # Set initial password
+  
+  local_mocked_bindings(
+    tcl_var = function(x) mock_pwd_var,  
+    tcl_value = function(x) tcltk::tclvalue(x),  
+    
+    tk_destroy = function(x) NULL,
+    tk_wait_window = function(x) NULL
+  )
+  
+  result <- readline_masked_tcltk_window("Enter password:", noblank = FALSE)
+  expect_equal(result, "user_password")  
+})
+
+test_that("readline_masked_tcltk_window returns NULL when user cancels", {
+  skip_if_not_installed("tcltk")  
+  skip_if(Sys.getenv("DISPLAY") == "", "No DISPLAY environment set for Tk")
+  
+  mock_pwd_var <- tcltk::tclVar("")
+  mock_flag_var <- tcltk::tclVar("0")  
+  
+  local_mocked_bindings(
+    tcl_var = function(x) if (x == 0) mock_flag_var else mock_pwd_var,
+    
+    tcl_value = function(x) {
+      if (identical(x, mock_flag_var)) return("0")  
+      return(NULL)  
+    },
+    
+    tk_destroy = function(x) NULL,
+    tk_wait_window = function(x) NULL
+  )
+  
+  result <- readline_masked_tcltk_window("Enter password:", noblank = FALSE)
+  expect_null(result)  
 })
