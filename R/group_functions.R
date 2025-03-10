@@ -7,7 +7,9 @@
 #' @return A data frame with the processed data, including metadata and descriptions if available.
 #' @examples
 #' \dontrun{
-#'   read_corpora(my_data)
+#'   library(rcorpora)
+#'   read_corpora(corpora(category = "animals"))
+#'   read_corpora(corpora("foods/pizzaToppings"))
 #' }
 #' @export
 read_corpora <- function(data){

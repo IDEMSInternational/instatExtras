@@ -1,13 +1,15 @@
 test_that("read_corpora processes different data formats correctly", {
   df <- data.frame(A = c("apple", "banana", "cherry"))
   list_data <- list(meta = "metadata", description = "test data", data = df)
-  
   result_df <- read_corpora(df)
   expect_s3_class(result_df, "data.frame")
   
   result_list <- read_corpora(list_data)
   expect_s3_class(result_list, "data.frame")
   expect_true("description" %in% colnames(result_list))
+
+  df_list <- read_corpora(corpora("foods/pizzaToppings"))
+  expect_s3_class(df_list, "data.frame")
 })
 
 test_that("cbind_unique binds data and removes duplicates", {
