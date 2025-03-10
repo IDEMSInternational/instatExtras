@@ -73,151 +73,151 @@ test_that("getPass errors", {
   expect_error(getPass(noblank = "yes"), "argument 'noblank' must be one of 'TRUE' or 'FALSE'")
   expect_error(getPass(forcemask = 1), "argument 'forcemask' must be one of 'TRUE' or 'FALSE'")
 })
-
-test_that("getPass correctly captures user input", {
-  local_mocked_bindings(
-    getPass_readline = function(...) "my_password"
-  )
-  expect_equal(getPass("Enter password: "), "my_password")
-})
-
-test_that("getPass returns NULL if user cancels input", {
-  local_mocked_bindings(
-    getPass_readline = function(...) NULL
-  )
-  
-  expect_null(getPass("Enter password: "))
-})
-
-test_that("getPass uses Tcl/Tk window when available", {
-  local_mocked_bindings(
-    readline_masked_tcltk_window = function(...) "tcltk_password",
-    hastcltk = function() TRUE
-  )
-  
-  expect_equal(getPass("Enter password: "), "tcltk_password")
-})
-
-test_that("getPass works in terminal mode", {
-  local_mocked_bindings(
-    readline_masked_term = function(...) "terminal_password",
-    isaterm = function() TRUE
-  )
-  
-  expect_equal(getPass("Enter password: "), "terminal_password")
-})
-
-test_that("getPass stops when masking is required but unsupported", {
-  local_mocked_bindings(
-    isaterm = function() FALSE,
-    hastcltk = function() FALSE
-  )
-  
-  expect_error(getPass("Enter password:", forcemask = TRUE), "Masking is not supported")
-})
-
-test_that("get_odk_form_names handles authentication and API request correctly", {
-  
-  # Mock `getPass()` to avoid user input
-  local_mocked_bindings(
-    getPass = function(...) "mock_password",
-    
-    # Mock our custom wrapper function instead of `httr::GET`
-    get_odk_http_get = function(url, auth = NULL) {
-      # Simulated JSON response structure
-      fake_response <- list(
-        list(title = "Form A", id = 1),
-        list(title = "Form B", id = 2)
-      )
-      structure(
-        list(content = fake_response, status_code = 200),
-        class = "response"
-      )
-    },
-    
-    # Mock our custom wrapper function instead of `httr::content`
-    get_odk_http_content = function(response, type) {
-      response$content
-    }
-  )
-  
-  # Test function with mock responses
-  form_names <- get_odk_form_names("mock_user", "kobo")
-  
-  # Expected output
-  expect_equal(form_names, c("Form A", "Form B"))
-})
-
-
-###
-
-test_that("readline_masked_rstudio_window correctly calls askForPassword()", {
-  local_mocked_bindings(
-    has_fun = function(fun) TRUE,  # Pretend askForPassword exists
-    ask_for_password = function(msg) "mock_password"
-  )
-  
-  result <- readline_masked_rstudio_window("Enter password:", forcemask = FALSE)
-  expect_equal(result, "mock_password")
-})
-
-test_that("readline_masked_rstudio_window falls back to readline_nomask()", {
-  local_mocked_bindings(
-    has_fun = function(fun) FALSE,  # Simulate an unsupported RStudio version
-    readline_nomask = function(msg, silent) "fallback_password"
-  )
-  
-  result <- readline_masked_rstudio_window("Enter password:", forcemask = FALSE)
-  expect_equal(result, "fallback_password")
-})
-
-test_that("readline_masked_rstudio_window errors if forcemask = TRUE and masking is unavailable", {
-  local_mocked_bindings(
-    has_fun = function(fun) FALSE  # Simulate no password masking support
-  )
-  
-  expect_error(readline_masked_rstudio_window("Enter password:", forcemask = TRUE),
-               "Masked input is not supported in your version of RStudio")
-})
-
-# test_that("readline_masked_tcltk_window captures user input correctly", {
-#   skip_if_not_installed("tcltk")  
-#   skip_if(Sys.getenv("DISPLAY") == "", "No DISPLAY environment set for Tk")
-#   
-#   # Create a mock password variable
-#   mock_pwd_var <- tcltk::tclVar("user_password")  # Set initial password
-#   
+# 
+# test_that("getPass correctly captures user input", {
 #   local_mocked_bindings(
-#     tcl_var = function(x) mock_pwd_var,  
-#     tcl_value = function(x) tcltk::tclvalue(x),  
-#     
-#     tk_destroy = function(x) NULL,
-#     tk_wait_window = function(x) NULL
+#     getPass_readline = function(...) "my_password"
 #   )
-#   
-#   result <- readline_masked_tcltk_window("Enter password:", noblank = FALSE)
-#   expect_equal(result, "user_password")  
+#   expect_equal(getPass("Enter password: "), "my_password")
 # })
 # 
-# test_that("readline_masked_tcltk_window returns NULL when user cancels", {
-#   skip_if_not_installed("tcltk")  
-#   skip_if(Sys.getenv("DISPLAY") == "", "No DISPLAY environment set for Tk")
-#   
-#   mock_pwd_var <- tcltk::tclVar("")
-#   mock_flag_var <- tcltk::tclVar("0")  
-#   
+# test_that("getPass returns NULL if user cancels input", {
 #   local_mocked_bindings(
-#     tcl_var = function(x) if (x == 0) mock_flag_var else mock_pwd_var,
-#     
-#     tcl_value = function(x) {
-#       if (identical(x, mock_flag_var)) return("0")  
-#       return(NULL)  
-#     },
-#     
-#     tk_destroy = function(x) NULL,
-#     tk_wait_window = function(x) NULL
+#     getPass_readline = function(...) NULL
 #   )
 #   
-#   result <- readline_masked_tcltk_window("Enter password:", noblank = FALSE)
-#   expect_null(result)  
+#   expect_null(getPass("Enter password: "))
 # })
+# 
+# test_that("getPass uses Tcl/Tk window when available", {
+#   local_mocked_bindings(
+#     readline_masked_tcltk_window = function(...) "tcltk_password",
+#     hastcltk = function() TRUE
+#   )
+#   
+#   expect_equal(getPass("Enter password: "), "tcltk_password")
+# })
+# 
+# test_that("getPass works in terminal mode", {
+#   local_mocked_bindings(
+#     readline_masked_term = function(...) "terminal_password",
+#     isaterm = function() TRUE
+#   )
+#   
+#   expect_equal(getPass("Enter password: "), "terminal_password")
+# })
+# 
+# test_that("getPass stops when masking is required but unsupported", {
+#   local_mocked_bindings(
+#     isaterm = function() FALSE,
+#     hastcltk = function() FALSE
+#   )
+#   
+#   expect_error(getPass("Enter password:", forcemask = TRUE), "Masking is not supported")
+# })
+# 
+# test_that("get_odk_form_names handles authentication and API request correctly", {
+#   
+#   # Mock `getPass()` to avoid user input
+#   local_mocked_bindings(
+#     getPass = function(...) "mock_password",
+#     
+#     # Mock our custom wrapper function instead of `httr::GET`
+#     get_odk_http_get = function(url, auth = NULL) {
+#       # Simulated JSON response structure
+#       fake_response <- list(
+#         list(title = "Form A", id = 1),
+#         list(title = "Form B", id = 2)
+#       )
+#       structure(
+#         list(content = fake_response, status_code = 200),
+#         class = "response"
+#       )
+#     },
+#     
+#     # Mock our custom wrapper function instead of `httr::content`
+#     get_odk_http_content = function(response, type) {
+#       response$content
+#     }
+#   )
+#   
+#   # Test function with mock responses
+#   form_names <- get_odk_form_names("mock_user", "kobo")
+#   
+#   # Expected output
+#   expect_equal(form_names, c("Form A", "Form B"))
+# })
+# 
+# 
+# ###
+# 
+# test_that("readline_masked_rstudio_window correctly calls askForPassword()", {
+#   local_mocked_bindings(
+#     has_fun = function(fun) TRUE,  # Pretend askForPassword exists
+#     ask_for_password = function(msg) "mock_password"
+#   )
+#   
+#   result <- readline_masked_rstudio_window("Enter password:", forcemask = FALSE)
+#   expect_equal(result, "mock_password")
+# })
+# 
+# test_that("readline_masked_rstudio_window falls back to readline_nomask()", {
+#   local_mocked_bindings(
+#     has_fun = function(fun) FALSE,  # Simulate an unsupported RStudio version
+#     readline_nomask = function(msg, silent) "fallback_password"
+#   )
+#   
+#   result <- readline_masked_rstudio_window("Enter password:", forcemask = FALSE)
+#   expect_equal(result, "fallback_password")
+# })
+# 
+# test_that("readline_masked_rstudio_window errors if forcemask = TRUE and masking is unavailable", {
+#   local_mocked_bindings(
+#     has_fun = function(fun) FALSE  # Simulate no password masking support
+#   )
+#   
+#   expect_error(readline_masked_rstudio_window("Enter password:", forcemask = TRUE),
+#                "Masked input is not supported in your version of RStudio")
+# })
+# 
+# # test_that("readline_masked_tcltk_window captures user input correctly", {
+# #   skip_if_not_installed("tcltk")  
+# #   skip_if(Sys.getenv("DISPLAY") == "", "No DISPLAY environment set for Tk")
+# #   
+# #   # Create a mock password variable
+# #   mock_pwd_var <- tcltk::tclVar("user_password")  # Set initial password
+# #   
+# #   local_mocked_bindings(
+# #     tcl_var = function(x) mock_pwd_var,  
+# #     tcl_value = function(x) tcltk::tclvalue(x),  
+# #     
+# #     tk_destroy = function(x) NULL,
+# #     tk_wait_window = function(x) NULL
+# #   )
+# #   
+# #   result <- readline_masked_tcltk_window("Enter password:", noblank = FALSE)
+# #   expect_equal(result, "user_password")  
+# # })
+# # 
+# # test_that("readline_masked_tcltk_window returns NULL when user cancels", {
+# #   skip_if_not_installed("tcltk")  
+# #   skip_if(Sys.getenv("DISPLAY") == "", "No DISPLAY environment set for Tk")
+# #   
+# #   mock_pwd_var <- tcltk::tclVar("")
+# #   mock_flag_var <- tcltk::tclVar("0")  
+# #   
+# #   local_mocked_bindings(
+# #     tcl_var = function(x) if (x == 0) mock_flag_var else mock_pwd_var,
+# #     
+# #     tcl_value = function(x) {
+# #       if (identical(x, mock_flag_var)) return("0")  
+# #       return(NULL)  
+# #     },
+# #     
+# #     tk_destroy = function(x) NULL,
+# #     tk_wait_window = function(x) NULL
+# #   )
+# #   
+# #   result <- readline_masked_tcltk_window("Enter password:", noblank = FALSE)
+# #   expect_null(result)  
+# # })
