@@ -47,6 +47,8 @@ test_that("view_html_object saves or prints HTML", {
 })
 
 test_that("view_graph_object handles different graph types correctly", {
+  skip_if_not(Sys.getenv("GITHUB_ACTIONS") == "true")
+  
   # Create different types of graph objects
   ggplot_obj <- ggplot2::ggplot(mtcars, ggplot2::aes(x = mpg, y = hp)) + ggplot2::geom_point()
   grob_obj <- grid::rectGrob()
