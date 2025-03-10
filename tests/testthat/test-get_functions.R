@@ -148,9 +148,6 @@ test_that("get_odk_form_names handles authentication and API request correctly",
   expect_equal(form_names, c("Form A", "Form B"))
 })
 
-
-###
-
 test_that("readline_masked_rstudio_window correctly calls askForPassword()", {
   local_mocked_bindings(
     has_fun = function(fun) TRUE,  # Pretend askForPassword exists
@@ -178,4 +175,5 @@ test_that("readline_masked_rstudio_window errors if forcemask = TRUE and masking
   
   expect_error(readline_masked_rstudio_window("Enter password:", forcemask = TRUE),
                "Masked input is not supported in your version of RStudio")
+
 })
