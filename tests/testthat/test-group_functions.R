@@ -65,19 +65,19 @@ test_that("view_graph_object handles different graph types correctly", {
   expect_type(file_path, "character")  # Ensure it's a string
   expect_match(file_path, "viewgraph.*\\.png")  # Ensure correct file naming
 
-  # # Case 2: When an RStudio viewer is available (should return the object)
-  # mockery::stub(view_graph_object, "getOption", function(x) function(x) {})  # Simulating RStudio viewer
-  # expect_equal(view_graph_object(ggplot_obj), ggplot_obj)  # Should return the ggplot object
-  # expect_equal(view_graph_object(grob_obj), grob_obj)  # Should return the grob object
-  # 
-  # # Case 3: Base R plot handling
-  # file_path_base <- view_graph_object(base_plot_obj)
-  # expect_type(file_path_base, "character")  # Ensure it's a string
-  # expect_match(file_path_base, "viewgraph.*\\.png")  # Ensure correct file naming
-  
-  # # Cleanup: Remove saved files
-  # if (file.exists(file_path)) file.remove(file_path)
-  # if (file.exists(file_path_base)) file.remove(file_path_base)
+  # Case 2: When an RStudio viewer is available (should return the object)
+  mockery::stub(view_graph_object, "getOption", function(x) function(x) {})  # Simulating RStudio viewer
+  expect_equal(view_graph_object(ggplot_obj), ggplot_obj)  # Should return the ggplot object
+  expect_equal(view_graph_object(grob_obj), grob_obj)  # Should return the grob object
+
+  # Case 3: Base R plot handling
+  file_path_base <- view_graph_object(base_plot_obj)
+  expect_type(file_path_base, "character")  # Ensure it's a string
+  expect_match(file_path_base, "viewgraph.*\\.png")  # Ensure correct file naming
+
+  # Cleanup: Remove saved files
+  if (file.exists(file_path)) file.remove(file_path)
+  if (file.exists(file_path_base)) file.remove(file_path_base)
 })
 
 # test_that("check_graph correctly records plots", {
