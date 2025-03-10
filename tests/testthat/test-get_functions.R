@@ -73,7 +73,7 @@ test_that("getPass errors", {
   expect_error(getPass(noblank = "yes"), "argument 'noblank' must be one of 'TRUE' or 'FALSE'")
   expect_error(getPass(forcemask = 1), "argument 'forcemask' must be one of 'TRUE' or 'FALSE'")
 })
-# 
+
 # test_that("getPass correctly captures user input", {
 #   local_mocked_bindings(
 #     getPass_readline = function(...) "my_password"
@@ -180,44 +180,49 @@ test_that("getPass errors", {
 #                "Masked input is not supported in your version of RStudio")
 # })
 # 
-# # test_that("readline_masked_tcltk_window captures user input correctly", {
-# #   skip_if_not_installed("tcltk")  
-# #   skip_if(Sys.getenv("DISPLAY") == "", "No DISPLAY environment set for Tk")
-# #   
-# #   # Create a mock password variable
-# #   mock_pwd_var <- tcltk::tclVar("user_password")  # Set initial password
-# #   
-# #   local_mocked_bindings(
-# #     tcl_var = function(x) mock_pwd_var,  
-# #     tcl_value = function(x) tcltk::tclvalue(x),  
-# #     
-# #     tk_destroy = function(x) NULL,
-# #     tk_wait_window = function(x) NULL
-# #   )
-# #   
-# #   result <- readline_masked_tcltk_window("Enter password:", noblank = FALSE)
-# #   expect_equal(result, "user_password")  
-# # })
-# # 
-# # test_that("readline_masked_tcltk_window returns NULL when user cancels", {
-# #   skip_if_not_installed("tcltk")  
-# #   skip_if(Sys.getenv("DISPLAY") == "", "No DISPLAY environment set for Tk")
-# #   
-# #   mock_pwd_var <- tcltk::tclVar("")
-# #   mock_flag_var <- tcltk::tclVar("0")  
-# #   
-# #   local_mocked_bindings(
-# #     tcl_var = function(x) if (x == 0) mock_flag_var else mock_pwd_var,
-# #     
-# #     tcl_value = function(x) {
-# #       if (identical(x, mock_flag_var)) return("0")  
-# #       return(NULL)  
-# #     },
-# #     
-# #     tk_destroy = function(x) NULL,
-# #     tk_wait_window = function(x) NULL
-# #   )
-# #   
-# #   result <- readline_masked_tcltk_window("Enter password:", noblank = FALSE)
-# #   expect_null(result)  
-# # })
+# test_that("readline_masked_tcltk_window handles password entry correctly", {
+#   # Mock tcltk functions to prevent actual UI interactions
+#   mock_tclVar <- function(value) {
+#     structure(value, class = "tclVar")
+#   }
+#   
+#   mockery::stub(readline_masked_tcltk_window, "tcltk::tclVar", mock_tclVar)
+#   mockery::stub(readline_masked_tcltk_window, "tcltk::tkmessageBox", function(...) NULL)
+#   mockery::stub(readline_masked_tcltk_window, "tcltk::tkwait.window", function(...) NULL)
+#   mockery::stub(readline_masked_tcltk_window, "tcltk::tkdestroy", function(...) NULL)
+#   
+#   # Simulate user input: Non-empty password
+#   mockery::stub(readline_masked_tcltk_window, "tcltk::tclvalue", function(var) {
+#     if (identical(var, mock_tclVar(0))) return("1") # Simulate submit flag
+#     else return("my_secure_password") # Simulate password entry
+#   })
+#   
+#   # Test case: User enters a password
+#   expect_equal(readline_masked_tcltk_window("Enter password:"), "my_secure_password")
+#   
+#   # Test case: User submits a blank password (allowed)
+#   mockery::stub(readline_masked_tcltk_window, "tcltk::tclvalue", function(var) {
+#     if (identical(var, mock_tclVar(0))) return("1") # Simulate submit
+#     else return("") # Blank password
+#   })
+#   
+#   expect_equal(readline_masked_tcltk_window("Enter password:", noblank = FALSE), "")
+#   
+#   # Test case: User submits a blank password (not allowed)
+#   blank_counter <- 0
+#   mockery::stub(readline_masked_tcltk_window, "tcltk::tclvalue", function(var) {
+#     blank_counter <<- blank_counter + 1
+#     if (identical(var, mock_tclVar(0))) return("1") # Simulate submit flag
+#     else return(ifelse(blank_counter == 1, "", "valid_password")) # First blank, then valid input
+#   })
+#   
+#   expect_equal(readline_masked_tcltk_window("Enter password:", noblank = TRUE), "valid_password")
+#   
+#   # Test case: User cancels (flagvar = 0)
+#   mockery::stub(readline_masked_tcltk_window, "tcltk::tclvalue", function(var) {
+#     if (identical(var, mock_tclVar(0))) return("0") # Simulate cancel
+#     else return("ignored_password") # Should be ignored
+#   })
+#   
+#   expect_null(readline_masked_tcltk_window("Enter password:"))
+# })
