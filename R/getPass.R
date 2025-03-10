@@ -123,7 +123,7 @@ os_windows = function(){
 }
 
 readline_masked_rstudio_window <- function(msg, forcemask){
-  if (!rstudioapi::hasFun("askForPassword")){
+  if (!has_fun("askForPassword")){
     stopmsg <- "Masked input is not supported in your version of RStudio; please update to version >= 0.99.879"
     if (!forcemask){
       message(paste0("NOTE: ", stopmsg, "\n"))
@@ -132,13 +132,12 @@ readline_masked_rstudio_window <- function(msg, forcemask){
       stop(stopmsg)
     }
   } else {
-    pw <- rstudioapi::askForPassword(msg)
+    pw <- ask_for_password(msg)
   }
   return(pw)
 }
 
-
-readline_nomask <- function(msg, noblank, silent=FALSE){
+readline_nomask <- function(msg, noblank = TRUE, silent=FALSE){
   if (!silent) message("WARNING: your platform is not supported. Input is not masked!")
   message(msg, appendLF=FALSE)
   pw <- readline()
@@ -223,4 +222,12 @@ readline_masked_tcltk_window <- function(msg, noblank=FALSE){
 
 readline_masked_term <- function(msg, showstars, noblank=FALSE){
   .Call(getPass_readline_masked, msg, as.integer(showstars), as.integer(noblank))
+}
+
+ask_for_password <- function(msg){
+  rstudioapi::askForPassword(prompt = msg)
+}
+
+has_fun <- function(name){
+  rstudioapi::hasFun(name)
 }
