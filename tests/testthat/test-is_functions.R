@@ -128,6 +128,22 @@ test_that("import_from_iri handles incorrect data_file gracefully", {
   )
 })
 
+test_that("import_from_iri handles incorrect data_file gracefully", {
+  expect_error(
+    import_from_iri(
+      download_from = "NOAA_CMORPH_DAILY",
+      data_file = "invalid_data_file",
+      path = "",
+      X1 = 35,
+      X2 = 36,
+      Y1 = -1,
+      Y2 = 0,
+      get_area_point = "area"
+    ),
+    "Data file does not exist for NOAA CMORPH data"
+  )
+})
+
 test_that("in_top_n correctly identifies top N values", {
   x <- c(10, 5, 7, 12, 3)
   result <- in_top_n(x, 3)

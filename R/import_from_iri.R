@@ -38,6 +38,12 @@ import_from_iri <- function(download_from, data_file, path, X1, X2,Y1,Y2, get_ar
     gaugelocdir = path
   }
   
+  cmorph_base_urls <- c(
+    "NOAA_CMORPH_DAILY" = "http://iridl.ldeo.columbia.edu/SOURCES/.NOAA/.NCEP/.CPC/.CMORPH/.daily",
+    "NOAA_CMORPH_3HOURLY" = "http://iridl.ldeo.columbia.edu/SOURCES/.NOAA/.NCEP/.CPC/.CMORPH/.3-hourly",
+    "NOAA_CMORPH_DAILY_CALCULATED" = "http://iridl.ldeo.columbia.edu/SOURCES/.NOAA/.NCEP/.CPC/.CMORPH/.daily_calculated"
+  )
+  
   if(download_from == "CHIRPS_V2P0"){
     prexyaddress <- "https://iridl.ldeo.columbia.edu/SOURCES/.UCSB/.CHIRPS/.v2p0"
     chirps_extensions <- c(
@@ -85,21 +91,20 @@ import_from_iri <- function(download_from, data_file, path, X1, X2,Y1,Y2, get_ar
     rfe2_extensions <- c("daily_estimated_prcp" = ".DAILY/.RFEv2/.est_prcp")
     extension <- rfe2_extensions[data_file]
     if (is.na(extension)) stop("Data file does not exist for NOAA RFE2 data")
-  } else if(download_from=="NOAA_CMORPH_DAILY" || download_from=="NOAA_CMORPH_3HOURLY" || download_from=="NOAA_CMORPH_DAILY_CALCULATED") {
-    if(download_from=="NOAA_CMORPH_DAILY") prexyaddress <- "http://iridl.ldeo.columbia.edu/SOURCES/.NOAA/.NCEP/.CPC/.CMORPH/.daily"
-    else if(download_from == "NOAA_CMORPH_3HOURLY") prexyaddress <- "http://iridl.ldeo.columbia.edu/SOURCES/.NOAA/.NCEP/.CPC/.CMORPH/.3-hourly"
-    
-    if(download_from == "NOAA_CMORPH_DAILY_CALCULATED") prexyaddress <- "http://iridl.ldeo.columbia.edu/SOURCES/.NOAA/.NCEP/.CPC/.CMORPH/.daily_calculated"
-    
-    if(data_file == "mean_microwave_only_est_prcp") extension <- ".mean/.microwave-only/.comb"
-    else if(data_file == "mean_morphed_est_prcp") extension <- ".mean/.morphed/.cmorph"
-    
-    if(data_file == "orignames_mean_microwave_only_est_prcp") extension <- ".orignames/.mean/.microwave-only/.comb"
-    else if(data_file == "orignames_mean_morphed_est_prcp") extension <- ".orignames/.mean/.morphed/.cmorph"
-    
-    if(data_file == "renamed102015_mean_microwave_only_est_prcp") extension <- ".renamed102015/.mean/.microwave-only/.comb"
-    else if(data_file == "renamed102015_mean_morphed_est_prcp") extension <- ".renamed102015/.mean/.morphed/.cmorph"
-    else stop("Data file does not exist for NOAA CMORPH data")
+  } else if(download_from %in% names(cmorph_base_urls)) {
+    cmorph_extensions <- c(
+      "mean_microwave_only_est_prcp"              = ".mean/.microwave-only/.comb",
+      "mean_morphed_est_prcp"                     = ".mean/.morphed/.cmorph",
+      "orignames_mean_microwave_only_est_prcp"    = ".orignames/.mean/.microwave-only/.comb",
+      "orignames_mean_morphed_est_prcp"           = ".orignames/.mean/.morphed/.cmorph",
+      "renamed102015_mean_microwave_only_est_prcp"= ".renamed102015/.mean/.microwave-only/.comb",
+      "renamed102015_mean_morphed_est_prcp"       = ".renamed102015/.mean/.morphed/.cmorph"
+    )
+    prexyaddress <- cmorph_base_urls[download_from]
+    extension <- cmorph_extensions[data_file]
+    if (is.na(extension)){
+      stop("Data file does not exist for NOAA CMORPH data")
+    }
   } else if(download_from=="NASA_TRMM_3B42") {
     prexyaddress <- "https://iridl.ldeo.columbia.edu/SOURCES/.NASA/.GES-DAAC/.TRMM_L3/.TRMM_3B42/.v7"
     
