@@ -141,3 +141,48 @@ test_that("check_github_repo handles various scenarios", {
   mockery::stub(check_github_repo, "gh::gh", function(...) stop("Not Found"))
   expect_equal(check_github_repo(owner = "user", repo = "non_existent"), 6)
 })
+
+test_that("set_library_paths updates library paths correctly", {
+  # Mock APPDATA environment variable
+  mock_sys_getenv <- function(var) {
+    if (var == "APPDATA") return("C:/Fake/AppData") else return("")
+  }
+  mockery::stub(set_library_paths, "Sys.getenv", mock_sys_getenv)
+  
+  # Mock dir.create to avoid real directory creation
+  mock_dir_create <- mockery::mock(NULL)
+  mockery::stub(set_library_paths, "dir.create", mock_dir_create)
+  
+  # Simulated library paths variable
+  mocked_lib_paths <- c("C:/Existing/Library1", "C:/Existing/Library2")
+  
+  # Mock .libPaths using a helper function
+  fake_libPaths <- function(new = NULL) {
+    if (is.null(new)) {
+      return(mocked_lib_paths)
+    } else {
+      mocked_lib_paths <<- new
+    }
+  }
+  
+  # Use `mockery::stub()` to replace .libPaths() with fake_libPaths()
+  mockery::stub(set_library_paths, ".libPaths", fake_libPaths)
+  
+  # Run function
+  set_library_paths("4.3")
+  
+  # Expected new library path
+  expected_new_path <- "C:/Fake/AppData/R-Instat/4.3/library"
+  
+  # Verify dir.create was called with the correct path
+  mockery::expect_called(mock_dir_create, 1)
+  mockery::expect_args(mock_dir_create, 1, expected_new_path, recursive = TRUE, showWarnings = FALSE)
+  
+  # Verify .libPaths() was updated correctly
+  expect_true(expected_new_path %in% mocked_lib_paths)
+  
+  # Verify it maintains only the valid paths (first and third if applicable)
+  if (length(mocked_lib_paths) > 2) {
+    expect_equal(mocked_lib_paths, c(expected_new_path, "C:/Existing/Library2"))
+  }
+})
