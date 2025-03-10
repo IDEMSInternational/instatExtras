@@ -70,7 +70,7 @@ getPass <- function(msg = "PASSWORD: ", noblank = FALSE, forcemask = FALSE) {
   }
   
   if (tolower(.Platform$GUI) == "rstudio") pw <- readline_masked_rstudio(msg = msg, noblank = noblank, forcemask = forcemask)
-  else if (isaterm()) pw <- readline_masked_term(msg = msg, showstars = TRUE, noblank = noblank)
+  #else if (isaterm()) pw <- readline_masked_term(msg = msg, showstars = TRUE, noblank = noblank)
   else if (hastcltk()) pw <- readline_masked_tcltk(msg = msg, noblank = noblank)
   else if (!forcemask) pw <- getPass_readline(msg)
   else stop("Masking is not supported on your platform!")
@@ -97,26 +97,22 @@ readline_masked_rstudio <- function(msg, forcemask, noblank=FALSE){
   return(pw)
 }
 
-isaterm <- function(){
-  gui <- .Platform$GUI
-  
-  if (!isatty(stdin())) return(FALSE)
-  # ban emacs: here and everywhere else in life
-  else if (Sys.getenv("EMACS") == "t" || identical(getOption("STERM"), "iESS")) return(FALSE)
-  else if (gui == "RTerm" || gui == "X11") return(TRUE)
-  else if (gui == "unknown" && .Platform$OS.type == "unix" && Sys.getenv("RSTUDIO") != 1 && Sys.getenv("R_GUI_APP_VERSION") == "") return(TRUE) # I think?
-  else return(FALSE)
-}
-
-
+# isaterm <- function(){
+#   gui <- .Platform$GUI
+#   
+#   if (!isatty(stdin())) return(FALSE)
+#   # ban emacs: here and everywhere else in life
+#   else if (Sys.getenv("EMACS") == "t" || identical(getOption("STERM"), "iESS")) return(FALSE)
+#   else if (gui == "RTerm" || gui == "X11") return(TRUE)
+#   else if (gui == "unknown" && .Platform$OS.type == "unix" && Sys.getenv("RSTUDIO") != 1 && Sys.getenv("R_GUI_APP_VERSION") == "") return(TRUE) # I think?
+#   else return(FALSE)
+# }
 
 hastcltk <- function(){
   test <- tryCatch(requireNamespace("tcltk", quietly=TRUE), warning=identity)
   if (!is.logical(test)) test <- FALSE
   test
 }
-
-
 
 os_windows = function(){
   .Platform$OS.type == tolower("windows")
@@ -220,9 +216,9 @@ readline_masked_tcltk_window <- function(msg, noblank=FALSE){
   return(pw)
 }
 
-readline_masked_term <- function(msg, showstars, noblank=FALSE){
-  .Call(getPass_readline_masked, msg, as.integer(showstars), as.integer(noblank))
-}
+# readline_masked_term <- function(msg, showstars, noblank=FALSE){
+#   .Call(getPass_readline_masked, msg, as.integer(showstars), as.integer(noblank))
+# }
 
 ask_for_password <- function(msg){
   rstudioapi::askForPassword(prompt = msg)
