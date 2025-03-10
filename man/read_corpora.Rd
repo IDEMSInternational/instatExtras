@@ -18,6 +18,8 @@ It handles various data types including data frames, vectors, matrices, and list
 }
 \examples{
 \dontrun{
-  read_corpora(my_data)
+  library(rcorpora)
+  read_corpora(corpora(category = "animals"))
+  read_corpora(corpora("foods/pizzaToppings"))
 }
 }
