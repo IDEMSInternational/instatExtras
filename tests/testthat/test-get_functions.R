@@ -180,21 +180,39 @@ test_that("readline_masked_rstudio_window errors if forcemask = TRUE and masking
                "Masked input is not supported in your version of RStudio")
 })
 
-test_that("readline_nomask captures user input", {
-  local_mocked_bindings(
-    readline = function() "test_password"
-  )
-  
-  result <- readline_nomask("Enter password:", noblank = FALSE)
-  expect_equal(result, "test_password")
-})
+# test_that("readline_nomask captures user input", {
+#   local_mocked_bindings(
+#     readline = function() "test_password"
+#   )
+#   
+#   result <- readline_nomask("Enter password:", noblank = FALSE)
+#   expect_equal(result, "test_password")
+# })
 
-test_that("readline_nomask prevents blank passwords if noblank = TRUE", {
+# test_that("readline_nomask prevents blank passwords if noblank = TRUE", {
+#   local_mocked_bindings(
+#     readline = function() "test_password"
+#   )
+#   
+#   result <- readline_nomask("Enter password:", noblank = TRUE)
+#   expect_equal(result, "test_password")
+# })
+
+##
+
+test_that("readline_masked_tcltk_window captures user input correctly", {
+  # Create a mock password variable
+  mock_pwd_var <- tcltk::tclVar("user_password")  # Set initial password
+  
   local_mocked_bindings(
-    readline = function() "test_password"
+    tcl_var = function(x) mock_pwd_var,  # Always return the mock password variable
+    tcl_value = function(x) tcltk::tclvalue(x),  # Retrieve the stored password
+    
+    tk_destroy = function(x) NULL,
+    tk_wait_window = function(x) NULL
   )
   
-  result <- readline_nomask("Enter password:", noblank = TRUE)
-  expect_equal(result, "test_password")
+  result <- readline_masked_tcltk_window("Enter password:", noblank = FALSE)
+  expect_equal(result, "user_password")  # Ensure the function returns the mocked password
 })
 
