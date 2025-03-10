@@ -198,21 +198,23 @@ test_that("readline_masked_rstudio_window errors if forcemask = TRUE and masking
 #   expect_equal(result, "test_password")
 # })
 
-##
-
-test_that("readline_masked_tcltk_window captures user input correctly", {
-  # Create a mock password variable
-  mock_pwd_var <- tcltk::tclVar("user_password")  # Set initial password
+test_that("readline_masked_tcltk_window returns NULL when user cancels", {
+  # Create a mock password variable and flag variable
+  mock_pwd_var <- tcltk::tclVar("")
+  mock_flag_var <- tcltk::tclVar("0")  # Flag should be "0" when user cancels
   
   local_mocked_bindings(
-    tcl_var = function(x) mock_pwd_var,  # Always return the mock password variable
-    tcl_value = function(x) tcltk::tclvalue(x),  # Retrieve the stored password
+    tcl_var = function(x) if (x == 0) mock_flag_var else mock_pwd_var,  
+    
+    tcl_value = function(x) {
+      if (identical(x, mock_flag_var)) return("0")  # Simulate cancellation flag
+      return(NULL)  # Password stays NULL
+    },
     
     tk_destroy = function(x) NULL,
     tk_wait_window = function(x) NULL
   )
   
   result <- readline_masked_tcltk_window("Enter password:", noblank = FALSE)
-  expect_equal(result, "user_password")  # Ensure the function returns the mocked password
+  expect_null(result)  # The function should return NULL if the user cancels
 })
-
