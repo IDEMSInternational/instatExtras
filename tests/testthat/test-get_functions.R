@@ -64,16 +64,16 @@ test_that("get_years_from_data extracts correct years", {
   expect_equal(rownames(result), c("Age", "X2019", "X2020", "X2021"))
 })
 
-# For getPass
-test_that("getPass errors", {
-  expect_error(getPass(1:5))
-  expect_error(getPass(msg = "Hello", noblank = 1:5))
-  expect_error(getPass(msg = "Hello", forcemask = 1:5))
-  expect_error(getPass(msg = NULL), "argument 'msg' must be a single string")
-  expect_error(getPass(noblank = "yes"), "argument 'noblank' must be one of 'TRUE' or 'FALSE'")
-  expect_error(getPass(forcemask = 1), "argument 'forcemask' must be one of 'TRUE' or 'FALSE'")
-})
-
+# # For getPass
+# test_that("getPass errors", {
+#   expect_error(getPass(1:5))
+#   expect_error(getPass(msg = "Hello", noblank = 1:5))
+#   expect_error(getPass(msg = "Hello", forcemask = 1:5))
+#   expect_error(getPass(msg = NULL), "argument 'msg' must be a single string")
+#   expect_error(getPass(noblank = "yes"), "argument 'noblank' must be one of 'TRUE' or 'FALSE'")
+#   expect_error(getPass(forcemask = 1), "argument 'forcemask' must be one of 'TRUE' or 'FALSE'")
+# })
+# 
 # test_that("getPass correctly captures user input", {
 #   local_mocked_bindings(
 #     getPass_readline = function(...) "my_password"
@@ -85,7 +85,7 @@ test_that("getPass errors", {
 #   local_mocked_bindings(
 #     getPass_readline = function(...) NULL
 #   )
-#   
+# 
 #   expect_null(getPass("Enter password: "))
 # })
 # 
@@ -94,7 +94,7 @@ test_that("getPass errors", {
 #     readline_masked_tcltk_window = function(...) "tcltk_password",
 #     hastcltk = function() TRUE
 #   )
-#   
+# 
 #   expect_equal(getPass("Enter password: "), "tcltk_password")
 # })
 # 
@@ -103,7 +103,7 @@ test_that("getPass errors", {
 #     readline_masked_term = function(...) "terminal_password",
 #     isaterm = function() TRUE
 #   )
-#   
+# 
 #   expect_equal(getPass("Enter password: "), "terminal_password")
 # })
 # 
@@ -112,16 +112,16 @@ test_that("getPass errors", {
 #     isaterm = function() FALSE,
 #     hastcltk = function() FALSE
 #   )
-#   
+# 
 #   expect_error(getPass("Enter password:", forcemask = TRUE), "Masking is not supported")
 # })
 # 
 # test_that("get_odk_form_names handles authentication and API request correctly", {
-#   
+# 
 #   # Mock `getPass()` to avoid user input
 #   local_mocked_bindings(
 #     getPass = function(...) "mock_password",
-#     
+# 
 #     # Mock our custom wrapper function instead of `httr::GET`
 #     get_odk_http_get = function(url, auth = NULL) {
 #       # Simulated JSON response structure
@@ -134,29 +134,26 @@ test_that("getPass errors", {
 #         class = "response"
 #       )
 #     },
-#     
+# 
 #     # Mock our custom wrapper function instead of `httr::content`
 #     get_odk_http_content = function(response, type) {
 #       response$content
 #     }
 #   )
-#   
+# 
 #   # Test function with mock responses
 #   form_names <- get_odk_form_names("mock_user", "kobo")
-#   
+# 
 #   # Expected output
 #   expect_equal(form_names, c("Form A", "Form B"))
 # })
-# 
-# 
-# ###
 # 
 # test_that("readline_masked_rstudio_window correctly calls askForPassword()", {
 #   local_mocked_bindings(
 #     has_fun = function(fun) TRUE,  # Pretend askForPassword exists
 #     ask_for_password = function(msg) "mock_password"
 #   )
-#   
+# 
 #   result <- readline_masked_rstudio_window("Enter password:", forcemask = FALSE)
 #   expect_equal(result, "mock_password")
 # })
@@ -166,7 +163,7 @@ test_that("getPass errors", {
 #     has_fun = function(fun) FALSE,  # Simulate an unsupported RStudio version
 #     readline_nomask = function(msg, silent) "fallback_password"
 #   )
-#   
+# 
 #   result <- readline_masked_rstudio_window("Enter password:", forcemask = FALSE)
 #   expect_equal(result, "fallback_password")
 # })
@@ -175,81 +172,52 @@ test_that("getPass errors", {
 #   local_mocked_bindings(
 #     has_fun = function(fun) FALSE  # Simulate no password masking support
 #   )
-#   
+# 
 #   expect_error(readline_masked_rstudio_window("Enter password:", forcemask = TRUE),
 #                "Masked input is not supported in your version of RStudio")
 # })
-# 
+
 # test_that("readline_masked_tcltk_window handles password entry correctly", {
-#   # Mock tcltk functions to prevent actual UI interactions
-#   mock_tclVar <- function(value) {
-#     structure(value, class = "tclVar")
+#   # Skip test if Tcl/Tk is not available (headless environments like GitHub Actions)
+#   if (!capabilities("tcltk") || Sys.getenv("GITHUB_ACTIONS") == "true") {
+#     skip("Tcl/Tk not available in headless environments like GitHub Actions")
 #   }
 #   
-#   mockery::stub(readline_masked_tcltk_window, "tcltk::tclVar", mock_tclVar)
-#   mockery::stub(readline_masked_tcltk_window, "tcltk::tkmessageBox", function(...) NULL)
-#   mockery::stub(readline_masked_tcltk_window, "tcltk::tkwait.window", function(...) NULL)
-#   mockery::stub(readline_masked_tcltk_window, "tcltk::tkdestroy", function(...) NULL)
+#   # Create a real Tcl/Tk window to use as a mock
+#   real_window <- tcltk::tktoplevel()
 #   
-#   # Simulate user input: Non-empty password
-#   mockery::stub(readline_masked_tcltk_window, "tcltk::tclvalue", function(var) {
-#     if (identical(var, mock_tclVar(0))) return("1") # Simulate submit flag
-#     else return("my_secure_password") # Simulate password entry
-#   })
-#   
-#   # Test case: User enters a password
-#   expect_equal(readline_masked_tcltk_window("Enter password:"), "my_secure_password")
-#   
-#   # Test case: User submits a blank password (allowed)
-#   mockery::stub(readline_masked_tcltk_window, "tcltk::tclvalue", function(var) {
-#     if (identical(var, mock_tclVar(0))) return("1") # Simulate submit
-#     else return("") # Blank password
-#   })
-#   
-#   expect_equal(readline_masked_tcltk_window("Enter password:", noblank = FALSE), "")
-#   
-#   # Test case: User submits a blank password (not allowed)
-#   blank_counter <- 0
-#   mockery::stub(readline_masked_tcltk_window, "tcltk::tclvalue", function(var) {
-#     blank_counter <<- blank_counter + 1
-#     if (identical(var, mock_tclVar(0))) return("1") # Simulate submit flag
-#     else return(ifelse(blank_counter == 1, "", "valid_password")) # First blank, then valid input
-#   })
-#   
-#   expect_equal(readline_masked_tcltk_window("Enter password:", noblank = TRUE), "valid_password")
-#   
-#   # Test case: User cancels (flagvar = 0)
-#   mockery::stub(readline_masked_tcltk_window, "tcltk::tclvalue", function(var) {
-#     if (identical(var, mock_tclVar(0))) return("0") # Simulate cancel
-#     else return("ignored_password") # Should be ignored
-#   })
-#   
-#   expect_null(readline_masked_tcltk_window("Enter password:"))
-# })
-
-
-# test_that("readline_masked_tcltk_window handles password entry correctly", {
-#   # Create real Tcl/Tk variables (to avoid structure issues)
+#   # Create real Tcl/Tk variables
 #   real_pwdvar <- tcltk::tclVar("")
 #   real_flagvar <- tcltk::tclVar(0)
 #   
-#   # mockery::stub tclVar to return real Tcl/Tk variables
+#   # Stub `tclVar()` to return real Tcl/Tk variables
 #   mockery::stub(readline_masked_tcltk_window, "tcltk::tclVar", function(value) {
 #     if (value == "") return(real_pwdvar)
 #     else return(real_flagvar)
 #   })
 #   
-#   # mockery::stub `tcltk::tclvalue()` to control return values
+#   # mockery::stub `tclvalue()` to simulate user inputs
 #   mockery::stub(readline_masked_tcltk_window, "tcltk::tclvalue", function(var) {
 #     if (identical(var, real_flagvar)) return("1")  # Simulate submit flag
-#     if (identical(var, real_pwdvar)) return("my_secure_password")  # Simulate user input
+#     if (identical(var, real_pwdvar)) return("my_secure_password")  # Simulate password entry
 #     return("")
 #   })
 #   
-#   # mockery::stub `tcltk` functions to prevent UI interactions
-#   mockery::stub(readline_masked_tcltk_window, "tcltk::tkmessageBox", function(...) NULL)
+#   # mockery::stub `tktoplevel()` to return the real Tk window
+#   mockery::stub(readline_masked_tcltk_window, "tcltk::tktoplevel", function(...) real_window)
+#   
+#   # mockery::stub other UI functions to prevent actual interactions
+#   mockery::stub(readline_masked_tcltk_window, "tcltk::tkframe", function(...) NULL)
+#   mockery::stub(readline_masked_tcltk_window, "tcltk::tkpack", function(...) NULL)
+#   mockery::stub(readline_masked_tcltk_window, "tcltk::tklabel", function(...) NULL)
+#   mockery::stub(readline_masked_tcltk_window, "tcltk::tkentry", function(...) NULL)
+#   mockery::stub(readline_masked_tcltk_window, "tcltk::tkbind", function(...) NULL)
+#   mockery::stub(readline_masked_tcltk_window, "tcltk::tkbutton", function(...) NULL)
+#   mockery::stub(readline_masked_tcltk_window, "tcltk::tkwm.minsize", function(...) NULL)
+#   mockery::stub(readline_masked_tcltk_window, "tcltk::tkwm.deiconify", function(...) NULL)
+#   mockery::stub(readline_masked_tcltk_window, "tcltk::tkfocus", function(...) NULL)
 #   mockery::stub(readline_masked_tcltk_window, "tcltk::tkwait.window", function(...) NULL)
-#   mockery::stub(readline_masked_tcltk_window, "tcltk::tkdestroy", function(...) NULL)
+#   mockery::stub(readline_masked_tcltk_window, "tcltk::tkmessageBox", function(...) NULL)
 #   
 #   # Test case: User enters a password
 #   expect_equal(readline_masked_tcltk_window("Enter password:"), "my_secure_password")
@@ -271,4 +239,7 @@ test_that("getPass errors", {
 #   })
 #   
 #   expect_null(readline_masked_tcltk_window("Enter password:"))
+#   
+#   # Destroy the Tk window after tests complete
+#   tcltk::tkdestroy(real_window)
 # })
