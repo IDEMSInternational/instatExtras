@@ -147,3 +147,92 @@ test_that("get_odk_form_names handles authentication and API request correctly",
   # Expected output
   expect_equal(form_names, c("Form A", "Form B"))
 })
+
+
+###
+
+test_that("readline_masked_rstudio_window correctly calls askForPassword()", {
+  local_mocked_bindings(
+    has_fun = function(fun) TRUE,  # Pretend askForPassword exists
+    ask_for_password = function(msg) "mock_password"
+  )
+  
+  result <- readline_masked_rstudio_window("Enter password:", forcemask = FALSE)
+  expect_equal(result, "mock_password")
+})
+
+test_that("readline_masked_rstudio_window falls back to readline_nomask()", {
+  local_mocked_bindings(
+    has_fun = function(fun) FALSE,  # Simulate an unsupported RStudio version
+    readline_nomask = function(msg, silent) "fallback_password"
+  )
+  
+  result <- readline_masked_rstudio_window("Enter password:", forcemask = FALSE)
+  expect_equal(result, "fallback_password")
+})
+
+test_that("readline_masked_rstudio_window errors if forcemask = TRUE and masking is unavailable", {
+  local_mocked_bindings(
+    has_fun = function(fun) FALSE  # Simulate no password masking support
+  )
+  
+  expect_error(readline_masked_rstudio_window("Enter password:", forcemask = TRUE),
+               "Masked input is not supported in your version of RStudio")
+})
+
+# test_that("readline_nomask captures user input", {
+#   local_mocked_bindings(
+#     readline = function() "test_password"
+#   )
+#   
+#   result <- readline_nomask("Enter password:", noblank = FALSE)
+#   expect_equal(result, "test_password")
+# })
+
+# test_that("readline_nomask prevents blank passwords if noblank = TRUE", {
+#   local_mocked_bindings(
+#     readline = function() "test_password"
+#   )
+#   
+#   result <- readline_nomask("Enter password:", noblank = TRUE)
+#   expect_equal(result, "test_password")
+# })
+
+##
+# 
+# test_that("readline_masked_tcltk_window captures user input correctly", {
+#   # Create a mock password variable
+#   mock_pwd_var <- tcltk::tclVar("user_password")  # Set initial password
+#   
+#   local_mocked_bindings(
+#     tcl_var = function(x) mock_pwd_var,  # Always return the mock password variable
+#     tcl_value = function(x) tcltk::tclvalue(x),  # Retrieve the stored password
+#     
+#     tk_destroy = function(x) NULL,
+#     tk_wait_window = function(x) NULL
+#   )
+#   
+#   result <- readline_masked_tcltk_window("Enter password:", noblank = FALSE)
+#   expect_equal(result, "user_password")  # Ensure the function returns the mocked password
+# })
+# 
+# test_that("readline_masked_tcltk_window returns NULL when user cancels", {
+#   # Create a mock password variable and flag variable
+#   mock_pwd_var <- tcltk::tclVar("")
+#   mock_flag_var <- tcltk::tclVar("0")  # Flag should be "0" when user cancels
+#   
+#   local_mocked_bindings(
+#     tcl_var = function(x) if (x == 0) mock_flag_var else mock_pwd_var,  
+#     
+#     tcl_value = function(x) {
+#       if (identical(x, mock_flag_var)) return("0")  # Simulate cancellation flag
+#       return(NULL)  # Password stays NULL
+#     },
+#     
+#     tk_destroy = function(x) NULL,
+#     tk_wait_window = function(x) NULL
+#   )
+#   
+#   result <- readline_masked_tcltk_window("Enter password:", noblank = FALSE)
+#   expect_null(result)  # The function should return NULL if the user cancels
+# })

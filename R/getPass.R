@@ -123,7 +123,7 @@ os_windows = function(){
 }
 
 readline_masked_rstudio_window <- function(msg, forcemask){
-  if (!rstudioapi::hasFun("askForPassword")){
+  if (!has_fun("askForPassword")){
     stopmsg <- "Masked input is not supported in your version of RStudio; please update to version >= 0.99.879"
     if (!forcemask){
       message(paste0("NOTE: ", stopmsg, "\n"))
@@ -132,13 +132,12 @@ readline_masked_rstudio_window <- function(msg, forcemask){
       stop(stopmsg)
     }
   } else {
-    pw <- rstudioapi::askForPassword(msg)
+    pw <- ask_for_password(msg)
   }
   return(pw)
 }
 
-
-readline_nomask <- function(msg, noblank, silent=FALSE){
+readline_nomask <- function(msg, noblank = TRUE, silent=FALSE){
   if (!silent) message("WARNING: your platform is not supported. Input is not masked!")
   message(msg, appendLF=FALSE)
   pw <- readline()
@@ -162,60 +161,60 @@ readline_masked_tcltk_window <- function(msg, noblank=FALSE){
   
   # Define event actions
   # (This should be in this function because window "tt" is local.)
-  tcreset <- function(){ tcltk::tclvalue(pwdvar) <- "" }
+  tcreset <- function(){ tcl_value(pwdvar) <- "" }
   
   tcsubmit <- function(){
-    if (noblank && tcltk::tclvalue(pwdvar) == ""){
-      tcltk::tkmessageBox(title = "getPass noblank = TRUE",
+    if (noblank && tcl_value(pwdvar) == ""){
+      tk_message_box(title = "getPass noblank = TRUE",
                           message = "No blank input please!",
                           parent = textbox)
     } else {
-      tcltk::tclvalue(flagvar) <- 1
-      tcltk::tkdestroy(tt)
+      tcl_value(flagvar) <- 1
+      tk_destroy(tt)
     }
   }
   
   tccleanup <- function(){
-    tcltk::tclvalue(flagvar) <- 0
-    tcltk::tkdestroy(tt)
+    tcl_value(flagvar) <- 0
+    tk_destroy(tt)
   }
   
   # Main window
-  tt <- tcltk::tktoplevel()
-  tcltk::tktitle(tt) <- "getPass input"
-  pwdvar <- tcltk::tclVar("")
-  flagvar <- tcltk::tclVar(0)
+  tt <- tk_top_level()
+  tk_title(tt, "getPass input")
+  pwdvar <- tcl_var("")
+  flagvar <- tcl_var(0)
   
   # Main frame
-  f1 <- tcltk::tkframe(tt)
-  tcltk::tkpack(f1, side = "top")
-  tcltk::tkpack(tcltk::tklabel(f1, text = msg), side = "left")
+  f1 <- tk_frame(tt)
+  tk_pack(f1, side = "top")
+  tk_pack(tk_label(f1, text = msg), side = "left")
   
   # Main entry
-  textbox <- tcltk::tkentry(f1, textvariable = pwdvar, show = "*")
-  tcltk::tkpack(textbox, side = "left")
-  tcltk::tkbind(textbox, "<Return>", tcsubmit)
-  if (.Platform$OS.type == "windows") tcltk::tkbind(textbox, "<Escape>", tccleanup)
-  else tcltk::tkbind(textbox, "<Control-c>", tccleanup)
+  textbox <- tk_entry(f1, textvariable = pwdvar, show = "*")
+  tk_pack(textbox, side = "left")
+  tk_bind(textbox, "<Return>", tcsubmit)
+  if (.Platform$OS.type == "windows") tk_bind(textbox, "<Escape>", tccleanup)
+  else tk_bind(textbox, "<Control-c>", tccleanup)
   
   # Buttons for submit and reset
-  reset.but <- tcltk::tkbutton(f1, text = "Reset", command = tcreset)
-  submit.but <- tcltk::tkbutton(f1, text = "Submit", command = tcsubmit)
+  reset.but <- tk_button(f1, text = "Reset", command = tcreset)
+  submit.but <- tk_button(f1, text = "Submit", command = tcsubmit)
   
-  tcltk::tkpack(reset.but, side = "left")
-  tcltk::tkpack(submit.but, side = "right")
+  tk_pack(reset.but, side = "left")
+  tk_pack(submit.but, side = "right")
   
   # Add focus
-  tcltk::tkwm.minsize(tt, "320", "40")
-  tcltk::tkwm.deiconify(tt)
-  tcltk::tkfocus(textbox)
+  tk_wm_minsize(tt, "320", "40")
+  tk_wm_deiconify(tt)
+  tk_focus(textbox)
   
   # Wait for destroy signal
-  tcltk::tkwait.window(tt)
-  pw <- tcltk::tclvalue(pwdvar)
+  tk_wait_window(tt)
+  pw <- tcl_value(pwdvar)
   
   # Check for return
-  flag <- tcltk::tclvalue(flagvar)
+  flag <- tcl_value(flagvar)
   if (flag == 0) pw <- NULL
   
   return(pw)
@@ -223,4 +222,82 @@ readline_masked_tcltk_window <- function(msg, noblank=FALSE){
 
 readline_masked_term <- function(msg, showstars, noblank=FALSE){
   .Call(getPass_readline_masked, msg, as.integer(showstars), as.integer(noblank))
+}
+
+ask_for_password <- function(msg){
+  rstudioapi::askForPassword(prompt = msg)
+}
+
+has_fun <- function(name){
+  rstudioapi::hasFun(name)
+}
+
+tcl_value <- function(x){
+  tcltk::tclvalue(x)
+}
+
+tk_message_box <- function(...){
+  tcltk::tkmessageBox(...)
+}
+
+tk_destroy <- function(win){
+  tcltk::tkdestroy(win)
+}
+
+tk_top_level <- function(...){
+  tcltk::tktoplevel(...)
+}
+
+tk_title <- function(tt, title = NULL) {
+  if (!is.null(title)) {
+    tcltk::tktitle(tt) <- title  # This is incorrect in base R
+    tcltk::tkwm.title(tt, title)  # Correct way to set a window title
+  }
+  return(tcltk::tktitle(tt))
+}
+
+tcl_var <- function(init = ""){
+  tcltk::tclVar(init)  
+}
+
+
+tk_frame <- function(...){
+  tcltk::tkframe(...)
+}
+
+tk_entry <- function(...){
+  tcltk::tkentry(...)
+}
+
+tk_pack <- function(...){
+  tcltk::tkpack(...)
+}
+
+tk_button <- function(...){
+  tcltk::tkbutton(...)
+}
+
+tk_wm_minsize <- function(...){
+  tcltk::tkwm.minsize(...)
+}
+
+tk_wm_deiconify <- function(tt){
+  tcltk::tkwm.deiconify(tt)
+}
+
+tk_focus <- function(textbox){
+  tcltk::tkfocus(textbox)
+}
+
+# Wait for destroy signal
+tk_wait_window <- function(...){
+  tcltk::tkwait.window(...)  
+}
+
+tk_label <- function(...){
+  tcltk::tklabel(...)  
+}
+
+tk_bind <- function(...){
+  tcltk::tkbind(...)  
 }
