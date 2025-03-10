@@ -60,11 +60,11 @@ test_that("view_graph_object handles different graph types correctly", {
   # Mock getOption("viewer") to simulate no RStudio viewer available
   mockery::stub(view_graph_object, "getOption", function(x) NULL)
   
-  # # Case 1: No viewer available (should return a file path)
-  # file_path <- view_graph_object(ggplot_obj)
-  # expect_type(file_path, "character")  # Ensure it's a string
-  # expect_match(file_path, "viewgraph.*\\.png")  # Ensure correct file naming
-  # 
+  # Case 1: No viewer available (should return a file path)
+  file_path <- view_graph_object(ggplot_obj)
+  expect_type(file_path, "character")  # Ensure it's a string
+  expect_match(file_path, "viewgraph.*\\.png")  # Ensure correct file naming
+
   # # Case 2: When an RStudio viewer is available (should return the object)
   # mockery::stub(view_graph_object, "getOption", function(x) function(x) {})  # Simulating RStudio viewer
   # expect_equal(view_graph_object(ggplot_obj), ggplot_obj)  # Should return the ggplot object
