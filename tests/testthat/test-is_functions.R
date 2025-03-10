@@ -13,6 +13,37 @@ test_that("import_from_iri handles incorrect source gracefully", {
   expect_error(import_from_iri("INVALID_SOURCE", "daily_0p05", "data", -10, 10, -10, 10, "area"))
 })
 
+test_that("import_from_iri handles incorrect source gracefully", {
+  expect_error(
+    import_from_iri(
+      download_from = "INVALID_SOURCE",
+      data_file = "daily_0p05",
+      path = "",
+      X1 = 35,
+      X2 = 36,
+      Y1 = -1,
+      Y2 = 0,
+      get_area_point = "area"
+    ),
+    "Source not specified correctly."
+  )
+})
+
+test_that("import_from_iri handles incorrect data_file gracefully", {
+  expect_error(
+    import_from_iri(
+      download_from = "CHIRPS_V2P0",
+      data_file = "invalid_data_file",
+      path = "",
+      X1 = 35,
+      X2 = 36,
+      Y1 = -1,
+      Y2 = 0,
+      get_area_point = "area"
+    ),
+    "Data file does not exist for CHIRPS V2P0 data"
+  )
+})
 test_that("in_top_n correctly identifies top N values", {
   x <- c(10, 5, 7, 12, 3)
   result <- in_top_n(x, 3)
