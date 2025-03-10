@@ -98,3 +98,91 @@ test_that("time_operation times an expression", {
 #   expect_true(any(grepl("R-Instat", .libPaths())))
 #   .libPaths(old_paths)  # Reset to avoid issues
 # })
+
+test_that("check_github_repo handles various scenarios", {
+  # Mock `gh::gh` to return a specific response
+  mock_gh <- mockery::mock(
+    list(list(sha = "latest_sha")),  # Mock response for latest commit
+    list(language = "R"),            # Mock response for repo language
+    cycle = TRUE                      # Cycle through responses
+  )
+  
+  mockery::stub(check_github_repo, "gh::gh", mock_gh)
+  
+  # Mock `requireNamespace` to simulate installed or missing packages
+  mock_requireNamespace <- mockery::mock(TRUE, FALSE, cycle = TRUE)
+  mockery::stub(check_github_repo, "requireNamespace", mock_requireNamespace)
+  
+  # Mock `utils::packageDescription` to return a fake SHA
+  mock_packageDescription <- function(pkg) {
+    list(GithubSHA1 = if (pkg == "installed_repo") "latest_sha" else "old_sha")
+  }
+  mockery::stub(check_github_repo, "utils::packageDescription", mock_packageDescription)
+  
+  # Case 1: Installed package, latest commit matches
+  expect_equal(check_github_repo(owner = "user", repo = "installed_repo"), 0)
+  
+  # Case 2: Installed package, latest commit differs
+  expect_equal(check_github_repo(owner = "user", repo = "outdated_repo"), 4)
+  
+  # Case 3: Installed package but no local SHA
+  mock_packageDescription_no_sha <- function(pkg) list(GithubSHA1 = NULL)
+  mockery::stub(check_github_repo, "utils::packageDescription", mock_packageDescription_no_sha)
+  expect_equal(check_github_repo(owner = "user", repo = "no_sha_repo"), 3)
+  
+  # Case 4: Not installed, R language repo
+  expect_equal(check_github_repo(owner = "user", repo = "r_project"), 6)
+  
+  # Case 5: Not installed, non-R repo
+  mockery::stub(check_github_repo, "gh::gh", mockery::mock(list(language = "Python")))
+  expect_equal(check_github_repo(owner = "user", repo = "python_project"), 3)
+  
+  # Case 6: Non-existent repo
+  mockery::stub(check_github_repo, "gh::gh", function(...) stop("Not Found"))
+  expect_equal(check_github_repo(owner = "user", repo = "non_existent"), 6)
+})
+
+test_that("set_library_paths updates library paths correctly", {
+  # Mock APPDATA environment variable
+  mock_sys_getenv <- function(var) {
+    if (var == "APPDATA") return("C:/Fake/AppData") else return("")
+  }
+  mockery::stub(set_library_paths, "Sys.getenv", mock_sys_getenv)
+  
+  # Mock dir.create to avoid real directory creation
+  mock_dir_create <- mockery::mock(NULL)
+  mockery::stub(set_library_paths, "dir.create", mock_dir_create)
+  
+  # Simulated library paths variable
+  mocked_lib_paths <- c("C:/Existing/Library1", "C:/Existing/Library2")
+  
+  # Mock .libPaths using a helper function
+  fake_libPaths <- function(new = NULL) {
+    if (is.null(new)) {
+      return(mocked_lib_paths)
+    } else {
+      mocked_lib_paths <<- new
+    }
+  }
+  
+  # Use `mockery::stub()` to replace .libPaths() with fake_libPaths()
+  mockery::stub(set_library_paths, ".libPaths", fake_libPaths)
+  
+  # Run function
+  set_library_paths("4.3")
+  
+  # Expected new library path
+  expected_new_path <- "C:/Fake/AppData/R-Instat/4.3/library"
+  
+  # Verify dir.create was called with the correct path
+  mockery::expect_called(mock_dir_create, 1)
+  mockery::expect_args(mock_dir_create, 1, expected_new_path, recursive = TRUE, showWarnings = FALSE)
+  
+  # Verify .libPaths() was updated correctly
+  expect_true(expected_new_path %in% mocked_lib_paths)
+  
+  # Verify it maintains only the valid paths (first and third if applicable)
+  if (length(mocked_lib_paths) > 2) {
+    expect_equal(mocked_lib_paths, c(expected_new_path, "C:/Existing/Library2"))
+  }
+})
