@@ -103,8 +103,7 @@ nc_as_data_frame <- function(nc, vars, keep_raw_time = TRUE, include_metadata = 
       warning("Cannot subset data when some dimension axes cannot be identified.")
       start <- NA
       count <- NA
-    }
-    else {
+    } else {
       start <- c()
       count <- c()
       for(dim in c("X", "Y", "Z", "T", "S")) {
@@ -120,28 +119,24 @@ nc_as_data_frame <- function(nc, vars, keep_raw_time = TRUE, include_metadata = 
                 if(units$hasatt && units$value == "julian_day") {
                   # RDotNet interprets Date class as numeric so character needed to preserve date
                   time_vals <- as.Date(curr_dim_values, origin = structure(-2440588, class = "Date"))
-                }
-                else {
+                } else {
                   pcict_time <- get_nc_time_series(nc, time.dim.name = dim_var)
                   posixct_time <- convert_pcict_to_posixct(pcict_time)
                   time_vals <- as.Date(posixct_time)
                 }
                 ind <- which(time_vals >= boundary[[dim_var]][[1]] & time_vals <= boundary[[dim_var]][[2]])
               })
-            }
-            else ind <- which(curr_dim_values >= boundary[[dim_var]][1] & curr_dim_values <= boundary[[dim_var]][2])
+            } else ind <- which(curr_dim_values >= boundary[[dim_var]][1] & curr_dim_values <= boundary[[dim_var]][2])
             # TODO This is temporary solution for when there is only one value for a dimension and there are rounding difference
             if(length(ind) == 0 && length(curr_dim_values) == 1 && round(curr_dim_values, 3) == round(boundary[[dim_var]][1], 3) && round(curr_dim_values, 3) == round(boundary[[dim_var]][2], 3)) ind <- 1
             if(length(ind) == 0) {
               stop("No values within the range specified for ", dim_var, ".")
-            }
-            else {
+            } else {
               start <- c(start, min(ind))
               count <- c(count, length(ind))
               dim_values[[dim_var]] <- dim_values[[dim_var]][ind]
             }
-          }
-          else {
+          } else {
             start <- c(start, 1)
             count <- c(count, length(curr_dim_values))
           }
@@ -152,8 +147,7 @@ nc_as_data_frame <- function(nc, vars, keep_raw_time = TRUE, include_metadata = 
         count <- rep(-1, length(dim_axes))
       }
     }
-  }
-  else {
+  } else {
     start <- rep(1, length(dim_axes))
     count <- rep(-1, length(dim_axes))
   }
@@ -192,8 +186,7 @@ nc_as_data_frame <- function(nc, vars, keep_raw_time = TRUE, include_metadata = 
       count_list[[i]] <- curr_count
       dim_values_list[[i]] <- curr_dim_values
     }
-  }
-  else {
+  } else {
     start_list[[1]] <- start
     count_list[[1]] <- count
     dim_values_list[[1]] <- dim_values
@@ -214,8 +207,7 @@ nc_as_data_frame <- function(nc, vars, keep_raw_time = TRUE, include_metadata = 
       curr_dim_names <- get_nc_dim_names(nc, var)
       if(!setequal(curr_dim_names, dim_names)) {
         warning("The dimensions of", var, "do not match the other variables.", var, "will be dropped.")
-      }
-      else {
+      } else {
         included_vars <- c(included_vars, var)
         curr_var_data[[var]] <- as.vector(get_ncvar_values(nc, var, start = start_list[[i]], count = count_list[[i]]))
       }
@@ -234,8 +226,7 @@ nc_as_data_frame <- function(nc, vars, keep_raw_time = TRUE, include_metadata = 
         units <- get_nc_attribute(nc, time_var, "units")
         if(units$hasatt && units$value == "julian_day") {
           time_df[["date"]] <- as.Date(raw_time, origin = structure(-2440588, class = "Date"))
-        }
-        else {
+        } else {
           pcict_time <- get_nc_time_series(nc, time.dim.name = time_var)
           pcict_time <- pcict_time[time_ind]
           posixct_time <- convert_pcict_to_posixct(pcict_time)
@@ -251,9 +242,7 @@ nc_as_data_frame <- function(nc, vars, keep_raw_time = TRUE, include_metadata = 
     }
     var_data_list[[i]] <- curr_var_data
   }
-  if(length(var_data_list) > 1) {
-    var_data <- dplyr::bind_rows(var_data_list)
-  }
+  if(length(var_data_list) > 1) var_data <- dplyr::bind_rows(var_data_list)
   else if(length(var_data_list) == 1) var_data <- var_data_list[[1]]
   else var_data_list <- data.frame()
   
