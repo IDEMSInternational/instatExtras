@@ -228,6 +228,11 @@ test_that("getPass errors", {
 # })
 
 test_that("readline_masked_tcltk_window handles password entry correctly", {
+  # Skip test if Tcl/Tk is not available (headless environments like GitHub Actions)
+  if (!capabilities("tcltk") || Sys.getenv("GITHUB_ACTIONS") == "true") {
+    skip("Tcl/Tk not available in headless environments like GitHub Actions")
+  }
+  
   # Create a real Tcl/Tk window to use as a mock
   real_window <- tcltk::tktoplevel()
   
@@ -236,39 +241,39 @@ test_that("readline_masked_tcltk_window handles password entry correctly", {
   real_flagvar <- tcltk::tclVar(0)
   
   # Stub `tclVar()` to return real Tcl/Tk variables
-  stub(readline_masked_tcltk_window, "tcltk::tclVar", function(value) {
+  mockery::stub(readline_masked_tcltk_window, "tcltk::tclVar", function(value) {
     if (value == "") return(real_pwdvar)
     else return(real_flagvar)
   })
   
-  # Stub `tclvalue()` to simulate user inputs
-  stub(readline_masked_tcltk_window, "tcltk::tclvalue", function(var) {
+  # mockery::stub `tclvalue()` to simulate user inputs
+  mockery::stub(readline_masked_tcltk_window, "tcltk::tclvalue", function(var) {
     if (identical(var, real_flagvar)) return("1")  # Simulate submit flag
     if (identical(var, real_pwdvar)) return("my_secure_password")  # Simulate password entry
     return("")
   })
   
-  # Stub `tktoplevel()` to return the real Tk window
-  stub(readline_masked_tcltk_window, "tcltk::tktoplevel", function(...) real_window)
+  # mockery::stub `tktoplevel()` to return the real Tk window
+  mockery::stub(readline_masked_tcltk_window, "tcltk::tktoplevel", function(...) real_window)
   
-  # Stub other UI functions to prevent actual interactions
-  stub(readline_masked_tcltk_window, "tcltk::tkframe", function(...) NULL)
-  stub(readline_masked_tcltk_window, "tcltk::tkpack", function(...) NULL)
-  stub(readline_masked_tcltk_window, "tcltk::tklabel", function(...) NULL)
-  stub(readline_masked_tcltk_window, "tcltk::tkentry", function(...) NULL)
-  stub(readline_masked_tcltk_window, "tcltk::tkbind", function(...) NULL)
-  stub(readline_masked_tcltk_window, "tcltk::tkbutton", function(...) NULL)
-  stub(readline_masked_tcltk_window, "tcltk::tkwm.minsize", function(...) NULL)
-  stub(readline_masked_tcltk_window, "tcltk::tkwm.deiconify", function(...) NULL)
-  stub(readline_masked_tcltk_window, "tcltk::tkfocus", function(...) NULL)
-  stub(readline_masked_tcltk_window, "tcltk::tkwait.window", function(...) NULL)
-  stub(readline_masked_tcltk_window, "tcltk::tkmessageBox", function(...) NULL)
+  # mockery::stub other UI functions to prevent actual interactions
+  mockery::stub(readline_masked_tcltk_window, "tcltk::tkframe", function(...) NULL)
+  mockery::stub(readline_masked_tcltk_window, "tcltk::tkpack", function(...) NULL)
+  mockery::stub(readline_masked_tcltk_window, "tcltk::tklabel", function(...) NULL)
+  mockery::stub(readline_masked_tcltk_window, "tcltk::tkentry", function(...) NULL)
+  mockery::stub(readline_masked_tcltk_window, "tcltk::tkbind", function(...) NULL)
+  mockery::stub(readline_masked_tcltk_window, "tcltk::tkbutton", function(...) NULL)
+  mockery::stub(readline_masked_tcltk_window, "tcltk::tkwm.minsize", function(...) NULL)
+  mockery::stub(readline_masked_tcltk_window, "tcltk::tkwm.deiconify", function(...) NULL)
+  mockery::stub(readline_masked_tcltk_window, "tcltk::tkfocus", function(...) NULL)
+  mockery::stub(readline_masked_tcltk_window, "tcltk::tkwait.window", function(...) NULL)
+  mockery::stub(readline_masked_tcltk_window, "tcltk::tkmessageBox", function(...) NULL)
   
   # Test case: User enters a password
   expect_equal(readline_masked_tcltk_window("Enter password:"), "my_secure_password")
   
   # Test case: User submits a blank password (allowed)
-  stub(readline_masked_tcltk_window, "tcltk::tclvalue", function(var) {
+  mockery::stub(readline_masked_tcltk_window, "tcltk::tclvalue", function(var) {
     if (identical(var, real_flagvar)) return("1")  # Simulate submit
     if (identical(var, real_pwdvar)) return("")  # Simulate blank input
     return("")
@@ -277,7 +282,7 @@ test_that("readline_masked_tcltk_window handles password entry correctly", {
   expect_equal(readline_masked_tcltk_window("Enter password:", noblank = FALSE), "")
   
   # Test case: User cancels (flagvar = 0)
-  stub(readline_masked_tcltk_window, "tcltk::tclvalue", function(var) {
+  mockery::stub(readline_masked_tcltk_window, "tcltk::tclvalue", function(var) {
     if (identical(var, real_flagvar)) return("0")  # Simulate cancel
     if (identical(var, real_pwdvar)) return("ignored_password")  # Should be ignored
     return("")
