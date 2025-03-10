@@ -61,6 +61,24 @@ test_that("getRowHeadersWithText retrieves correct row names", {
   expect_equal(result, "Row2")
 })
 
+test_that("getRowHeadersWithText handles regex and exact match cases correctly", {
+  # Create a test data frame
+  data <- data.frame(
+    ID = c("A101", "B202", "C303", "D404", "E505"),
+    Name = c("Alice", "Bob", "Charlie", "David", "Alice"),
+    stringsAsFactors = FALSE
+  )
+  rownames(data) <- c("Row1", "Row2", "Row3", "Row4", "Row5")
+  
+  # Case 1: use_regex = TRUE and match_entire_cell = TRUE
+  result1 <- getRowHeadersWithText(data, column = "Name", searchText = "Alice", use_regex = TRUE, match_entire_cell = TRUE)
+  expect_equal(result1, c("Row1", "Row5"))
+  
+  # Case 2: use_regex = FALSE and match_entire_cell = TRUE
+  result2 <- getRowHeadersWithText(data, column = "Name", searchText = "Alice", use_regex = FALSE, match_entire_cell = TRUE)
+  expect_equal(result2, c("Row1", "Row5"))
+})
+
 test_that("convert_to_list properly converts character strings to numeric vectors", {
   expect_equal(convert_to_list("c(1,2,3)"), c(1, 2, 3))
   expect_equal(convert_to_list("1:5"), c(1, 5)) # is this how we want it to be though?
