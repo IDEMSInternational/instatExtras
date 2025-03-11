@@ -15,7 +15,7 @@ test_that("import_from_iri handles incorrect source gracefully", {
 
 test_that("import_from_ODK handles incorrect source gracefully", {
   expect_error(import_from_ODK(platform = "invalid_platform"))
-  expect_error(import_from_ODK(platform = "kobo"))
+  expect_error(import_from_ODK(form_name = "Form A", platform = "ona"))
 })
 
 test_that("import_from_ODK correctly retrieves form data from kobo", {
@@ -44,9 +44,8 @@ test_that("import_from_ODK correctly retrieves form data from kobo", {
   
   expect_true("field1" %in% names(result))
   expect_equal(result$field1, "value1")
+  expect_error(import_from_ODK("mock_user", platform = "kobo"))
   
-  # missing username
-  expect_error(import_from_ODK(form_name = "Form A", platform= "ona"))
 })
 
 # Test for invalid password
