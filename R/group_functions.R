@@ -29,9 +29,9 @@ read_corpora <- function(data){
     } else if (!is.null(names(data[i])) && names(data[i]) == "meta"){
       data_unlist[[i]] <- NULL
       # then check if the element is a vector, matrix, data frame, or list.
-    } else if (class(data[[i]]) %in% c("character", "factor", "logical", "numeric", "integer")){
+    } else if (inherits(data[[i]], c("character", "factor", "logical", "numeric", "integer"))){
       data_unlist[[i]] <- data.frame(list = data[[i]])
-    } else if ("matrix" %in% class(data[[i]])){
+    } else if (inherits(data[[i]], "matrix")){
       data_unlist[[i]] <- data.frame(list = do.call(paste, c(data.frame(data[[i]]), sep="-")))
     } else if (inherits(data[[i]], "data.frame")){
       data_unlist[[i]] <- data.frame(list = data[[i]])

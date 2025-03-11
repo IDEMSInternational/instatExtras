@@ -12,6 +12,34 @@ test_that("read_corpora processes different data formats correctly", {
   expect_s3_class(df_list, "data.frame")
 })
 
+test_that("Matrix is correctly converted to a data frame", {
+  input_matrix <- matrix(c("a", "b", "c", "d"), nrow = 2, byrow = TRUE)
+  input_matrix <- list(input_matrix, list(NA))
+  expected_output <- data.frame(variable1 = "1", list = c("a-b", "c-d"))
+  
+  result <- read_corpora(input_matrix)
+  
+  expect_equal(result$list, expected_output$list)
+})
+
+# Test for list handling
+
+test_that("Lists are correctly unlisted and processed", {
+  input_list <- list(
+    first = list(sub1 = "value1", sub2 = "value2"),
+    second = "value3"
+  )
+  
+  result <- read_corpora(input_list)
+  
+  expect_true("variable1" %in% colnames(result))
+  expect_true("variable2" %in% colnames(result))
+  expect_true("list" %in% colnames(result))
+  expect_true("value1" %in% result$list)
+  expect_true("value2" %in% result$list)
+  expect_true("value3" %in% result$list)
+})
+
 test_that("cbind_unique binds data and removes duplicates", {
   df1 <- data.frame(A = 1:3, B = c("x", "y", "z"))
   df2 <- data.frame(B = c("y", "z", "w"), C = c(10, 20, 30))
