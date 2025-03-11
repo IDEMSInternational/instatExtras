@@ -161,8 +161,7 @@ slopegraph <- function(data, x, y, colour, data_label = NULL,
     if (line_colour == "ByGroup") {
       LineGeom <- list(ggplot2::geom_line(ggplot2::aes(colour = {{colour}}, 
                                                        alpha = 1), linewidth = line_thickness))
-    }
-    else {
+    } else {
       LineGeom <- list(ggplot2::geom_line(ggplot2::aes_(), linewidth = line_thickness, colour = line_colour))
     }
   }
