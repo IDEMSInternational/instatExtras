@@ -59,7 +59,7 @@ test_that("nc_get_dim_min_max handles time conversion correctly", {
   mock_nc <- list(
     dim = list(time = list(vals = c(0, 1, 2, 3, 4, 5)))
   )
-
+  
   local_mocked_bindings(
     get_nc_attribute = function(nc, dimension, attr) {
       if (dimension == "time" && attr == "units") {
@@ -69,10 +69,10 @@ test_that("nc_get_dim_min_max handles time conversion correctly", {
       }
     }
   )
-
+  
   expect_equal(
     nc_get_dim_min_max(mock_nc, "time", time_as_date = TRUE), c(0, 5)
-    )
+  )
 })
 
 
@@ -101,21 +101,28 @@ test_that("nc_as_data_frame includes metadata when requested", {
 })
 
 test_that("nc_as_data_frame handles boundary correctly", {
-  mock_nc <- list(dim = list(x = list(vals = c(1, 2, 3))))
+  mock_nc <- list(
+    dim = list(
+      x = list(vals = c(1, 2, 3))
+    )
+  )
   
   local_mocked_bindings(
     get_nc_variable_list = function(nc) c("var1"),
     get_nc_dim_names = function(nc, var) c("x"),
     get_nc_dim_values = function(nc, dim_name) c(1, 2, 3),
-    get_nc_attribute = function(nc, dim, attr) list(hasatt = TRUE, value = "julian_day")
+    get_nc_attribute = function(nc, dim, attr) list(hasatt = TRUE, value = "julian_day"),
+    get_ncvar_values = function(nc, var, start, count) c(10, 20, 30)  # Mock ncvar_get output
   )
   
   boundary <- list(x = c(1, 2))
   
   result <- nc_as_data_frame(mock_nc, vars = c("var1"), boundary = boundary)
   
+  # Ensure the boundary subset worked
   expect_true("x" %in% names(result))  # Boundary-filtered dimension should be present
   expect_true(all(result$x %in% c(1, 2, 3)))  # Only boundary values should remain
+  expect_equal(nrow(result), 3)  # Only two rows should remain after filtering
 })
 
 test_that("nc_as_data_frame correctly subsets using lon/lat points", {
