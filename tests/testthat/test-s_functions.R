@@ -55,8 +55,10 @@ test_that("slopegraph handles valid input correctly", {
   
   plot <- slopegraph(data, x, y, colour, data_label)
   expect_s3_class(plot, "gg")  # Check if it returns a ggplot object
-  
   expect_message(slopegraph(data, x, y, colour, data_label, line_colour = c(1, 2)))
+  
+  plot2 <- slopegraph(data, x, y, colour, data_label, reverse_x_axis = TRUE)
+  expect_s3_class(plot2, "gg")  # Check if it returns a ggplot object
 })
 
 test_that("slopegraph throws error for missing required arguments", {
@@ -106,6 +108,7 @@ test_that("slopegraph throws error for missing data or values in x or colour", {
   # call variable not in data
   expect_error(slopegraph(data = data_na_colour, x = X, y = y, colour = colour), "'X' is not the name of a variable in the dataframe")
   expect_error(slopegraph(data = data_na_colour, x = x, y = Y, colour = colour), "'Y' is not the name of a variable in the dataframe")
+  expect_error(slopegraph(data = data_na_colour, x = x, y = y, data_label  = "Hello", colour = colour), "'Hello' is not the name of a variable in the dataframe")
   expect_error(slopegraph(data = data_na_colour, x = x, y = y, colour = COLOUR), "'COLOUR' is not the name of a variable in the dataframe")
 
   # incorrect variable type
