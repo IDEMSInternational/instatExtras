@@ -40,11 +40,8 @@ get_odk_form_names <- function(username, platform) {
     odk_data <- get_odk_http_get(url)  # Use wrapper function
   }
   if (odk_data$status_code != 200){
-    if (odk_data$status_code == 401){
-      stop("Invalid username/password")
-    } else {
-      stop(paste0("Issue in accessing ODK forms: status_code ", odk_data$status_code, ", ", nanonext::status_code(odk_data$status_code)))
-    }
+    if (odk_data$status_code == 401) stop("Invalid username/password")
+    else stop(paste0("Issue in accessing ODK forms: status_code ", odk_data$status_code, ", ", nanonext::status_code(odk_data$status_code)))
   }
   forms <- get_odk_http_content(odk_data, "parse")  # Use wrapper function
   form_names <- sapply(forms, function(x) x$title)
