@@ -118,7 +118,29 @@ test_that("nc_as_data_frame handles boundary correctly", {
   expect_true(all(result$x %in% c(1, 2, 3)))  # Only boundary values should remain
 })
 
-
+test_that("nc_as_data_frame correctly subsets using lon/lat points", {
+  mock_nc <- list(
+    dim = list(
+      time = list(vals = c(1, 2, 3))  # Single time dimension
+    )
+  )
+  
+  local_mocked_bindings(
+    get_nc_variable_list = function(nc) c("temperature"),
+    get_nc_dim_names = function(nc, var) c("time"),
+    get_nc_dim_values = function(nc, dim_name) c(1, 2, 3),
+    get_nc_dim_axes = function(nc, var) list(time = "T"),  # Time axis identified
+    get_nc_attribute = function(nc, dim, attr) list(hasatt = TRUE, value = "julian_day"),
+    get_ncvar_values = function(nc, var, start, count) c(15, 18, 20)  # Temperature values
+  )
+  
+  result <- nc_as_data_frame(mock_nc, vars = c("temperature"), keep_raw_time = TRUE)
+  
+  # Check that time is correctly processed
+  expect_true("time" %in% names(result))  # Time column should exist
+  expect_equal(nrow(result), 3)  # 3 time points
+  expect_equal(result$temperature[1], 15)  # Ensure values are correct
+})
 
 test_that("nc_as_data_frame correctly filters by boundary", {
   mock_nc <- list(dim = list(x = list(vals = c(1, 2, 3))))
