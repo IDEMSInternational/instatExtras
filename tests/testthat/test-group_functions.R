@@ -22,8 +22,6 @@ test_that("Matrix is correctly converted to a data frame", {
   expect_equal(result$list, expected_output$list)
 })
 
-# Test for list handling
-
 test_that("Lists are correctly unlisted and processed", {
   input_list <- list(
     first = list(sub1 = "value1", sub2 = "value2"),
@@ -109,6 +107,24 @@ test_that("view_graph_object handles different graph types correctly", {
 #   plot_recorded <- check_graph(NULL)
 #   expect_true(inherits(plot_recorded, "recordedplot") || is.null(plot_recorded))
 # })
+
+test_that("Graph object is recorded correctly", {
+  # Create a simple plot
+  plot(1:10, 1:10)
+  graph_obj <- grDevices::recordPlot()
+  
+  result <- check_graph(graph_obj)
+  
+  expect_true(!is.null(result))
+  expect_s3_class(result, "recordedplot")
+})
+
+test_that("Function handles NULL input gracefully", {
+  result <- check_graph(NULL)
+  
+  expect_s3_class(result, "recordedplot")
+})
+
 
 test_that("get_vignette retrieves vignette information", {
   result <- get_vignette("dplyr")
