@@ -108,7 +108,7 @@ test_that("slopegraph throws error for missing data or values in x or colour", {
   # call variable not in data
   expect_error(slopegraph(data = data_na_colour, x = X, y = y, colour = colour), "'X' is not the name of a variable in the dataframe")
   expect_error(slopegraph(data = data_na_colour, x = x, y = Y, colour = colour), "'Y' is not the name of a variable in the dataframe")
-  expect_error(slopegraph(data = data_na_colour, x = x, y = y, data_label  = "Hello", colour = colour), "'Hello' is not the name of a variable in the dataframe")
+  expect_error(slopegraph(data = data_na_colour, x = x, y = y, data_label  = Hello, colour = colour), "'Hello' is not the name of a variable in the dataframe")
   expect_error(slopegraph(data = data_na_colour, x = x, y = y, colour = COLOUR), "'COLOUR' is not the name of a variable in the dataframe")
 
   # incorrect variable type
