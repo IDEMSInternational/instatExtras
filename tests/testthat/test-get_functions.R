@@ -155,7 +155,7 @@ test_that("get_odk_form_names handles invalid password correctly", {
   
   # Expect function to throw an error due to invalid credentials
   expect_error(
-    get_odk_form_names("mock_user", "kobo"),
+    get_odk_form_names("mock_user", "ona"),
     "Invalid username/password"
   )
 })

@@ -45,7 +45,26 @@ test_that("import_from_ODK correctly retrieves form data from kobo", {
   expect_true("field1" %in% names(result))
   expect_equal(result$field1, "value1")
   expect_error(import_from_ODK("mock_user", platform = "kobo"))
+})
+
+test_that("import_from_ODK handles invalid password correctly", {
+  # Mock `getPass()` to return an incorrect password
+  local_mocked_bindings(
+    getPass = function(...) "wrong_password",
+    
+    # Mock our custom wrapper function instead of `httr::GET`
+    get_odk_http_get = function(url, auth = NULL) {
+      structure(
+        list(status_code = 401),  # Simulate authentication failure
+        class = "response"
+      )
+    }
+  )
   
+  # Expect function to throw an error due to invalid credentials
+  expect_error(
+    import_from_ODK("mock_user", form = "form A", platform = "ona"), "Invalid username/password"
+  )
 })
 
 # Test for invalid password
