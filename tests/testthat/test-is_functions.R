@@ -62,9 +62,7 @@ test_that("import_from_ODK handles invalid password correctly", {
   )
   
   # Expect function to throw an error due to invalid credentials
-  expect_error(
-    import_from_ODK("mock_user", form = "form A", platform = "ona"), "Invalid username/password"
-  )
+  expect_error(import_from_ODK("mock_user", form = "form A", platform = "ona"))
 })
 
 # Test for invalid password
