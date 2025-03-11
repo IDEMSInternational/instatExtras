@@ -18,7 +18,7 @@ test_that("import_from_ODK handles incorrect source gracefully", {
   expect_error(import_from_ODK(platform = "kobo"))
 })
 
-test_that("import_from_ODK correctly retrieves form data", {
+test_that("import_from_ODK correctly retrieves form data from kobo", {
   local_mocked_bindings(
     getPass = function(...) "mock_password",
     
@@ -44,6 +44,9 @@ test_that("import_from_ODK correctly retrieves form data", {
   
   expect_true("field1" %in% names(result))
   expect_equal(result$field1, "value1")
+  
+  # missing username
+  expect_error(import_from_ODK(form_name = "Form A", platform= "ona"))
 })
 
 # Test for invalid password
