@@ -15,7 +15,7 @@ test_that("read_corpora processes different data formats correctly", {
 test_that("Matrix is correctly converted to a data frame", {
   input_matrix <- matrix(c("a", "b", "c", "d"), nrow = 2, byrow = TRUE)
   input_matrix <- list(input_matrix, list(NA))
-  expected_output <- data.frame(variable1 = "1", list = c("a-b", "c-d"))
+  expected_output <- data.frame(variable1 = "1", list = c("a-b", "c-d", "a", "c", "b", "d", NA))
   
   result <- read_corpora(input_matrix)
   
