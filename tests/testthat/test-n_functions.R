@@ -215,3 +215,4 @@ test_that("nc_get_dim_min_max correctly converts time when time_as_date is TRUE"
   
   expect_equal(result, expected_dates)  # Ensures conversion works correctly
 })
+

@@ -8,25 +8,35 @@
 #'@return The imported form data as a structured object.
 #'
 import_from_ODK = function(username, form_name, platform) {
+  import_from_ODK_WP(username, form_name, platform, NULL)
+}
+
+# Same as import_from_ODK, but includes password option. This is used for testing purposes. 
+import_from_ODK_WP = function(username, form_name, platform, password = NULL) {
   if(platform == "kobo") {
     url <- "https://kc.kobotoolbox.org/api/v1/data"
-  }
-  else if(platform == "ona") {
+  } else if(platform == "ona") {
     url <- "https://api.ona.io/api/v1/data"
   }
   else stop("Unrecognised platform.")
-  password <- getPass(paste0(username, " password:"))
+  if (is.null(password)) password <- getPass(paste0(username, " password:"))
   if(!missing(username) && !missing(password)) {
     has_authentication <- TRUE
     user <- httr::authenticate(username, password)
     odk_data <- httr::GET(url, user)
-  }
-  else {
+  } else {
     has_authentication <- FALSE
     odk_data <- httr::GET(url)
   }
   
   forms <- httr::content(odk_data, "parse")
+  if (odk_data$status_code != 200){
+    if (odk_data$status_code == 401){
+      stop("Invalid username/password")
+    } else {
+      stop(paste0("Issue in accessing ODK forms: status_code ", odk_data$status_code, ", ", nanonext::status_code(odk_data$status_code)))
+    }
+  }
   form_names <- sapply(forms, function(x) x$title)    # get_odk_form_names_results <- get_odk_form_names(username, platform)
   # form_names <- get_odk_form_names_results[1]
   # forms <- get_odk_form_names_results[2]
@@ -37,11 +47,10 @@ import_from_ODK = function(username, form_name, platform) {
   
   if(has_authentication) curr_form <- httr::GET(paste0(url,"/", form_id), user)
   else curr_form <- httr::GET(paste0(url,"/", form_id))
-
+  
   form_data <- httr::content(curr_form, "text")
   #TODO Look at how to convert columns that are lists
   #     maybe use tidyr::unnest
   out <- jsonlite::fromJSON(form_data, flatten = TRUE)
   return(out)
 }
-

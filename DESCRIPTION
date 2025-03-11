@@ -25,6 +25,7 @@ Imports:
   httr,
   jsonlite,
   lubridate,
+  nanonext,
   ncdf4,
   ncdf4.helpers,
   magrittr,

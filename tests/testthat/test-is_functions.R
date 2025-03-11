@@ -13,6 +13,18 @@ test_that("import_from_iri handles incorrect source gracefully", {
   expect_error(import_from_iri("INVALID_SOURCE", "daily_0p05", "data", -10, 10, -10, 10, "area"))
 })
 
+test_that("import_from_ODK handles incorrect source gracefully", {
+  expect_error(import_from_ODK_WP(platform = "invalid_platform"))
+  expect_error(import_from_ODK_WP(platform = "kobo"))
+  expect_error(import_from_ODK_WP(platform = "kobo", username = "ami", password = "incorrect"), "Invalid username/password")
+  expect_error(import_from_ODK_WP(platform = "kobo", username = "ami", password = "ami", form_name = "invalid form name"))
+})
+
+test_that("import_from_ODK handles incorrect source gracefully", {
+  import_data <- import_from_ODK_WP(platform = "kobo", username = "ami", password = "ami", form_name = "MHAC App Users Collection Form")
+  expect_s3_class(import_data, "data.frame")
+})
+
 # test_that("import_from_iri correctly imports minimal monthly area data from CHIRPS_V2P0", {
 #   result <- import_from_iri(
 #     download_from = "CHIRPS_V2P0",
@@ -180,3 +192,4 @@ test_that("is.NAvariable correctly identifies NA and NULL vectors", {
   expect_false(is.NAvariable(c(1, 2, 3)))
   expect_false(is.NAvariable(c(TRUE, FALSE, NA)))
 })
+
