@@ -246,6 +246,7 @@ test_that("is.binary correctly identifies binary variables", {
   expect_true(is.binary(c(0, 1, 1, 0)))
   expect_true(is.binary(factor(c("Yes", "No", "Yes"))))
   expect_false(is.binary(c(1, 2, 3, 4)))
+  expect_false(is.binary(as.Date("1994-04-10")))
 })
 
 test_that("is.emptyvariable correctly identifies empty variables", {
