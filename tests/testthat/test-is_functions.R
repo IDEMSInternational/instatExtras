@@ -14,15 +14,75 @@ test_that("import_from_iri handles incorrect source gracefully", {
 })
 
 test_that("import_from_ODK handles incorrect source gracefully", {
-  expect_error(import_from_ODK_WP(platform = "invalid_platform"))
-  expect_error(import_from_ODK_WP(platform = "kobo"))
-  expect_error(import_from_ODK_WP(platform = "kobo", username = "ami", password = "incorrect"), "Invalid username/password")
-  expect_error(import_from_ODK_WP(platform = "kobo", username = "ami", password = "ami", form_name = "invalid form name"))
+  expect_error(import_from_ODK(platform = "invalid_platform"))
+  expect_error(import_from_ODK(platform = "kobo"))
 })
 
-test_that("import_from_ODK handles incorrect source gracefully", {
-  import_data <- import_from_ODK_WP(platform = "kobo", username = "ami", password = "ami", form_name = "MHAC App Users Collection Form")
-  expect_s3_class(import_data, "data.frame")
+test_that("import_from_ODK correctly retrieves form data", {
+  local_mocked_bindings(
+    getPass = function(...) "mock_password",
+    
+    get_odk_http_get = function(url, auth = NULL) {
+      if (grepl("/api/v1/data$", url)) {
+        fake_response <- list(
+          list(title = "Form A", id = "123"),
+          list(title = "Form B", id = "456")
+        )
+        return(structure(list(content = fake_response, status_code = 200), class = "response"))
+      } else if (grepl("/api/v1/data/123$", url)) {
+        return(structure(list(content = '{"field1": "value1", "field2": "value2"}', status_code = 200), class = "response"))
+      }
+    },
+    
+    get_odk_http_content = function(response, type) {
+      if (type == "parse") return(response$content)
+      if (type == "text") return(response$content)
+    }
+  )
+  
+  result <- import_from_ODK("mock_user", "Form A", "kobo")
+  
+  expect_true("field1" %in% names(result))
+  expect_equal(result$field1, "value1")
+})
+
+# Test for invalid password
+test_that("import_from_ODK handles invalid password correctly", {
+  local_mocked_bindings(
+    getPass = function(...) "wrong_password",
+    
+    get_odk_http_get = function(url, auth = NULL) {
+      return(structure(list(status_code = 401), class = "response"))
+    }
+  )
+  
+  expect_error(
+    import_from_ODK("mock_user", "Form A", "kobo"),
+    "Invalid username/password"
+  )
+})
+
+# Test for form not found
+test_that("import_from_ODK handles missing form correctly", {
+  local_mocked_bindings(
+    getPass = function(...) "mock_password",
+    
+    get_odk_http_get = function(url, auth = NULL) {
+      fake_response <- list(
+        list(title = "Form B", id = "456")  # Form A is missing intentionally
+      )
+      return(structure(list(content = fake_response, status_code = 200), class = "response"))
+    },
+    
+    get_odk_http_content = function(response, type) {
+      if (type == "parse") return(response$content)
+    }
+  )
+  
+  expect_error(
+    import_from_ODK("mock_user", "Form A", "kobo"),
+    "Form A not found in available forms"
+  )
 })
 
 # test_that("import_from_iri correctly imports minimal monthly area data from CHIRPS_V2P0", {
