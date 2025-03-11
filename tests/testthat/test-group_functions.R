@@ -168,6 +168,9 @@ test_that("getExample retrieves example code", {
 
   result <- getExample("filter", "dplyr", give.lines = TRUE, echo = TRUE)
   expect_type(result, "character")
+  
+  result <- getExample("filter", "dplyr", give.lines = FALSE, echo = TRUE)
+  expect_type(result, "character")
 })
 
 test_that("frac10, frac20, frac100, frac_den convert decimals to fractions", {
@@ -177,11 +180,18 @@ test_that("frac10, frac20, frac100, frac_den convert decimals to fractions", {
   expect_equal(frac_den(0.333, 3), "1/3")
 })
 
-# test_that("monitor_memory returns memory usage in MB", {
-#   mem_usage <- monitor_memory()
-#   expect_type(mem_usage, "double")
-#   expect_gt(mem_usage, 0)
-# })
+test_that("monitor_memory returns memory usage in MB", {
+  mem_usage <- monitor_memory()
+  expect_type(mem_usage, "double")
+  expect_gt(mem_usage, 0)
+})
+
+test_that("Memory usage is returned correctly", {
+  result <- monitor_memory()
+  
+  expect_true(is.numeric(result))
+  expect_true(result > 0)
+})
 
 test_that("time_operation times an expression", {
   expect_output(time_operation(Sys.sleep(0.1)), "user  system elapsed")

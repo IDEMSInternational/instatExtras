@@ -636,9 +636,11 @@ frac_den <- function(x, den) { paste0(round(x * den), "/", den) }
 #'
 #' @export
 monitor_memory <- function() {
-  if (.Platform$OS.type == "windows") mem_used <- utils::memory.size()
-  else mem_used <- sum(gc()[, "used"]) / 1024
-  return(mem_used)
+  # 'memory.size()' is no longer supported 
+  #if (.Platform$OS.type == "windows") mem_used <- utils::memory.size()
+  #else 
+  sum(gc()[, "used"]) / 1024
+  #return(mem_used)
 }
 
 #' Time an Operation
