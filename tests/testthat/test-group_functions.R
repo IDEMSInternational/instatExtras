@@ -12,6 +12,32 @@ test_that("read_corpora processes different data formats correctly", {
   expect_s3_class(df_list, "data.frame")
 })
 
+test_that("Matrix is correctly converted to a data frame", {
+  input_matrix <- matrix(c("a", "b", "c", "d"), nrow = 2, byrow = TRUE)
+  input_matrix <- list(input_matrix, list(NA))
+  expected_output <- data.frame(variable1 = "1", list = c("a-b", "c-d", "a", "c", "b", "d", NA))
+  
+  result <- read_corpora(input_matrix)
+  
+  expect_equal(result$list, expected_output$list)
+})
+
+test_that("Lists are correctly unlisted and processed", {
+  input_list <- list(
+    first = list(sub1 = "value1", sub2 = "value2"),
+    second = "value3"
+  )
+  
+  result <- read_corpora(input_list)
+  
+  expect_true("variable1" %in% colnames(result))
+  expect_true("variable2" %in% colnames(result))
+  expect_true("list" %in% colnames(result))
+  expect_true("value1" %in% result$list)
+  expect_true("value2" %in% result$list)
+  expect_true("value3" %in% result$list)
+})
+
 test_that("cbind_unique binds data and removes duplicates", {
   df1 <- data.frame(A = 1:3, B = c("x", "y", "z"))
   df2 <- data.frame(B = c("y", "z", "w"), C = c(10, 20, 30))
@@ -82,6 +108,24 @@ test_that("view_graph_object handles different graph types correctly", {
 #   expect_true(inherits(plot_recorded, "recordedplot") || is.null(plot_recorded))
 # })
 
+test_that("Graph object is recorded correctly", {
+  # Create a simple plot
+  plot(1:10, 1:10)
+  graph_obj <- grDevices::recordPlot()
+  
+  result <- check_graph(graph_obj)
+  
+  expect_true(!is.null(result))
+  expect_s3_class(result, "recordedplot")
+})
+
+test_that("Function handles NULL input gracefully", {
+  result <- check_graph(NULL)
+  
+  expect_s3_class(result, "recordedplot")
+})
+
+
 test_that("get_vignette retrieves vignette information", {
   result <- get_vignette("dplyr")
   expect_type(result, "character")
@@ -124,6 +168,9 @@ test_that("getExample retrieves example code", {
 
   result <- getExample("filter", "dplyr", give.lines = TRUE, echo = TRUE)
   expect_type(result, "character")
+  
+  result <- getExample("filter", "dplyr", give.lines = FALSE, echo = TRUE)
+  expect_type(result, "character")
 })
 
 test_that("frac10, frac20, frac100, frac_den convert decimals to fractions", {
@@ -133,11 +180,18 @@ test_that("frac10, frac20, frac100, frac_den convert decimals to fractions", {
   expect_equal(frac_den(0.333, 3), "1/3")
 })
 
-# test_that("monitor_memory returns memory usage in MB", {
-#   mem_usage <- monitor_memory()
-#   expect_type(mem_usage, "double")
-#   expect_gt(mem_usage, 0)
-# })
+test_that("monitor_memory returns memory usage in MB", {
+  mem_usage <- monitor_memory()
+  expect_type(mem_usage, "double")
+  expect_gt(mem_usage, 0)
+})
+
+test_that("Memory usage is returned correctly", {
+  result <- monitor_memory()
+  
+  expect_true(is.numeric(result))
+  expect_true(result > 0)
+})
 
 test_that("time_operation times an expression", {
   expect_output(time_operation(Sys.sleep(0.1)), "user  system elapsed")

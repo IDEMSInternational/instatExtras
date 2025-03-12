@@ -42,6 +42,7 @@ test_that("get_lat_from_data extracts latitude values", {
 
 test_that("get_odk_form_names rejects incorrect platforms", {
   expect_error(get_odk_form_names("username", "invalid_platform"))
+  expect_error(get_odk_form_names(platform = "invalid_platform"))
 })
 
 test_that("get_quarter_label returns correct quarter labels", {
@@ -136,6 +137,27 @@ test_that("get_odk_form_names handles authentication and API request correctly",
 
   # Expected output
   expect_equal(form_names, c("Form A", "Form B"))
+})
+
+test_that("get_odk_form_names handles invalid password correctly", {
+  # Mock `getPass()` to return an incorrect password
+  local_mocked_bindings(
+    getPass = function(...) "wrong_password",
+    
+    # Mock our custom wrapper function instead of `httr::GET`
+    get_odk_http_get = function(url, auth = NULL) {
+      structure(
+        list(status_code = 401),  # Simulate authentication failure
+        class = "response"
+      )
+    }
+  )
+  
+  # Expect function to throw an error due to invalid credentials
+  expect_error(
+    get_odk_form_names("mock_user", "ona"),
+    "Invalid username/password"
+  )
 })
 
 test_that("readline_masked_rstudio_window correctly calls askForPassword()", {
