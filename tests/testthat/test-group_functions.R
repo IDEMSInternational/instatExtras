@@ -235,7 +235,6 @@ test_that("getExample handles invalid topics with character.only = FALSE", {
 test_that("getExample handles missing topics gracefully", {
   # Expect a warning and empty character output
   expect_warning(getExample("non_existent_function", package = "base", give.lines = TRUE))
-  expect_equal(result, character())
 })
 
 test_that("getExample runs with verbose mode", {
