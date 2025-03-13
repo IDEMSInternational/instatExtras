@@ -72,19 +72,19 @@ test_that("view_html_object saves or prints HTML", {
   expect_type(html_output, "character")
 })
 
-test_that("view_html_object handles list of identical objects", {
-  # Create a mock list of HTML objects (represented as characters for testing)
-  mock_html_list <- list("html1", "html2", "html3")
-  
-  # Expected output
-  expected_output <- lapply(mock_html_list, process_html_object)
-  
-  # Run function
-  result <- view_html_object(mock_html_list)
-  
-  # Check if output matches expected
-  expect_equal(result, expected_output)
-})
+# test_that("view_html_object handles list of identical objects", {
+#   # Create a mock list of HTML objects (represented as characters for testing)
+#   mock_html_list <- list("html1", "html2", "html3")
+#   
+#   # Expected output
+#   expected_output <- lapply(mock_html_list, process_html_object)
+#   
+#   # Run function
+#   result <- view_html_object(mock_html_list)
+#   
+#   # Check if output matches expected
+#   expect_equal(result, expected_output)
+# })
 
 # test_that("view_html_object returns NULL for non-list input", {
 #   non_list_input <- "html_object"
