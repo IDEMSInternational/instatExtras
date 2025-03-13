@@ -36,3 +36,29 @@ test_that("package_check returns expected output", {
   expect_true(is.list(result))
   expect_true(result[[1]] %in% c("1", "2", "3", "4", "5"))
 })
+
+test_that("pivot_tricot produces expected output", {
+  # Create a mock dataset
+  test_data <- data.frame(
+    id = c(1, 2),
+    option_a = c("Variety1", "Variety2"),
+    option_b = c("Variety2", "Variety3"),
+    option_c = c("Variety3", "Variety1"),
+    trait1_pos = c("A", "A"),
+    trait1_neg = c("C", "B"),
+    trait2_pos = c("A", "Not observed"),
+    trait2_neg = c("B", "C")
+  )
+  
+  # Run function
+  result <- pivot_tricot(test_data)
+  
+  # Check column names
+  expect_true(all(c("id", "variety", "trait1", "trait2") %in% names(result)))
+  
+  # Check if ranks are correctly assigned
+  expect_equal(result$trait1[result$variety == "Variety1"], c(1, 2))
+
+  # Check for missing values handling
+  expect_false(any(is.na(result$variety)))
+})
