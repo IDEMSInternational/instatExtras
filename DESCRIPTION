@@ -44,7 +44,8 @@ Imports:
   tidyr,
   tidyselect
 Suggests: 
-    testthat (>= 3.0.0),
+    gosset,
     mockery,
-    rcorpora
+    rcorpora,
+    testthat (>= 3.0.0)
 Config/testthat/edition: 3

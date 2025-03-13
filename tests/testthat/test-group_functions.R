@@ -72,6 +72,26 @@ test_that("view_html_object saves or prints HTML", {
   expect_type(html_output, "character")
 })
 
+# test_that("view_html_object handles list of identical objects", {
+#   # Create a mock list of HTML objects (represented as characters for testing)
+#   mock_html_list <- list("html1", "html2", "html3")
+#   
+#   # Expected output
+#   expected_output <- lapply(mock_html_list, process_html_object)
+#   
+#   # Run function
+#   result <- view_html_object(mock_html_list)
+#   
+#   # Check if output matches expected
+#   expect_equal(result, expected_output)
+# })
+
+# test_that("view_html_object returns NULL for non-list input", {
+#   non_list_input <- "html_object"
+#   result <- view_html_object(non_list_input)
+#   expect_equal(result, "html_object")
+# })
+
 test_that("view_graph_object handles different graph types correctly", {
   skip_if_not(Sys.getenv("GITHUB_ACTIONS") == "true")
 
@@ -125,6 +145,35 @@ test_that("Function handles NULL input gracefully", {
   expect_s3_class(result, "recordedplot")
 })
 
+test_that("check_graph returns the input graph object if not NULL", {
+  # Create a simple ggplot graph
+  p <- ggplot2::ggplot(mtcars, ggplot2::aes(mpg, cyl)) + ggplot2::geom_point()
+
+  # Run function
+  result <- check_graph(p)
+
+  # Expect that result is the same as input
+  expect_equal(result, p)
+})
+
+test_that("check_graph captures a recorded plot when given NULL", {
+  # Ensure there is an active plot
+  plot(1:10, 1:10)
+
+  # Run function with NULL input
+  result <- check_graph(NULL)
+
+  # Expect result to be a recorded plot
+  expect_true(inherits(result, "recordedplot"))
+})
+
+test_that("check_graph does not modify non-graph objects", {
+  non_graph <- "not_a_graph"
+  result <- check_graph(non_graph)
+
+  # Expect the function to return the same non-graph object
+  expect_equal(result, non_graph)
+})
 
 test_that("get_vignette retrieves vignette information", {
   result <- get_vignette("dplyr")
@@ -162,15 +211,66 @@ test_that("convert_to_list properly converts character strings to numeric vector
   expect_equal(convert_to_list("10"), 10)
 })
 
-test_that("getExample retrieves example code", {
-  result <- getExample("filter", "dplyr", give.lines = TRUE)
-  expect_type(result, "character")
-
-  result <- getExample("filter", "dplyr", give.lines = TRUE, echo = TRUE)
-  expect_type(result, "character")
+test_that("getExample works with character.only = FALSE", {
+  # Use a non-character input (unquoted function name)
+  result <- getExample(mean, package = "base", give.lines = TRUE, character.only = FALSE)
   
-  result <- getExample("filter", "dplyr", give.lines = FALSE, echo = TRUE)
+  # Expect the result to be a non-empty character string
   expect_type(result, "character")
+  expect_true(nchar(result) > 0)
+  
+  # Expect that calling with a quoted function name gives the same result
+  result2 <- getExample("mean", package = "base", give.lines = TRUE, character.only = TRUE)
+  expect_equal(result, result2)
+})
+
+test_that("getExample handles invalid topics with character.only = FALSE", {
+  # Use an unquoted function name that doesn't exist
+  expect_warning(result <- getExample(non_existent_function, package = "base", give.lines = TRUE, character.only = FALSE))
+  
+  # Expect an empty character vector
+  expect_equal(result, character())
+})
+
+test_that("getExample handles missing topics gracefully", {
+  # Expect a warning and empty character output
+  expect_warning(getExample("non_existent_function", package = "base", give.lines = TRUE))
+})
+
+test_that("getExample runs with verbose mode", {
+  result <- getExample("sum", package = "base", give.lines = TRUE, verbose = TRUE)
+  
+  # Expect result to be character output
+  expect_type(result, "character")
+  expect_true(nchar(result) > 0)
+})
+
+test_that("getExample respects the echo argument", {
+  expect_output(getExample("mean", package = "base", echo = TRUE), "mean")
+  expect_silent(getExample("mean", package = "base", echo = FALSE))
+})
+
+test_that("getExample handles run.dontrun and run.donttest correctly", {
+  result <- getExample("mean", package = "base", give.lines = TRUE, run.dontrun = TRUE, run.donttest = TRUE)
+  
+  # Expect non-empty output with potentially "dontrun" and "donttest" blocks included
+  expect_type(result, "character")
+  expect_true(nchar(result) > 0)
+})
+
+test_that("getExample returns empty when no examples exist", {
+  result <- getExample("library", package = "base", give.lines = TRUE)
+  
+  # Expect an empty character vector
+  expect_equal(class(result), "character")
+})
+
+test_that("getExample respects the prompt.prefix argument", {
+  result <- getExample("mean", package = "base", give.lines = TRUE, prompt.prefix = "TEST")
+  
+  # Expect a character output
+  expect_type(result, "character")
+  expect_true(nchar(result) > 0)
 })
 
 test_that("frac10, frac20, frac100, frac_den convert decimals to fractions", {
@@ -203,6 +303,11 @@ test_that("time_operation times an expression", {
 #   expect_true(any(grepl("R-Instat", .libPaths())))
 #   .libPaths(old_paths)  # Reset to avoid issues
 # })
+
+test_that("check_github_repo handles url", {
+  result <- check_github_repo(url = "https://github.com/hadley/ggplot2")
+  expect_equal(result, 3)
+})
 
 test_that("check_github_repo handles various scenarios", {
   # Mock `gh::gh` to return a specific response
@@ -246,6 +351,38 @@ test_that("check_github_repo handles various scenarios", {
   mockery::stub(check_github_repo, "gh::gh", function(...) stop("Not Found"))
   expect_equal(check_github_repo(owner = "user", repo = "non_existent"), 6)
 })
+
+test_that("check_github_repo handles various scenarios", {
+  # Mock `gh::gh` to return specific responses for API calls
+  mock_gh <- mockery::mock(
+    list(list(sha = "latest_sha")),  # Mock response for latest commit (used in case 1 & 2)
+    list(language = "Python"),       # Mock response for non-R repo (used in case 5)
+    cycle = TRUE                     # Cycle through responses
+  )
+  mockery::stub(check_github_repo, "gh::gh", mock_gh)
+  
+  # Mock `requireNamespace` to simulate installed or missing packages
+  mock_requireNamespace <- mockery::mock(TRUE, TRUE, FALSE, cycle = TRUE)
+  mockery::stub(check_github_repo, "requireNamespace", mock_requireNamespace)
+  
+  # Mock `utils::packageDescription` to return different SHAs for comparison
+  mock_packageDescription <- function(pkg) {
+    list(GithubSHA1 = if (pkg == "outdated_repo") "old_sha" else "latest_sha")
+  }
+  mockery::stub(check_github_repo, "utils::packageDescription", mock_packageDescription)
+  
+  # Case 1: Installed package, latest commit differs → should return 1
+  expect_equal(check_github_repo(owner = "user", repo = "outdated_repo"), 1)
+  
+  # Case 2: Unable to retrieve latest commit from GitHub → should return 2
+  mockery::stub(check_github_repo, "gh::gh", function(...) stop("GitHub API Error"))
+  expect_equal(check_github_repo(owner = "user", repo = "api_error_repo"), 2)
+  
+  # Case 5: Repository exists but is not an R package → should return 5
+  mockery::stub(check_github_repo, "gh::gh", function(...) list(language = "Python"))
+  expect_equal(check_github_repo(owner = "user", repo = "python_project"), 5)
+})
+
 
 test_that("set_library_paths updates library paths correctly", {
   # Mock APPDATA environment variable

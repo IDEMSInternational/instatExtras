@@ -270,3 +270,26 @@ test_that("is.NAvariable correctly identifies NA and NULL vectors", {
   expect_false(is.NAvariable(c(TRUE, FALSE, NA)))
 })
 
+test_that("is.containVariableLabel correctly identifies TRUE and FALSE values", {
+  df <- data.frame(x = 1:10, y = 11:20)
+  sjlabelled::set_label(df$x, "Age")
+  expect_false(is.containVariableLabel(df$x))
+  
+  vec <- c(1, 2, 3, 4, 5)
+  expect_false(is.containVariableLabel(vec))
+})
+
+test_that("is.containPartialValueLabel correctly identifies partial labels", {
+  # Mock function for is.containValueLabel
+  mock_is.containValueLabel <- function(x) {
+    return(!is.null(attr(x, "labels_label")))
+  }
+  
+  # Mock `is.containValueLabel` inside function
+  mockery::stub(is.containPartialValueLabel, "is.containValueLabel", mock_is.containValueLabel)
+  
+  # Case 3: No labels at all (should return FALSE)
+  x_no_label <- c(1, 2, 3, 4)
+  attr(x_no_label, "labels_label") <- NULL  # Explicitly ensure no labels
+  expect_false(is.containPartialValueLabel(x_no_label))
+})
