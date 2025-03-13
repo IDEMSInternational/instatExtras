@@ -270,3 +270,11 @@ test_that("is.NAvariable correctly identifies NA and NULL vectors", {
   expect_false(is.NAvariable(c(TRUE, FALSE, NA)))
 })
 
+test_that("is.containVariableLabel correctly identifies TRUE and FALSE values", {
+  df <- data.frame(x = 1:10, y = 11:20)
+  sjlabelled::set_label(df$x, "Age")
+  expect_false(is.containVariableLabel(df$x))
+  
+  vec <- c(1, 2, 3, 4, 5)
+  expect_false(is.containVariableLabel(vec))
+})
