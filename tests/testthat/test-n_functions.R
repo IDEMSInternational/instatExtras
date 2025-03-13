@@ -26,6 +26,7 @@ test_that("next_default_item generates unique item names", {
   expect_equal(next_default_item("item3", existing_names), "item31")
   expect_equal(next_default_item("newItem", existing_names), "newItem")
   expect_equal(next_default_item("item", existing_names, include_index = TRUE, start_index = 5), "item4")
+  expect_error(next_default_item(3), "prefix must be of type character")
 })
 
 test_that("Not-in operator works as expected", {
