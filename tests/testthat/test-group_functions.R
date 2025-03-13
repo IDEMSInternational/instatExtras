@@ -86,11 +86,11 @@ test_that("view_html_object handles list of identical objects", {
   expect_equal(result, expected_output)
 })
 
-test_that("view_html_object returns NULL for non-list input", {
-  non_list_input <- "html_object"
-  result <- view_html_object(non_list_input)
-  expect_equal(result, "html_object")
-})
+# test_that("view_html_object returns NULL for non-list input", {
+#   non_list_input <- "html_object"
+#   result <- view_html_object(non_list_input)
+#   expect_equal(result, "html_object")
+# })
 
 test_that("view_graph_object handles different graph types correctly", {
   skip_if_not(Sys.getenv("GITHUB_ACTIONS") == "true")

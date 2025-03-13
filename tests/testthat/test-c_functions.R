@@ -17,6 +17,9 @@ test_that("compare_columns correctly identifies differences", {
   
   # Case when they are the same
   expect_output(compare_columns(x, x), "Columns contain all the same values: TRUE")
+  
+  expect_output(compare_columns(x, x, display_intersection = TRUE), "Columns contain all the same values: TRUE")
+  expect_output(compare_columns(x, x, display_union = TRUE), "Columns contain all the same values: TRUE")
 })
 
 test_that("consecutive_sum computes cumulative sum correctly", {
