@@ -278,3 +278,15 @@ test_that("is.containVariableLabel correctly identifies TRUE and FALSE values", 
   vec <- c(1, 2, 3, 4, 5)
   expect_false(is.containVariableLabel(vec))
 })
+
+# Mock function for is.containValueLabel
+mock_is.containValueLabel <- function(x) {
+  return(!is.null(attr(x, "labels_label")))
+}
+
+test_that("is.containPartialValueLabel correctly identifies partial labels", {
+  # Case 3: No labels at all (should return FALSE)
+  x_no_label <- c(1, 2, 3, 4)
+  attr(x_no_label, "labels_label") <- NULL  # Explicitly ensure no labels
+  expect_false(is.containPartialValueLabel(x_no_label))
+})
