@@ -19,6 +19,14 @@
 #' converted <- convert_to_character_matrix(data)
 #' print(converted)
 #' 
+#' # example with SFC data
+#' points <- sf::st_sfc(sf::st_point(c(1, 2)), sf::st_point(c(3, 4)))
+#' sf_data <- data.frame(id = c(1, 2))
+#' sf_data$geometry <- points
+#' class(sf_data$geometry) <- c("sfc", class(sf_data$geometry))  # Ensure "sfc" class
+#' # Run function
+#' result <- convert_to_character_matrix(sf_data)
+#' 
 #' @seealso
 #' \code{\link{get_default_significant_figures}}
 convert_to_character_matrix <- function(data, format_decimal_places = TRUE, decimal_places, is_scientific = FALSE, return_data_frame = TRUE, na_display = NULL, check.names = TRUE) {

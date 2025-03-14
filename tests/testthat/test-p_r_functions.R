@@ -100,13 +100,3 @@ test_that("package_check handles different package states correctly", {
   expect_equal(result[[1]], "5")
 })
 
-test_that("create_av_packs fetches available packages", {
-  # Run the function
-  create_av_packs()
-  
-  # Check if av_packs is created and has the expected structure
-  expect_true(exists("av_packs", envir = .GlobalEnv))
-  expect_true(is.data.frame(av_packs))
-  expect_true("Package" %in% colnames(av_packs))
-  expect_true("Version" %in% colnames(av_packs))
-})

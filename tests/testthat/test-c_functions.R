@@ -141,3 +141,14 @@ test_that("convert_SST works correctly", {
   # Check that SST values are numeric
   expect_true(is.numeric(my_data$SST_value))
 })
+
+test_that("create_av_packs fetches available packages", {
+  # Run the function
+  create_av_packs()
+  
+  # Check if av_packs is created and has the expected structure
+  expect_true(exists("av_packs", envir = .GlobalEnv))
+  expect_true(is.data.frame(av_packs))
+  expect_true("Package" %in% colnames(av_packs))
+  expect_true("Version" %in% colnames(av_packs))
+})
