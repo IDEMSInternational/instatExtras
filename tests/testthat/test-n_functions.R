@@ -282,3 +282,104 @@ test_that("nc_as_data_frame stops when id_points length does not match lon_point
     "id_points \\(if specified\\) must have the same length as lon_points and lat_points."
   )
 })
+
+
+test_that("subset_nc_dimensions correctly subsets dimensions based on boundary", {
+  mock_nc <- list()  # No need to mock nc object in detail for this test
+  
+  dim_axes <- list(X = "X", Y = "Y", Z = "Z")
+  dim_values <- list(
+    X = c(1, 2, 3, 4, 5),
+    Y = c(10, 20, 30, 40, 50),
+    Z = c(100, 200, 300, 400, 500)
+  )
+  
+  boundary <- list(X = c(2, 4), Y = c(20, 40))
+  
+  result <- subset_nc_dimensions(mock_nc, dim_axes, dim_values, boundary, has_points = FALSE)
+  
+  expect_equal(result$start, c(2, 2, 1))  # X starts at 2, Y starts at 2, Z remains full (starts at 1)
+  expect_equal(result$count, c(3, 3, 5))  # X keeps 3 values (2-4), Y keeps 3 (20-40), Z keeps all
+  expect_equal(result$dim_values$X, c(2, 3, 4))  # X should be filtered
+  expect_equal(result$dim_values$Y, c(20, 30, 40))  # Y should be filtered
+  expect_equal(result$dim_values$Z, c(100, 200, 300, 400, 500))  # Z remains unchanged
+})
+
+test_that("subset_nc_dimensions stops when no values are in boundary range", {
+  mock_nc <- list()
+  
+  dim_axes <- list(X = "X", Y = "Y")
+  dim_values <- list(
+    X = c(1, 2, 3, 4, 5),
+    Y = c(10, 20, 30, 40, 50)
+  )
+  
+  boundary <- list(X = c(10, 20))  # No values in this range
+  
+  expect_error(
+    subset_nc_dimensions(mock_nc, dim_axes, dim_values, boundary, has_points = FALSE),
+    "No values within the range specified for X."
+  )
+})
+
+test_that("subset_nc_dimensions does not subset dimensions without a boundary", {
+  mock_nc <- list()
+  
+  dim_axes <- list(X = "X", Y = "Y")
+  dim_values <- list(
+    X = c(1, 2, 3, 4, 5),
+    Y = c(10, 20, 30, 40, 50)
+  )
+  
+  boundary <- list()  # No boundary set
+  
+  result <- subset_nc_dimensions(mock_nc, dim_axes, dim_values, boundary, has_points = FALSE)
+  
+  expect_equal(result$start, c(1, 1))  # All start at 1
+  expect_equal(result$count, c(5, 5))  # All keep their full length
+  expect_equal(result$dim_values$X, c(1, 2, 3, 4, 5))
+  expect_equal(result$dim_values$Y, c(10, 20, 30, 40, 50))
+})
+
+test_that("subset_nc_dimensions correctly handles time conversion", {
+  local_mocked_bindings(
+    get_nc_attribute = function(nc, dim_var, attr) {
+      if (dim_var == "T" && attr == "units") {
+        return(list(hasatt = TRUE, value = "julian_day"))
+      } else {
+        return(list(hasatt = FALSE))
+      }
+    },
+    get_nc_time_series = function(nc, time.dim.name) {
+      c(0, 10, 20, 30, 40)  # Simulated Julian days
+    },
+    convert_pcict_to_posixct = function(pcict_time) {
+      as.POSIXct("2000-01-01", tz = "UTC") + (pcict_time * 86400)
+    }
+  )
+  
+  mock_nc <- list()
+  
+  dim_axes <- list(T = "T")
+  dim_values <- list(T = c(0, 10, 20, 30, 40))  # Julian day values
+  boundary <- list(T = c(as.Date("2000-01-11"), as.Date("2000-01-31")))  # Filtering within date range
+
+  expect_error(subset_nc_dimensions(mock_nc, dim_axes, dim_values, boundary, has_points = FALSE), "No values within the range specified for T.")
+})
+
+test_that("subset_nc_dimensions handles rounding differences for single-value dimensions", {
+  mock_nc <- list()
+  
+  dim_axes <- list(Z = "Z")
+  dim_values <- list(
+    Z = c(99.99999)  # Almost 100, but not quite
+  )
+  
+  boundary <- list(Z = c(100, 100))  # Exact match requested
+  
+  result <- subset_nc_dimensions(mock_nc, dim_axes, dim_values, boundary, has_points = FALSE)
+  
+  expect_equal(result$start, c(1))  # Single value must be included
+  expect_equal(result$count, c(1))  # Only one value remains
+  expect_equal(result$dim_values$Z, c(99.99999))  # Value is kept despite rounding issues
+})

@@ -100,7 +100,6 @@ nc_as_data_frame <- function(nc, vars, keep_raw_time = TRUE, include_metadata = 
   if(!is.null(boundary)) {
     if(!all(names(boundary) %in% dim_names)) stop("boundary contains dimensions not associated with", vars[1])
     if(anyNA(dim_axes)) {
-      print("bbb")
       warning("Cannot subset data when some dimension axes cannot be identified.")
       start <- NA
       count <- NA
@@ -343,9 +342,7 @@ process_nc_file <- function(nc, vars, keep_raw_time, include_metadata, boundary,
 
 # Wrapper for getting time series
 get_nc_time_series <- function(nc, time.dim.name) {
-  print("a")
   ncdf4.helpers::nc.get.time.series(nc, time.dim.name = time.dim.name)
-  print("b")
 }
 
 # Wrapper for converting PCICt time to POSIXct
@@ -360,12 +357,10 @@ subset_nc_dimensions <- function(nc, dim_axes, dim_values, boundary, has_points)
   count <- c()
   for(dim in c("X", "Y", "Z", "T", "S")) {
     if(dim %in% dim_axes) {
-      print("a")
       dim_var <- names(dim_axes)[which(dim_axes == dim)]
       curr_dim_values <- dim_values[[dim_var]]
       if(dim_var %in% names(boundary) && !(has_points && dim %in% c("X", "Y"))) {
         if(dim == "T") {
-          print("b")
           ind <- integer(0)
           try({
             print(dim_var)
