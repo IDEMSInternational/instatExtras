@@ -1,4 +1,3 @@
-
 index.search <- function (topic, paths, firstOnly = FALSE) {
   res <- character()
   for (p in paths) {
