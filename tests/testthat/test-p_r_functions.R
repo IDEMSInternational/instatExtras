@@ -62,3 +62,51 @@ test_that("pivot_tricot produces expected output", {
   # Check for missing values handling
   expect_false(any(is.na(result$variety)))
 })
+
+test_that("package_check handles different package states correctly", {
+  # Mock `pingr::is_online` to simulate online/offline status
+  mockery::stub(package_check, "pingr::is_online", function() TRUE)
+  
+  # Mock `create_av_packs` to provide a dummy CRAN package list
+  mock_create_av_packs <- function() {
+    av_packs <<- data.frame(
+      Package = c("ggplot2", "zzlite"),
+      Version = c("3.3.5", "1.1.0"),
+      stringsAsFactors = FALSE
+    )
+  }
+  mockery::stub(package_check, "create_av_packs", mock_create_av_packs)
+  
+  # Mock `utils::installed.packages` to simulate installed packages
+  mockery::stub(utils::installed.packages, "installed.packages", function() {
+    matrix(c("ggplot2", "3.3.5"), ncol = 2, dimnames = list(NULL, c("Package", "Version")))
+  })
+  
+  # Case 1: Installed CRAN package → out[[1]] should be "1"
+  result <- package_check("ggplot2")
+  expect_equal(result[[1]], "1")
+  
+  # Case 2: CRAN package but NOT installed → out[[1]] should be "2"
+  result <- package_check("zzlite")
+  expect_equal(result[[1]], "2")
+  
+  # Case 3: Non-existent package (not in CRAN, not installed) → out[[1]] should be "4"
+  result <- package_check("nonexistentpkg")
+  expect_equal(result[[1]], "4")
+  
+  # Case 4: Offline mode → out[[1]] should be "5"
+  mockery::stub(package_check, "pingr::is_online", function() FALSE)
+  result <- package_check("ggplot2")
+  expect_equal(result[[1]], "5")
+})
+
+test_that("create_av_packs fetches available packages", {
+  # Run the function
+  create_av_packs()
+  
+  # Check if av_packs is created and has the expected structure
+  expect_true(exists("av_packs", envir = .GlobalEnv))
+  expect_true(is.data.frame(av_packs))
+  expect_true("Package" %in% colnames(av_packs))
+  expect_true("Version" %in% colnames(av_packs))
+})
