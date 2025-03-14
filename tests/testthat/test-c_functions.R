@@ -22,6 +22,16 @@ test_that("compare_columns correctly identifies differences", {
   expect_output(compare_columns(x, x, display_union = TRUE), "Columns contain all the same values: TRUE")
 })
 
+test_that("compare_columns displays intersection and union correctly", {
+  # Define two example vectors
+  x <- c(1, 2, 3, 4, 5)
+  y <- c(4, 5, 6, 7, 8)
+  
+  # Capture and test the output of compare_columns
+  expect_output(compare_columns(x, y, display_intersection = TRUE), "Columns contain all the same values: FALSE")
+  expect_output(compare_columns(x, y, display_union = TRUE), "Columns contain all the same values: FALSE")
+})
+
 test_that("consecutive_sum computes cumulative sum correctly", {
   expect_equal(consecutive_sum(c(1, 2, 3, 4, 5)), c(1, 3, 6, 10, 15))
   expect_equal(consecutive_sum(c(1, NA, 3, 0, 5), initial_value = 10), c(11, NA, NA, 0, 5))
