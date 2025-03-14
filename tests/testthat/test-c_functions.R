@@ -37,6 +37,66 @@ test_that("convert_to_character_matrix handles data correctly", {
   expect_true(all(sapply(result, is.character)))  # Ensure all values are converted to character
 })
 
+test_that("convert_to_character_matrix handles empty data", {
+  # Create an empty data frame with column names
+  empty_data <- data.frame(a = numeric(0), b = character(0), c = logical(0))
+  
+  # Run function
+  result <- convert_to_character_matrix(empty_data)
+  
+  # Expect result to be a data frame with the same column names
+  expect_true(is.data.frame(result))
+  expect_equal(ncol(result), ncol(empty_data))
+  expect_equal(nrow(result), 0)
+  expect_equal(colnames(result), colnames(empty_data))
+})
+
+test_that("convert_to_character_matrix correctly handles 'sfc' class columns", {
+  # Create a simple sf object (geometry column)
+  points <- sf::st_sfc(sf::st_point(c(1, 2)), sf::st_point(c(3, 4)))
+  sf_data <- data.frame(id = c(1, 2))
+  sf_data$geometry <- points
+  class(sf_data$geometry) <- c("sfc", class(sf_data$geometry))  # Ensure "sfc" class
+  
+  # Run function
+  result <- convert_to_character_matrix(sf_data)
+  
+  # Expect result to be a data frame
+  expect_true(is.data.frame(result))
+  
+  # Ensure id column remains unchanged as character
+  expect_equal(result$id, as.character(sf_data$id))
+})
+
+test_that("convert_to_character_matrix replaces NA values correctly", {
+  # Create a data frame with NA values
+  data <- data.frame(
+    numbers = c(1.23, NA, 7.89),  # Numeric with NA
+    text = c("apple", NA, "cherry"),  # Character with NA
+    logical = c(TRUE, FALSE, NA),  # Logical with NA
+    stringsAsFactors = FALSE
+  )
+  
+  # Define the NA replacement string
+  na_placeholder <- "MISSING"
+  
+  # Run function with na_display
+  result <- convert_to_character_matrix(data, na_display = na_placeholder)
+  
+  # Ensure result is a data frame
+  expect_true(is.data.frame(result))
+  
+  # Ensure NA values are replaced
+  expect_equal(result$numbers[2], na_placeholder)
+  expect_equal(result$text[2], na_placeholder)
+  expect_equal(result$logical[3], na_placeholder)
+  
+  # Ensure other values remain unchanged
+  expect_equal(result$numbers[c(1,3)], as.character(data$numbers[c(1,3)]))
+  expect_equal(result$text[c(1,3)], as.character(data$text[c(1,3)]))
+  expect_equal(result$logical[c(1,2)], as.character(data$logical[c(1,2)]))
+})
+
 test_that("create_av_packs retrieves package data correctly", {
   create_av_packs()
 
