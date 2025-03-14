@@ -276,3 +276,13 @@ test_that("get_installed_packages_with_data returns correct package lists", {
   result_all_packages <- get_installed_packages_with_data(with_data = FALSE)
   expect_equal(result_all_packages, c("ggplot2", "dplyr", "base", "stats"))
 })
+
+test_that("get_odk_http_get handles request failure", {
+  # Mock `httr::GET` to simulate an error (e.g., invalid URL)
+  mock_GET <- function(url, auth) {
+    stop("Request failed")
+  }
+  mockery::stub(get_odk_http_get, "httr::GET", mock_GET)
+  
+  expect_error(get_odk_http_get("invalid_url"), "Request failed")
+})
