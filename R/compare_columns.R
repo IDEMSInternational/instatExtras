@@ -55,6 +55,8 @@ compare_columns <- function(x, y, use_unique = TRUE, sort_values = TRUE, firstno
       if(length(inter) != 0) cat(paste0("'", inter, "'", collapse = ", "))
       cat("\n \n")
     }
-    if(display_union) cat(paste0("Union (Values that appear in either column): ", paste0("'", dplyr::union(x, y), "'", collapse = ", ")))
+    if(display_union){
+      cat(paste0("Union (Values that appear in either column): ", paste0("'", dplyr::union(x, y), "'", collapse = ", ")))
+    }
   }
 }

@@ -13,6 +13,10 @@ test_that("import_from_iri handles incorrect source gracefully", {
   expect_error(import_from_iri("INVALID_SOURCE", "daily_0p05", "data", -10, 10, -10, 10, "area"))
 })
 
+test_that("import_from_iri handles incorrect source gracefully", {
+  expect_error(import_from_iri("CHIRPS_V2P0", "daily_0p05", "data", -10, 10, -10, 10, "get_area_point"))
+})
+
 test_that("import_from_ODK handles incorrect source gracefully", {
   expect_error(import_from_ODK(platform = "invalid_platform"))
   expect_error(import_from_ODK(form_name = "Form A", platform = "ona"))

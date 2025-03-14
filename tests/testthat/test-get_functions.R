@@ -255,3 +255,34 @@ test_that("readline_masked_tcltk_window handles password entry correctly", {
   # Destroy the Tk window after tests complete
   tcltk::tkdestroy(real_window)
 })
+
+test_that("get_installed_packages_with_data returns correct package lists", {
+  # Mock `.packages(all.available = TRUE)` to simulate installed packages
+  mockery::stub(get_installed_packages_with_data, ".packages", function(all.available) {
+    return(c("ggplot2", "dplyr", "base", "stats"))
+  })
+  
+  # Mock `utils::data()` to simulate packages with data sets
+  mock_utils_data <- function(package) {
+    return(list(results = matrix(c("ggplot2", "datasets", "base"), ncol = 1)))
+  }
+  mockery::stub(get_installed_packages_with_data, "utils::data", mock_utils_data)
+  
+  # Case 1: with_data = TRUE (should return only packages that have data sets)
+  result_with_data <- get_installed_packages_with_data(with_data = TRUE)
+  expect_equal(result_with_data, c("ggplot2", "datasets", "base"))
+  
+  # Case 2: with_data = FALSE (should return all installed packages)
+  result_all_packages <- get_installed_packages_with_data(with_data = FALSE)
+  expect_equal(result_all_packages, c("ggplot2", "dplyr", "base", "stats"))
+})
+
+test_that("get_odk_http_get handles request failure", {
+  # Mock `httr::GET` to simulate an error (e.g., invalid URL)
+  mock_GET <- function(url, auth) {
+    stop("Request failed")
+  }
+  mockery::stub(get_odk_http_get, "httr::GET", mock_GET)
+  
+  expect_error(get_odk_http_get("invalid_url"), "Request failed")
+})

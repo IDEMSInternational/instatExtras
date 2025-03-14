@@ -104,44 +104,14 @@ nc_as_data_frame <- function(nc, vars, keep_raw_time = TRUE, include_metadata = 
       start <- NA
       count <- NA
     } else {
-      start <- c()
-      count <- c()
-      for(dim in c("X", "Y", "Z", "T", "S")) {
-        if(dim %in% dim_axes) {
-          dim_var <- names(dim_axes)[which(dim_axes == dim)]
-          curr_dim_values <- dim_values[[dim_var]]
-          if(dim_var %in% names(boundary) && !(has_points && dim %in% c("X", "Y"))) {
-            if(dim == "T") {
-              ind <- integer(0)
-              try({
-                print(dim_var)
-                units <- get_nc_attribute(nc, dim_var, "units")
-                if(units$hasatt && units$value == "julian_day") {
-                  # RDotNet interprets Date class as numeric so character needed to preserve date
-                  time_vals <- as.Date(curr_dim_values, origin = structure(-2440588, class = "Date"))
-                } else {
-                  pcict_time <- get_nc_time_series(nc, time.dim.name = dim_var)
-                  posixct_time <- convert_pcict_to_posixct(pcict_time)
-                  time_vals <- as.Date(posixct_time)
-                }
-                ind <- which(time_vals >= boundary[[dim_var]][[1]] & time_vals <= boundary[[dim_var]][[2]])
-              })
-            } else ind <- which(curr_dim_values >= boundary[[dim_var]][1] & curr_dim_values <= boundary[[dim_var]][2])
-            # TODO This is temporary solution for when there is only one value for a dimension and there are rounding difference
-            if(length(ind) == 0 && length(curr_dim_values) == 1 && round(curr_dim_values, 3) == round(boundary[[dim_var]][1], 3) && round(curr_dim_values, 3) == round(boundary[[dim_var]][2], 3)) ind <- 1
-            if(length(ind) == 0) {
-              stop("No values within the range specified for ", dim_var, ".")
-            } else {
-              start <- c(start, min(ind))
-              count <- c(count, length(ind))
-              dim_values[[dim_var]] <- dim_values[[dim_var]][ind]
-            }
-          } else {
-            start <- c(start, 1)
-            count <- c(count, length(curr_dim_values))
-          }
-        }
-      }
+      # Call the new function for dimension subsetting
+      subset_result <- subset_nc_dimensions(nc, dim_axes, dim_values, boundary, has_points)
+      
+      start <- subset_result$start
+      count <- subset_result$count
+      dim_values <- subset_result$dim_values
+      
+      # If no subsetting was applied, set start and count defaults
       if(length(start) == 0) {
         start <- rep(1, length(dim_axes))
         count <- rep(-1, length(dim_axes))
@@ -154,38 +124,14 @@ nc_as_data_frame <- function(nc, vars, keep_raw_time = TRUE, include_metadata = 
   start_list <- list()
   count_list <- list()
   dim_values_list <- list()
-  if(has_points) {
-    dim_axes <- get_nc_dim_axes(nc, vars[1])
-    x_var <- names(dim_axes)[which(dim_axes == "X")]
-    y_var <- names(dim_axes)[which(dim_axes == "Y")]
-    if(length(x_var) == 0 || length(y_var) == 0) stop("Cannot select points because dimensions are not labelled correctly in the nc file. Modify the nc file or remove the points to import all data.")
-    xs <- dim_values[[x_var]]
-    ys <- dim_values[[y_var]]
-    for(i in seq_along(lon_points)) {
-      curr_start <- start
-      curr_count <- count
-      curr_dim_values <- dim_values
-      xy_possible <- expand.grid(xs, ys)
-      point_ind <- which.min(sp::spDistsN1(pts = as.matrix(xy_possible), pt = c(lon_points[i], lat_points[i]), longlat = great_circle_dist))
-      x_ind <- which(xs == xy_possible[point_ind, 1])[1]
-      curr_start[1] <- x_ind
-      curr_count[1]  <- 1
-      curr_dim_values[[x_var]] <- curr_dim_values[[x_var]][x_ind]
-      y_ind <- which(ys == xy_possible[point_ind, 2])[1]
-      curr_start[2] <- y_ind
-      curr_count[2]  <- 1
-      curr_dim_values[[y_var]] <- curr_dim_values[[y_var]][y_ind]
-      if(show_requested_points) {
-        curr_dim_values[[paste0(x_var, "_point")]] <- lon_points[i]
-        curr_dim_values[[paste0(y_var, "_point")]] <- lat_points[i]
-        if(!is.null(id_points)) curr_dim_values[["station"]] <- id_points[i]
-        requested_points_added <- TRUE
-      }
-      
-      start_list[[i]] <- curr_start
-      count_list[[i]] <- curr_count
-      dim_values_list[[i]] <- curr_dim_values
-    }
+  
+  if (has_points) {
+    dim_axes <- get_nc_dim_axes(nc, vars)
+    subset_result <- subset_nc_by_points(nc, dim_axes, dim_values, lon_points, lat_points, id_points, start, count, show_requested_points, great_circle_dist)
+    start_list <- subset_result$start_list
+    count_list <- subset_result$count_list
+    dim_values_list <- subset_result$dim_values_list
+    requested_points_added <- subset_result$requested_points_added
   } else {
     start_list[[1]] <- start
     count_list[[1]] <- count
@@ -372,10 +318,98 @@ process_nc_file <- function(nc, vars, keep_raw_time, include_metadata, boundary,
 
 # Wrapper for getting time series
 get_nc_time_series <- function(nc, time.dim.name) {
-  ncdf4.helpers::nc.get.time.series(nc, time.dim.name)
+  ncdf4.helpers::nc.get.time.series(nc, time.dim.name = time.dim.name)
 }
 
 # Wrapper for converting PCICt time to POSIXct
 convert_pcict_to_posixct <- function(pcict_time) {
   PCICt::as.POSIXct.PCICt(pcict_time)
 }
+
+
+
+subset_nc_dimensions <- function(nc, dim_axes, dim_values, boundary, has_points) {
+  start <- c()
+  count <- c()
+  for(dim in c("X", "Y", "Z", "T", "S")) {
+    if(dim %in% dim_axes) {
+      dim_var <- names(dim_axes)[which(dim_axes == dim)]
+      curr_dim_values <- dim_values[[dim_var]]
+      if(dim_var %in% names(boundary) && !(has_points && dim %in% c("X", "Y"))) {
+        if(dim == "T") {
+          ind <- integer(0)
+          try({
+            print(dim_var)
+            units <- get_nc_attribute(nc, dim_var, "units")
+            if(units$hasatt && units$value == "julian_day") {
+              # RDotNet interprets Date class as numeric so character needed to preserve date
+              time_vals <- as.Date(curr_dim_values, origin = structure(-2440588, class = "Date"))
+            } else {
+              pcict_time <- get_nc_time_series(nc, time.dim.name = dim_var)
+              posixct_time <- convert_pcict_to_posixct(pcict_time)
+              time_vals <- as.Date(posixct_time)
+            }
+            ind <- which(time_vals >= boundary[[dim_var]][[1]] & time_vals <= boundary[[dim_var]][[2]])
+          })
+        } else ind <- which(curr_dim_values >= boundary[[dim_var]][1] & curr_dim_values <= boundary[[dim_var]][2])
+        # TODO This is temporary solution for when there is only one value for a dimension and there are rounding difference
+        if(length(ind) == 0 && length(curr_dim_values) == 1 && round(curr_dim_values, 3) == round(boundary[[dim_var]][1], 3) && round(curr_dim_values, 3) == round(boundary[[dim_var]][2], 3)) ind <- 1
+        if(length(ind) == 0) {
+          stop("No values within the range specified for ", dim_var, ".")
+        } else {
+          start <- c(start, min(ind))
+          count <- c(count, length(ind))
+          dim_values[[dim_var]] <- dim_values[[dim_var]][ind]
+        }
+      } else {
+        start <- c(start, 1)
+        count <- c(count, length(curr_dim_values))
+      }
+    }
+  }
+  return(list(start = start, count = count, dim_values = dim_values))
+}
+
+
+
+
+
+
+
+
+
+subset_nc_by_points <- function(nc, dim_axes, dim_values, lon_points, lat_points, id_points, start, count, show_requested_points, great_circle_dist) {
+  x_var <- names(dim_axes)[which(dim_axes == "X")]
+  y_var <- names(dim_axes)[which(dim_axes == "Y")]
+  if(length(x_var) == 0 || length(y_var) == 0) stop("Cannot select points because dimensions are not labelled correctly in the nc file. Modify the nc file or remove the points to import all data.")
+  xs <- dim_values[[x_var]]
+  ys <- dim_values[[y_var]]
+  for(i in seq_along(lon_points)) {
+    curr_start <- start
+    curr_count <- count
+    curr_dim_values <- dim_values
+    xy_possible <- expand.grid(xs, ys)
+    point_ind <- which.min(sp::spDistsN1(pts = as.matrix(xy_possible), pt = c(lon_points[i], lat_points[i]), longlat = great_circle_dist))
+    x_ind <- which(xs == xy_possible[point_ind, 1])[1]
+    curr_start[1] <- x_ind
+    curr_count[1]  <- 1
+    curr_dim_values[[x_var]] <- curr_dim_values[[x_var]][x_ind]
+    y_ind <- which(ys == xy_possible[point_ind, 2])[1]
+    curr_start[2] <- y_ind
+    curr_count[2]  <- 1
+    curr_dim_values[[y_var]] <- curr_dim_values[[y_var]][y_ind]
+    if(show_requested_points) {
+      curr_dim_values[[paste0(x_var, "_point")]] <- lon_points[i]
+      curr_dim_values[[paste0(y_var, "_point")]] <- lat_points[i]
+      if(!is.null(id_points)) curr_dim_values[["station"]] <- id_points[i]
+      requested_points_added <- TRUE
+    }
+    start_list[[i]] <- curr_start
+    count_list[[i]] <- curr_count
+    dim_values_list[[i]] <- curr_dim_values
+  }
+  return(list(start_list = start_list, count_list = count_list, dim_values_list = dim_values_list, requested_points_added = requested_points_added))
+}
+
+
+

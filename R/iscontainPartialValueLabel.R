@@ -15,8 +15,7 @@
 is.containPartialValueLabel <- function(x) {
   if (is.containValueLabel(x)) {
     levelCounts <- table(x)
-    return(!all(x[!is.na(x)] %in% attr(x, labels_label)) &&
-             sum(levelCounts == 0) == 0)
+    return(!all(x[!is.na(x)] %in% attr(x, labels_label)) && sum(levelCounts == 0) == 0)
   } else {
     return(FALSE)
   }
