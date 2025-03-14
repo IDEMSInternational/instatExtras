@@ -9,17 +9,6 @@ test_that("n_non_numeric counts non-numeric elements correctly", {
   expect_equal(n_non_numeric(z), 3)
 })
 
-test_that("nc_get_dim_min_max handles missing dimension", {
-  mock_nc <- list(dim = list(time = list(vals = 1:10)))
-  expect_equal(nc_get_dim_min_max(mock_nc, "time"), c(1, 10))
-  expect_error(nc_get_dim_min_max(mock_nc, "depth"), "depth not found in file")
-})
-
-test_that("nc_as_data_frame rejects mismatched points", {
-  mock_nc <- list(dim = list(lon = list(vals = 1:10), lat = list(vals = 1:10)))
-  expect_error(nc_as_data_frame(mock_nc, vars = c("temp"), lon_points = c(1,2), lat_points = c(3)), "lon_points and lat_points have unequal lengths")
-})
-
 test_that("next_default_item generates unique item names", {
   existing_names <- c("item1", "item2", "item3")
   
@@ -33,6 +22,17 @@ test_that("Not-in operator works as expected", {
   expect_true(5 %notin% c(1, 2, 3, 4))
   expect_false("a" %notin% c("a", "b", "c"))
   expect_true("z" %notin% c("a", "b", "c"))
+})
+
+test_that("nc_get_dim_min_max handles missing dimension", {
+  mock_nc <- list(dim = list(time = list(vals = 1:10)))
+  expect_equal(nc_get_dim_min_max(mock_nc, "time"), c(1, 10))
+  expect_error(nc_get_dim_min_max(mock_nc, "depth"), "depth not found in file")
+})
+
+test_that("nc_as_data_frame rejects mismatched points", {
+  mock_nc <- list(dim = list(lon = list(vals = 1:10), lat = list(vals = 1:10)))
+  expect_error(nc_as_data_frame(mock_nc, vars = c("temp"), lon_points = c(1,2), lat_points = c(3)), "lon_points and lat_points have unequal lengths")
 })
 
 test_that("nc_get_dim_min_max retrieves correct min and max for a valid dimension", {
@@ -217,3 +217,26 @@ test_that("nc_get_dim_min_max correctly converts time when time_as_date is TRUE"
   expect_equal(result, expected_dates)  # Ensures conversion works correctly
 })
 
+test_that("nc_as_data_frame correctly identifies dimension in dim_axes", {
+  mock_nc <- list(
+    dim = list(
+      time = list(vals = c(1, 2, 3, 4, 5)),
+      x = list(vals = c(10, 20, 30))
+    )
+  )
+  
+  local_mocked_bindings(
+    get_nc_variable_list = function(nc) c("temperature"),
+    get_nc_dim_names = function(nc, var) c("time", "x"),
+    get_nc_dim_values = function(nc, dim_name) if (dim_name == "time") c(1, 2, 3, 4, 5) else c(10, 20, 30),
+    get_nc_dim_axes = function(nc, var) list(time = "T", x = "X"),  # Simulate correct axis identification
+    get_ncvar_values = function(nc, var, start, count) matrix(1:15, ncol = 3),  # Mock variable values
+    get_nc_attribute = function(nc, var, attr) list(hasatt = TRUE, value = "some_attribute", attr = "units")
+  )
+  
+  result_a <- nc_as_data_frame(mock_nc, vars = c("temperature"))
+  
+  expect_true("time" %in% names(result_a))  # Ensure the time dimension is included
+  expect_true("x" %in% names(result_a))  # Ensure the x dimension is included
+  expect_equal(nrow(result_a), 15)  # Check expected row count based on mocked values
+})
