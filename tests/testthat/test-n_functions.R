@@ -383,3 +383,26 @@ test_that("subset_nc_dimensions handles rounding differences for single-value di
   expect_equal(result$count, c(1))  # Only one value remains
   expect_equal(result$dim_values$Z, c(99.99999))  # Value is kept despite rounding issues
 })
+
+test_that("subset_nc_by_points works correctly", {
+  # Mock netCDF object
+  nc <- list()
+  get_nc_dim_axes <- function(nc) {
+    return(list("lon" = "X", "lat" = "Y"))
+  }
+  
+  dim_values <- list(
+    "lon" = seq(-180, 180, by = 10),
+    "lat" = seq(-90, 90, by = 10)
+  )
+  
+  lon_points <- c(-170, 0, 170)
+  lat_points <- c(-80, 0, 80)
+  id_points <- c("A", "B", "C")
+  start <- c(1, 1)
+  count <- c(-1, -1)
+  show_requested_points <- TRUE
+  great_circle_dist <- TRUE
+  
+  expect_error(subset_nc_by_points(nc, dim_values, lon_points, lat_points, id_points, start, count, show_requested_points, great_circle_dist))
+})

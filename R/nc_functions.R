@@ -124,38 +124,14 @@ nc_as_data_frame <- function(nc, vars, keep_raw_time = TRUE, include_metadata = 
   start_list <- list()
   count_list <- list()
   dim_values_list <- list()
-  if(has_points) {
-    dim_axes <- get_nc_dim_axes(nc, vars[1])
-    x_var <- names(dim_axes)[which(dim_axes == "X")]
-    y_var <- names(dim_axes)[which(dim_axes == "Y")]
-    if(length(x_var) == 0 || length(y_var) == 0) stop("Cannot select points because dimensions are not labelled correctly in the nc file. Modify the nc file or remove the points to import all data.")
-    xs <- dim_values[[x_var]]
-    ys <- dim_values[[y_var]]
-    for(i in seq_along(lon_points)) {
-      curr_start <- start
-      curr_count <- count
-      curr_dim_values <- dim_values
-      xy_possible <- expand.grid(xs, ys)
-      point_ind <- which.min(sp::spDistsN1(pts = as.matrix(xy_possible), pt = c(lon_points[i], lat_points[i]), longlat = great_circle_dist))
-      x_ind <- which(xs == xy_possible[point_ind, 1])[1]
-      curr_start[1] <- x_ind
-      curr_count[1]  <- 1
-      curr_dim_values[[x_var]] <- curr_dim_values[[x_var]][x_ind]
-      y_ind <- which(ys == xy_possible[point_ind, 2])[1]
-      curr_start[2] <- y_ind
-      curr_count[2]  <- 1
-      curr_dim_values[[y_var]] <- curr_dim_values[[y_var]][y_ind]
-      if(show_requested_points) {
-        curr_dim_values[[paste0(x_var, "_point")]] <- lon_points[i]
-        curr_dim_values[[paste0(y_var, "_point")]] <- lat_points[i]
-        if(!is.null(id_points)) curr_dim_values[["station"]] <- id_points[i]
-        requested_points_added <- TRUE
-      }
-      
-      start_list[[i]] <- curr_start
-      count_list[[i]] <- curr_count
-      dim_values_list[[i]] <- curr_dim_values
-    }
+  
+  if (has_points) {
+    dim_axes <- get_nc_dim_axes(nc, vars)
+    subset_result <- subset_nc_by_points(nc, dim_axes, dim_values, lon_points, lat_points, id_points, start, count, show_requested_points, great_circle_dist)
+    start_list <- subset_result$start_list
+    count_list <- subset_result$count_list
+    dim_values_list <- subset_result$dim_values_list
+    requested_points_added <- subset_result$requested_points_added
   } else {
     start_list[[1]] <- start
     count_list[[1]] <- count
@@ -402,64 +378,7 @@ subset_nc_dimensions <- function(nc, dim_axes, dim_values, boundary, has_points)
 
 
 
-subset_nc_by_points <- function(nc, dim_values, lon_points, lat_points, id_points, start, count, show_requested_points, great_circle_dist) {
-  dim_axes <- get_nc_dim_axes(nc)
-  x_var <- names(dim_axes)[which(dim_axes == "X")]
-  y_var <- names(dim_axes)[which(dim_axes == "Y")]
-  
-  if (length(x_var) == 0 || length(y_var) == 0) {
-    stop("Cannot select points because dimensions are not labelled correctly in the nc file. Modify the nc file or remove the points to import all data.")
-  }
-  
-  xs <- dim_values[[x_var]]
-  ys <- dim_values[[y_var]]
-  
-  start_list <- list()
-  count_list <- list()
-  dim_values_list <- list()
-  requested_points_added <- FALSE
-  
-  for (i in seq_along(lon_points)) {
-    curr_start <- start
-    curr_count <- count
-    curr_dim_values <- dim_values
-    
-    xy_possible <- expand.grid(xs, ys)
-    point_ind <- which.min(sp::spDistsN1(pts = as.matrix(xy_possible), pt = c(lon_points[i], lat_points[i]), longlat = great_circle_dist))
-    
-    x_ind <- which(xs == xy_possible[point_ind, 1])[1]
-    curr_start[1] <- x_ind
-    curr_count[1] <- 1
-    curr_dim_values[[x_var]] <- curr_dim_values[[x_var]][x_ind]
-    
-    y_ind <- which(ys == xy_possible[point_ind, 2])[1]
-    curr_start[2] <- y_ind
-    curr_count[2] <- 1
-    curr_dim_values[[y_var]] <- curr_dim_values[[y_var]][y_ind]
-    
-    if (show_requested_points) {
-      curr_dim_values[[paste0(x_var, "_point")]] <- lon_points[i]
-      curr_dim_values[[paste0(y_var, "_point")]] <- lat_points[i]
-      if (!is.null(id_points)) curr_dim_values[["station"]] <- id_points[i]
-      requested_points_added <- TRUE
-    }
-    
-    start_list[[i]] <- curr_start
-    count_list[[i]] <- curr_count
-    dim_values_list[[i]] <- curr_dim_values
-  }
-  
-  return(list(
-    start_list = start_list,
-    count_list = count_list,
-    dim_values_list = dim_values_list,
-    requested_points_added = requested_points_added
-  ))
-}
-
-
-if(has_points) {
-  dim_axes <- get_nc_dim_axes(nc, vars[1])
+subset_nc_by_points <- function(nc, dim_axes, dim_values, lon_points, lat_points, id_points, start, count, show_requested_points, great_circle_dist) {
   x_var <- names(dim_axes)[which(dim_axes == "X")]
   y_var <- names(dim_axes)[which(dim_axes == "Y")]
   if(length(x_var) == 0 || length(y_var) == 0) stop("Cannot select points because dimensions are not labelled correctly in the nc file. Modify the nc file or remove the points to import all data.")
@@ -485,14 +404,12 @@ if(has_points) {
       if(!is.null(id_points)) curr_dim_values[["station"]] <- id_points[i]
       requested_points_added <- TRUE
     }
-    
     start_list[[i]] <- curr_start
     count_list[[i]] <- curr_count
     dim_values_list[[i]] <- curr_dim_values
   }
-} else {
-  start_list[[1]] <- start
-  count_list[[1]] <- count
-  dim_values_list[[1]] <- dim_values
+  return(list(start_list = start_list, count_list = count_list, dim_values_list = dim_values_list, requested_points_added = requested_points_added))
 }
-  
+
+
+
