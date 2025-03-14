@@ -105,9 +105,18 @@ nc_as_data_frame <- function(nc, vars, keep_raw_time = TRUE, include_metadata = 
       start <- NA
       count <- NA
     } else {
+      # Call the new function for dimension subsetting
+      subset_result <- subset_nc_dimensions(nc, dim_axes, dim_values, boundary, has_points)
       
-      ### TODO
-
+      start <- subset_result$start
+      count <- subset_result$count
+      dim_values <- subset_result$dim_values
+      
+      # If no subsetting was applied, set start and count defaults
+      if(length(start) == 0) {
+        start <- rep(1, length(dim_axes))
+        count <- rep(-1, length(dim_axes))
+      }
     }
   } else {
     start <- rep(1, length(dim_axes))
@@ -349,18 +358,20 @@ convert_pcict_to_posixct <- function(pcict_time) {
 subset_nc_dimensions <- function(nc, dim_axes, dim_values, boundary, has_points) {
   start <- c()
   count <- c()
-  
   for(dim in c("X", "Y", "Z", "T", "S")) {
     if(dim %in% dim_axes) {
+      print("a")
       dim_var <- names(dim_axes)[which(dim_axes == dim)]
       curr_dim_values <- dim_values[[dim_var]]
-      
       if(dim_var %in% names(boundary) && !(has_points && dim %in% c("X", "Y"))) {
         if(dim == "T") {
+          print("b")
           ind <- integer(0)
           try({
+            print(dim_var)
             units <- get_nc_attribute(nc, dim_var, "units")
             if(units$hasatt && units$value == "julian_day") {
+              # RDotNet interprets Date class as numeric so character needed to preserve date
               time_vals <- as.Date(curr_dim_values, origin = structure(-2440588, class = "Date"))
             } else {
               pcict_time <- get_nc_time_series(nc, time.dim.name = dim_var)
@@ -369,17 +380,9 @@ subset_nc_dimensions <- function(nc, dim_axes, dim_values, boundary, has_points)
             }
             ind <- which(time_vals >= boundary[[dim_var]][[1]] & time_vals <= boundary[[dim_var]][[2]])
           })
-        } else {
-          ind <- which(curr_dim_values >= boundary[[dim_var]][1] & curr_dim_values <= boundary[[dim_var]][2])
-        }
-        
-        # Handle case where only one value exists and rounding differences occur
-        if(length(ind) == 0 && length(curr_dim_values) == 1 &&
-           round(curr_dim_values, 3) == round(boundary[[dim_var]][1], 3) &&
-           round(curr_dim_values, 3) == round(boundary[[dim_var]][2], 3)) {
-          ind <- 1
-        }
-        
+        } else ind <- which(curr_dim_values >= boundary[[dim_var]][1] & curr_dim_values <= boundary[[dim_var]][2])
+        # TODO This is temporary solution for when there is only one value for a dimension and there are rounding difference
+        if(length(ind) == 0 && length(curr_dim_values) == 1 && round(curr_dim_values, 3) == round(boundary[[dim_var]][1], 3) && round(curr_dim_values, 3) == round(boundary[[dim_var]][2], 3)) ind <- 1
         if(length(ind) == 0) {
           stop("No values within the range specified for ", dim_var, ".")
         } else {
@@ -393,6 +396,5 @@ subset_nc_dimensions <- function(nc, dim_axes, dim_values, boundary, has_points)
       }
     }
   }
-  
   return(list(start = start, count = count, dim_values = dim_values))
 }

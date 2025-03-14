@@ -217,26 +217,68 @@ test_that("nc_get_dim_min_max correctly converts time when time_as_date is TRUE"
   expect_equal(result, expected_dates)  # Ensures conversion works correctly
 })
 
-test_that("nc_as_data_frame correctly identifies dimension in dim_axes", {
-  mock_nc <- list(
-    dim = list(
-      time = list(vals = c(1, 2, 3, 4, 5)),
-      x = list(vals = c(10, 20, 30))
-    )
-  )
-  
+test_that("nc_get_dim_min_max correctly converts time using get_nc_time_series and convert_pcict_to_posixct", {
   local_mocked_bindings(
-    get_nc_variable_list = function(nc) c("temperature"),
-    get_nc_dim_names = function(nc, var) c("time", "x"),
-    get_nc_dim_values = function(nc, dim_name) if (dim_name == "time") c(1, 2, 3, 4, 5) else c(10, 20, 30),
-    get_nc_dim_axes = function(nc, var) list(time = "T", x = "X"),  # Simulate correct axis identification
-    get_ncvar_values = function(nc, var, start, count) matrix(1:15, ncol = 3),  # Mock variable values
-    get_nc_attribute = function(nc, var, attr) list(hasatt = TRUE, value = "some_attribute", attr = "units")
+    # Mock NetCDF time axes
+    get_nc_dim_axes = function(nc) list(time = "T"),
+    
+    # Mock NetCDF attribute function to return time units that require conversion
+    get_nc_attribute = function(nc, dimension, attr) {
+      if (dimension == "time" && attr == "units") {
+        return(list(hasatt = TRUE, value = "days since 2000-01-01"))
+      } else {
+        return(list(hasatt = FALSE))
+      }
+    },
+    
+    # Mock NetCDF time series retrieval
+    get_nc_time_series = function(nc, time.dim.name) {
+      c(10, 20, 30, 40, 50)  # Simulating days since 2000-01-01
+    },
+    
+    # Mock PCICt time conversion
+    convert_pcict_to_posixct = function(pcict_time) {
+      as.POSIXct("2000-01-01", tz = "UTC") + (pcict_time * 86400)  # Convert days to POSIXct
+    }
   )
   
-  result_a <- nc_as_data_frame(mock_nc, vars = c("temperature"))
+  # Fake NetCDF structure
+  mock_nc <- list(
+    dim = list(time = list(vals = c(10, 20, 30, 40, 50)))  # Simulated time values
+  )
   
-  expect_true("time" %in% names(result_a))  # Ensure the time dimension is included
-  expect_true("x" %in% names(result_a))  # Ensure the x dimension is included
-  expect_equal(nrow(result_a), 15)  # Check expected row count based on mocked values
+  result <- nc_get_dim_min_max(mock_nc, "time", time_as_date = TRUE)
+  
+  # Expected output: min and max dates converted from days since 2000-01-01
+  expected_dates <- as.character(as.Date(c("2000-01-11", "2000-02-20")))
+  
+  expect_equal(result, expected_dates)  # Ensures conversion works correctly
+})
+
+test_that("nc_as_data_frame stops when only one of lon_points or lat_points is specified", {
+  mock_nc <- list(dim = list(lon = list(vals = 1:10), lat = list(vals = 1:10)))
+  
+  expect_error(
+    nc_as_data_frame(mock_nc, vars = c("temp"), lon_points = c(1,2)), 
+    "You must specificy both lon_points and lat_points"
+  )
+  
+  expect_error(
+    nc_as_data_frame(mock_nc, vars = c("temp"), lat_points = c(3,4)), 
+    "You must specificy both lon_points and lat_points"
+  )
+})
+
+test_that("nc_as_data_frame stops when id_points length does not match lon_points and lat_points", {
+  mock_nc <- list(dim = list(lon = list(vals = 1:10), lat = list(vals = 1:10)))
+  
+  expect_error(
+    nc_as_data_frame(mock_nc, vars = c("temp"), lon_points = c(1,2), lat_points = c(3,4), id_points = c("A")), 
+    "id_points \\(if specified\\) must have the same length as lon_points and lat_points."
+  )
+  
+  expect_error(
+    nc_as_data_frame(mock_nc, vars = c("temp"), lon_points = c(1,2), lat_points = c(3,4), id_points = c("A", "B", "C")), 
+    "id_points \\(if specified\\) must have the same length as lon_points and lat_points."
+  )
 })
