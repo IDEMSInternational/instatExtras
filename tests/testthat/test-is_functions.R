@@ -326,3 +326,27 @@ test_that("is.containValueLabel handles different data types", {
   num <- 42
   expect_false(is.containValueLabel(num))
 })
+
+test_that("is.containPartialValueLabel returns FALSE when all values are labeled", {
+  x <- c(1, 2, 3)
+  attr(x, "labels") <- c(1, 2, 3)
+  expect_false(is.containPartialValueLabel(x))
+})
+
+test_that("is.containPartialValueLabel returns FALSE when no label attribute is present", {
+  x <- c(1, 2, 3, 4)
+  expect_false(is.containPartialValueLabel(x))
+})
+
+test_that("is.containPartialValueLabel handles NA values correctly", {
+  x <- c(1, 2, 3, NA)
+  attr(x, "labels") <- c(1, 2)
+  expect_true(is.containPartialValueLabel(x))
+})
+
+test_that("is.containPartialValueLabel returns FALSE when all values match labels with no missing levels", {
+  x <- c(1, 2, 3, 1, 2, 3)
+  attr(x, "labels") <- c(1, 2, 3)
+  expect_false(is.containPartialValueLabel(x))
+})
+
