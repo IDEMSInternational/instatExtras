@@ -286,3 +286,12 @@ test_that("get_odk_http_get handles request failure", {
   
   expect_error(get_odk_http_get("invalid_url"), "Request failed")
 })
+
+test_that("readline_masked_tcltk_window returns test values", {
+  expect_equal(readline_masked_tcltk_window("Enter password:", test_mode = "mock_password"), "mock_password")
+  expect_equal(readline_masked_tcltk_window("Enter password:", test_mode = ""), "")
+})
+
+test_that("readline_masked_tcltk_window handles blank input when noblank = TRUE", {
+  expect_equal(readline_masked_tcltk_window("Enter password:", noblank = TRUE, test_mode = ""), "")
+})
