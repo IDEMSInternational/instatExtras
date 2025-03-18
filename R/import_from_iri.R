@@ -58,7 +58,9 @@ import_from_iri <- function(download_from, data_file, path, X1, X2,Y1,Y2, get_ar
       "monthly_prcp" = ".monthly/.global/.precipitation"
     )
     extension <- chirps_extensions[data_file]
-    if (is.na(extension)) stop("Data file does not exist for CHIRPS V2P0 data")
+    if (is.na(extension)){
+      stop("Data file does not exist for CHIRPS V2P0 data")
+    } 
     #Annual and 2Monthly and 3monthly does not exist for CHIRPS_V2P0
   } else if(download_from == "TAMSAT") {
     prexyaddress <- "http://iridl.ldeo.columbia.edu/home/.remic/.Reading/.Meteorology/.TAMSAT"
@@ -73,7 +75,9 @@ import_from_iri <- function(download_from, data_file, path, X1, X2,Y1,Y2, get_ar
     
     extension <- tamsat_extensions[data_file]
     
-    if (is.na(extension)) stop("Data file does not exist for TAMSAT data")
+    if (is.na(extension)){
+      stop("Data file does not exist for TAMSAT data")
+    }
     
   } else if(download_from=="NOAA_ARC2") {
     prexyaddress <- "http://iridl.ldeo.columbia.edu/SOURCES/.NOAA/.NCEP/.CPC/.FEWS/.Africa/.DAILY/.ARC2"
@@ -85,12 +89,16 @@ import_from_iri <- function(download_from, data_file, path, X1, X2,Y1,Y2, get_ar
     
     extension <- arc2_extensions[data_file]
     
-    if (is.na(extension)) stop("Data file does not exist for NOAA ARC2 data")
+    if (is.na(extension)){
+      stop("Data file does not exist for NOAA ARC2 data")
+    }
   } else if(download_from=="NOAA_RFE2") {
     prexyaddress <- "http://iridl.ldeo.columbia.edu/SOURCES/.NOAA/.NCEP/.CPC/.FEWS/.Africa"
     rfe2_extensions <- c("daily_estimated_prcp" = ".DAILY/.RFEv2/.est_prcp")
     extension <- rfe2_extensions[data_file]
-    if (is.na(extension)) stop("Data file does not exist for NOAA RFE2 data")
+    if (is.na(extension)){
+      stop("Data file does not exist for NOAA RFE2 data")
+    }
   } else if(download_from %in% names(cmorph_base_urls)) {
     cmorph_extensions <- c(
       "mean_microwave_only_est_prcp"              = ".mean/.microwave-only/.comb",
@@ -114,10 +122,11 @@ import_from_iri <- function(download_from, data_file, path, X1, X2,Y1,Y2, get_ar
       "3_hourly_pre_gauge_adjusted_infrared_est_prcp" = ".three-hourly/.IRprecipitation",
       "3_hourly_pre_gauge_adjusted_microwave_est_prcp" = ".three-hourly/.HQprecipitation"
     )
-    
     extension <- trmm_extensions[data_file]
     
-    if (is.na(extension)) stop("Data file does not exist for NASA TRMM 3B42 data")
+    if (is.na(extension)){
+      stop("Data file does not exist for NASA TRMM 3B42 data")
+    }
   } else{
     stop("Source not specified correctly.")
   }
