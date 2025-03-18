@@ -406,3 +406,48 @@ test_that("subset_nc_by_points works correctly", {
   
   expect_error(subset_nc_by_points(nc, dim_values, lon_points, lat_points, id_points, start, count, show_requested_points, great_circle_dist))
 })
+
+# Create mock data for testing
+mock_dim_axes <- list("lon" = "X", "lat" = "Y")
+mock_dim_values <- list(
+  "lon" = seq(-180, 180, by = 10),
+  "lat" = seq(-90, 90, by = 10)
+)
+mock_lon_points <- c(-170, 0, 150)
+mock_lat_points <- c(-80, 10, 80)
+mock_id_points <- c("A", "B", "C")
+mock_start <- c(1, 1)
+mock_count <- c(length(mock_dim_values$lon), length(mock_dim_values$lat))
+show_requested_points <- TRUE
+great_circle_dist <- TRUE
+
+# Define test cases
+test_that("Function correctly subsets points from netCDF grid", {
+  result <- subset_nc_by_points(
+    nc = NULL,  # Mock, not actually used in the function
+    dim_axes = mock_dim_axes,
+    dim_values = mock_dim_values,
+    lon_points = mock_lon_points,
+    lat_points = mock_lat_points,
+    id_points = mock_id_points,
+    start = mock_start,
+    count = mock_count,
+    show_requested_points = show_requested_points,
+    great_circle_dist = great_circle_dist
+  )
+  
+  # Ensure correct number of points are processed
+  expect_length(result$start_list, length(mock_lon_points))
+  expect_length(result$count_list, length(mock_lon_points))
+  expect_length(result$dim_values_list, length(mock_lon_points))
+  
+  # Check that requested points were added
+  expect_true(result$requested_points_added)
+  
+  # Verify that each subsetted point matches the expected coordinates
+  for (i in seq_along(mock_lon_points)) {
+    expect_equal(result$dim_values_list[[i]]$lon, mock_lon_points[i], tolerance = 1e-6)
+    expect_equal(result$dim_values_list[[i]]$lat, mock_lat_points[i], tolerance = 1e-6)
+    expect_equal(result$dim_values_list[[i]]$station, mock_id_points[i])
+  }
+})
