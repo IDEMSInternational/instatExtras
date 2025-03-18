@@ -297,3 +297,32 @@ test_that("is.containPartialValueLabel correctly identifies partial labels", {
   attr(x_no_label, "labels_label") <- NULL  # Explicitly ensure no labels
   expect_false(is.containPartialValueLabel(x_no_label))
 })
+
+
+
+
+
+# Unit tests
+test_that("is.containValueLabel correctly identifies presence of labels_label attribute", {
+  x <- 1:10
+  attr(x, "labels") <- "Test Label"
+  expect_true(is.containValueLabel(x))
+})
+
+test_that("is.containValueLabel returns FALSE when labels_label is missing", {
+  x <- 1:10
+  expect_false(is.containValueLabel(x))
+})
+
+test_that("is.containValueLabel handles different data types", {
+  df <- data.frame(a = 1:5)
+  attr(df$a, "labels") <- "Column Label"
+  expect_true(is.containValueLabel(df$a))
+  
+  char_vec <- c("A", "B", "C")
+  attr(char_vec, "labels") <- "Char Label"
+  expect_true(is.containValueLabel(char_vec))
+  
+  num <- 42
+  expect_false(is.containValueLabel(num))
+})

@@ -4,7 +4,6 @@
 #' This function checks if an object contains a value label attribute. It determines whether the input object has an attribute with the name "labels_label".
 #'  
 #' @param x The object to be checked for the presence of a value label attribute.
-#'
 #' @return
 #' The function returns a logical value indicating whether the input object contains a value label attribute. It returns TRUE if the attribute is present, and FALSE otherwise.
 #' 
