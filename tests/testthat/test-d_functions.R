@@ -36,3 +36,13 @@ test_that("duplicated_count_index correctly identifies duplicate counts", {
   index_result <- duplicated_count_index(data, type = "index")
   expect_equal(index_result, c(1, 1, 1, 2, 2, 2, 1))
 })
+
+test_that("duplicated_cases handles NA values correctly", {
+  col_name <- c(1, NA, 2, 2.01, 2.1, NA, 3)  # Includes NA values
+  result <- duplicated_cases(col_name, tolerance = 0.01)
+  expect_equal(result, c(1, NA, 1, 2, 1, NA, 1))
+  
+  col_name <- as.character(col_name)  # Includes NA values
+  result <- duplicated_cases(col_name, tolerance = 0.01)
+  expect_equal(result, c(1, NA, 1, 1, 1, NA, 1))
+})

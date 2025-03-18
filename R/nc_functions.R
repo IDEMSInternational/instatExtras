@@ -173,8 +173,7 @@ nc_as_data_frame <- function(nc, vars, keep_raw_time = TRUE, include_metadata = 
         if(units$hasatt && units$value == "julian_day") {
           time_df[["date"]] <- as.Date(raw_time, origin = structure(-2440588, class = "Date"))
         } else {
-          pcict_time <- get_nc_time_series(nc, time.dim.name = time_var)
-          pcict_time <- pcict_time[time_ind]
+          pcict_time <- (get_nc_time_series(nc, time.dim.name = time_var))[time_ind]
           posixct_time <- convert_pcict_to_posixct(pcict_time)
           time_df[["date"]] <- as.Date(posixct_time)
           time_df[["datetime"]] <- posixct_time
@@ -370,15 +369,10 @@ subset_nc_dimensions <- function(nc, dim_axes, dim_values, boundary, has_points)
   return(list(start = start, count = count, dim_values = dim_values))
 }
 
-
-
-
-
-
-
-
-
 subset_nc_by_points <- function(nc, dim_axes, dim_values, lon_points, lat_points, id_points, start, count, show_requested_points, great_circle_dist) {
+  start_list <- list()
+  count_list <- list()
+  dim_values_list <- list()
   x_var <- names(dim_axes)[which(dim_axes == "X")]
   y_var <- names(dim_axes)[which(dim_axes == "Y")]
   if(length(x_var) == 0 || length(y_var) == 0) stop("Cannot select points because dimensions are not labelled correctly in the nc file. Modify the nc file or remove the points to import all data.")
@@ -410,6 +404,3 @@ subset_nc_by_points <- function(nc, dim_axes, dim_values, lon_points, lat_points
   }
   return(list(start_list = start_list, count_list = count_list, dim_values_list = dim_values_list, requested_points_added = requested_points_added))
 }
-
-
-

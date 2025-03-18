@@ -47,6 +47,16 @@ test_that("convert_to_character_matrix handles data correctly", {
   expect_true(all(sapply(result, is.character)))  # Ensure all values are converted to character
 })
 
+test_that("convert_to_character_matrix handles data correctly", {
+  data <- data.frame(A = c(1.234, 5.678), B = c(10.123, 20.456))
+  result <- convert_to_character_matrix(data, format_decimal_places = FALSE)
+  
+  expect_type(result, "list")  # Data frames are lists in R
+  expect_equal(ncol(result), 2)
+  expect_equal(nrow(result), 2)
+  expect_true(all(sapply(result, is.character)))  # Ensure all values are converted to character
+})
+
 test_that("convert_to_character_matrix handles empty data", {
   # Create an empty data frame with column names
   empty_data <- data.frame(a = numeric(0), b = character(0), c = logical(0))

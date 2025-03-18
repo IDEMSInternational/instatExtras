@@ -37,8 +37,9 @@
 #' package_check("ggplot2")
 package_check <- function(package) {
   out <- c()
-  if  (!pingr::is_online())  out[[1]] <- "5" 
-  else{
+  if  (!pingr::is_online()){
+    out[[1]] <- "5" 
+  } else {
     if(!exists("av_packs")) {
       create_av_packs()
     }
@@ -52,16 +53,15 @@ package_check <- function(package) {
         out[[2]] <- utils::compareVersion(v_machine, v_web)
         out[[3]] <- v_machine
         out[[4]] <- v_web			
+      } else{
+        out[[1]] <- "2"	
       }
-      else  out[[1]] <- "2"	
-    }
-    else{
+    } else{
       #PACKAGE IS INSTALLED BUT NOT IN THE CRAN REPO
       if (package %in% rownames(utils::installed.packages())) out[[1]] <- "3"			
       #PACKAGE IS NOT INSTALLED AND NOT IN THE CRAN REPO
       else out[[1]] <- "4"	
     }
-    
   }
   return(out)
 }
