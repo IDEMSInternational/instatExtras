@@ -493,6 +493,12 @@ test_that("convert_pcict_to_posixct converts PCICt time correctly", {
   expect_equal(as.character(convert_pcict_to_posixct(pcict_time)), "2000-01-01 12:00:00")
 })
 
+# Test for error when boundary contains invalid dimensions
+test_that("nc_as_data_frame throws error for invalid boundary dimensions", {
+  expect_error(nc_as_data_frame(nc, vars = "test_var", boundary = list("invalid_dim" = c(1, 2))),
+               "boundary contains dimensions not associated with")
+})
+
 # Close and remove test NetCDF file
 close_nc_file(nc)
 file.remove(test_nc_file)
