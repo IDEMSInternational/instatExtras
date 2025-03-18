@@ -440,7 +440,7 @@ test_that("check_graph catches warnings and returns NULL", {
 
 test_that("check_graph catches error and returns NULL", {
   error_graph <- function() {
-    stop("This is a test warning")
+    stop("This is a test error")
     return(NULL)
   }
   
