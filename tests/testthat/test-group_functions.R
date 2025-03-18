@@ -437,3 +437,12 @@ test_that("check_graph catches warnings and returns NULL", {
   
   expect_warning(check_graph(warning_graph()))
 })
+
+test_that("check_graph catches error and returns NULL", {
+  error_graph <- function() {
+    stop("This is a test error")
+    return(NULL)
+  }
+  
+  expect_error(check_graph(error_graph()))
+})
