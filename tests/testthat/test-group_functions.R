@@ -428,3 +428,12 @@ test_that("set_library_paths updates library paths correctly", {
     expect_equal(mocked_lib_paths, c(expected_new_path, "C:/Existing/Library2"))
   }
 })
+
+test_that("check_graph catches warnings and returns NULL", {
+  warning_graph <- function() {
+    warning("This is a test warning")
+    return(NULL)
+  }
+  
+  expect_warning(check_graph(warning_graph()))
+})
