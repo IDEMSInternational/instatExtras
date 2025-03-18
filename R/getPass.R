@@ -152,15 +152,13 @@ readline_masked_tcltk <- function(msg, noblank=FALSE){
 }
 
 readline_masked_tcltk_window <- function(msg, noblank = FALSE, test_mode = NULL) {
-  if (!is.null(test_mode)) {
-    return(test_mode)  # Return the test value if test_mode is set
-  }
-  
   # Add noblank to msg
   if (noblank) msg <- paste0(msg, "\n(no blank)")
   
   # Define event actions
-  tcreset <- function(){ tcltk::tclvalue(pwdvar) <- "" }
+  tcreset <- function(){ 
+    tcltk::tclvalue(pwdvar) <- ""
+  }
   
   tcsubmit <- function(){
     if (noblank && tcltk::tclvalue(pwdvar) == ""){
@@ -176,6 +174,13 @@ readline_masked_tcltk_window <- function(msg, noblank = FALSE, test_mode = NULL)
   tccleanup <- function(){
     tcltk::tclvalue(flagvar) <- 0
     tcltk::tkdestroy(tt)
+  }
+  
+  if (!is.null(test_mode)) {
+    tcreset()
+    tcsubmit()
+    tccleanup()
+    return(test_mode)  # Return the test value if test_mode is set
   }
   
   # Main window
