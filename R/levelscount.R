@@ -21,6 +21,6 @@
 #' # Expected output: FALSE
 #'
 is.levelscount <- function(x, n){
-  return(isTRUE(sum(levels(x)) == n))
+  #return(isTRUE(sum(levels(x)) == n))
 }
 
