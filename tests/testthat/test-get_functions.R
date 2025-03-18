@@ -288,10 +288,30 @@ test_that("get_odk_http_get handles request failure", {
 })
 
 test_that("readline_masked_tcltk_window returns test values", {
-  expect_equal(readline_masked_tcltk_window("Enter password:", test_mode = "mock_password"), "mock_password")
   expect_equal(readline_masked_tcltk_window("Enter password:", test_mode = ""), "")
 })
 
-# test_that("readline_masked_tcltk_window handles blank input when noblank = TRUE", {
-#   expect_equal(readline_masked_tcltk_window("Enter password:", noblank = TRUE, test_mode = ""), "")
-# })
+test_that("readline_masked_tcltk_window returns test values", {
+  expect_equal(readline_masked_tcltk_window("Enter password:", test_mode = "mock_password"), "mock_password")
+})
+
+test_that("ask_for_password returns mocked input", {
+  # Mock rstudioapi::askForPassword to return a predefined password
+  mock_askForPassword <- mockery::mock("mocked_password")
+  
+  mockery::stub(ask_for_password, "rstudioapi::askForPassword", mock_askForPassword)
+  
+  expect_equal(ask_for_password("Enter password:"), "mocked_password")
+})
+
+test_that("has_fun returns expected values", {
+  # Mock rstudioapi::hasFun to simulate function availability
+  mock_hasFun_true <- mockery::mock(TRUE)
+  mock_hasFun_false <- mockery::mock(FALSE)
+  
+  mockery::stub(has_fun, "rstudioapi::hasFun", mock_hasFun_true)
+  expect_true(has_fun("askForPassword"))
+  
+  mockery::stub(has_fun, "rstudioapi::hasFun", mock_hasFun_false)
+  expect_false(has_fun("nonExistentFunction"))
+})

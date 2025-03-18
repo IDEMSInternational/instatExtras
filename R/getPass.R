@@ -177,6 +177,7 @@ readline_masked_tcltk_window <- function(msg, noblank = FALSE, test_mode = NULL)
   }
   
   if (!is.null(test_mode)) {
+    pwdvar <- "test"
     tcreset()
     tcsubmit()
     tccleanup()
