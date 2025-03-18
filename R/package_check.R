@@ -62,7 +62,6 @@ package_check <- function(package) {
       #PACKAGE IS NOT INSTALLED AND NOT IN THE CRAN REPO
       else out[[1]] <- "4"	
     }
-    
   }
   return(out)
 }
