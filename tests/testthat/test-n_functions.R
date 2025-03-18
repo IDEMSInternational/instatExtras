@@ -451,3 +451,48 @@ test_that("Function correctly subsets points from netCDF grid", {
     expect_equal(result$dim_values_list[[i]]$station, mock_id_points[i])
   }
 })
+
+# Create a mock NetCDF file for testing
+test_nc_file <- tempfile(fileext = ".nc")
+nc <- ncdf4::nc_create(test_nc_file, vars = list(ncdf4::ncvar_def("test_var", "", list(ncdf4::ncdim_def("time", "days", 1:10)))))
+
+test_that("get_nc_attribute retrieves attribute correctly", {
+  ncdf4::ncatt_put(nc, "test_var", "units", "days since 2000-01-01")
+  expect_equal(get_nc_attribute(nc, "test_var", "units")$value, "days since 2000-01-01")
+})
+
+# Test get_nc_dim_names
+test_that("get_nc_dim_names returns correct dimension names", {
+  expect_equal(get_nc_dim_names(nc, "test_var"), "time")
+})
+
+# Test get_ncvar_values
+test_that("get_ncvar_values retrieves values correctly", {
+  ncdf4::ncvar_put(nc, "test_var", 1:10)
+  expect_equal(as.integer(get_ncvar_values(nc, "test_var", start = 1, count = 10)), 1:10)
+})
+
+# Test list_nc_files
+test_that("list_nc_files lists only NetCDF files", {
+  dir <- tempdir()
+  file.create(file.path(dir, "test1.nc"))
+  file.create(file.path(dir, "test2.txt"))
+  expect_equal(list_nc_files(dir)[length(list_nc_files(dir))], file.path(dir, "test1.nc"))
+})
+
+# Test open and close NetCDF file
+test_that("open_nc_file and close_nc_file work correctly", {
+  nc2 <- open_nc_file(test_nc_file)
+  expect_s3_class(nc2, "ncdf4")
+  close_nc_file(nc2)
+})
+
+# Test convert_pcict_to_posixct
+test_that("convert_pcict_to_posixct converts PCICt time correctly", {
+  pcict_time <- PCICt::as.PCICt("2000-01-01 12:00:00", cal = "gregorian")
+  expect_equal(as.character(convert_pcict_to_posixct(pcict_time)), "2000-01-01 12:00:00")
+})
+
+# Close and remove test NetCDF file
+close_nc_file(nc)
+file.remove(test_nc_file)
