@@ -81,11 +81,19 @@ nc_get_dim_min_max <- function(nc, dimension, time_as_date = TRUE) {
 #' #         great_circle_dist = FALSE)
 
 nc_as_data_frame <- function(nc, vars, keep_raw_time = TRUE, include_metadata = TRUE, boundary = NULL, lon_points = NULL, lat_points = NULL, id_points = NULL, show_requested_points = TRUE, great_circle_dist = TRUE) {
-  if(missing(vars)) vars <- get_nc_variable_list(nc)
-  if(sum(is.null(lon_points), is.null(lat_points)) == 1) stop("You must specificy both lon_points and lat_points")
+  if(missing(vars)){
+    vars <- get_nc_variable_list(nc) 
+  }
+  if(sum(is.null(lon_points), is.null(lat_points)) == 1){
+    stop("You must specificy both lon_points and lat_points")
+  }
   has_points <- (sum(is.null(lon_points), is.null(lat_points)) == 0)
-  if(has_points && length(lon_points) != length(lat_points)) stop("lon_points and lat_points have unequal lengths.")
-  if(has_points && !is.null(id_points) && length(id_points) != length(lat_points)) stop("id_points (if specified) must have the same length as lon_points and lat_points.")
+  if(has_points && length(lon_points) != length(lat_points)){
+    stop("lon_points and lat_points have unequal lengths.")
+  } 
+  if(has_points && !is.null(id_points) && length(id_points) != length(lat_points)){
+    stop("id_points (if specified) must have the same length as lon_points and lat_points.")
+  }
   dim_names <- get_nc_dim_names(nc, vars[1])
   dim_values <- list()
   requested_points_added <- FALSE
