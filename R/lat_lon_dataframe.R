@@ -28,5 +28,5 @@ lat_lon_dataframe <- function(datafile){
       station = append(station, paste(paste("latS", abs(lat_lon[j,1]), sep = ""), paste("lon", lat_lon[j,2], sep = ""), sep = "_"))
     }
   }
-  return(cbind(lat_lon,station))
+  return(cbind(lat_lon, station))
 }
