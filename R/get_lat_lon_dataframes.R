@@ -38,6 +38,15 @@ get_lon_from_data <- function(datafile){
 #' # data_file <- read.csv("mydata.csv")
 #' # get_lat_from_data(data_file)
 #' 
-get_lat_from_data <- function(datafile){
-  return(unique(stats::na.omit(as.numeric(as.character(datafile[5:nrow(datafile),1])))))
+get_lat_from_data <- function(datafile) {
+  # Extract the latitude column, skipping the first 4 rows
+  lat_values <- datafile[5:nrow(datafile), 1]
+
+  # Convert to numeric
+  lat_values <- as.numeric(as.character(lat_values))
+  
+  # Remove NAs, and return unique values
+  unique_latitudes <- unique(stats::na.omit(lat_values))
+  
+  return(unique_latitudes)
 }
