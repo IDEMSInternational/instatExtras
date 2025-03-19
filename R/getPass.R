@@ -97,10 +97,8 @@ getPass_readline <- function(...) {
 
 # other functions used in this
 readline_masked_rstudio <- function(msg, forcemask, noblank=FALSE){
-  if (noblank){ while (TRUE){
-    pw <- readline_masked_rstudio_window(msg, forcemask)
-    if (is.null(pw) || pw != "") break
-    }
+  if (noblank){ while (TRUE){ pw <- readline_masked_rstudio_window(msg, forcemask)
+    if (is.null(pw) || pw != "") break }
   } else{
     pw <- readline_masked_rstudio_window(msg, forcemask)
   }
@@ -152,10 +150,8 @@ readline_nomask <- function(msg, noblank = TRUE, silent=FALSE){
   if (!silent) message("WARNING: your platform is not supported. Input is not masked!")
   message(msg, appendLF=FALSE)
   pw <- readline()
-  while (interactive() && isTRUE(noblank) && pw == "") {
-    message("No blank input, please!", appendLF=FALSE)
-    pw <- readline()
-  }
+  while (interactive() && isTRUE(noblank) && pw == "") {message("No blank input, please!", appendLF=FALSE)
+    pw <- readline()}
   return(pw)
 }
 
