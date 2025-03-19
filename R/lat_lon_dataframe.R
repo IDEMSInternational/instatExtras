@@ -24,8 +24,7 @@ lat_lon_dataframe <- function(datafile){
   for (j in 1:nrow(lat_lon)){
     if(lat_lon[j,1]>=0){
       station = append(station, paste(paste("latN", lat_lon[j,1], sep = ""), paste("lon", lat_lon[j,2], sep = ""), sep = "_"))
-    }
-    else{
+    } else{
       station = append(station, paste(paste("latS", abs(lat_lon[j,1]), sep = ""), paste("lon", lat_lon[j,2], sep = ""), sep = "_"))
     }
   }

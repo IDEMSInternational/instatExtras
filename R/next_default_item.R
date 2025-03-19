@@ -16,10 +16,13 @@
 #' 
 #' next_default_item("item", c("item1", "item2", "item3"), include_index = TRUE, start_index = 5)
 next_default_item = function(prefix, existing_names = c(), include_index = FALSE, start_index = 1) {
-  if(!is.character(prefix)) stop("prefix must be of type character")
-  
+  if(!is.character(prefix)){
+    stop("prefix must be of type character") 
+  }
   if(!include_index) {
-    if(!prefix %in% existing_names) return(prefix)
+    if(!prefix %in% existing_names){
+      return(prefix)
+    }
   }
   
   item_name_exists = TRUE
