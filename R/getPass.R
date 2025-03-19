@@ -75,11 +75,14 @@ getPass <- function(msg = "PASSWORD: ", noblank = FALSE, forcemask = FALSE) {
     stop("argument 'forcemask' must be one of 'TRUE' or 'FALSE'")
   }
   
-  if (tolower(.Platform$GUI) == "rstudio") pw <- readline_masked_rstudio(msg = msg, noblank = noblank, forcemask = forcemask)
+  if (tolower(.Platform$GUI) == "rstudio"){
+    pw <- readline_masked_rstudio(msg = msg, noblank = noblank, forcemask = forcemask)
   #else if (isaterm()) pw <- readline_masked_term(msg = msg, showstars = TRUE, noblank = noblank)
-  else if (hastcltk()) pw <- readline_masked_tcltk(msg = msg, noblank = noblank)
-  else if (!forcemask) pw <- getPass_readline(msg)
-  else stop("Masking is not supported on your platform!")
+  } else if (hastcltk()){
+    pw <- readline_masked_tcltk(msg = msg, noblank = noblank)
+  } else if (!forcemask){
+    pw <- getPass_readline(msg)
+  } else stop("Masking is not supported on your platform!")
   
   if (is.null(pw)){
     invisible()
