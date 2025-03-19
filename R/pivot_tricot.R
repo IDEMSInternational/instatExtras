@@ -32,11 +32,11 @@ pivot_tricot <- function(data,
                          trait_bad = "_neg",
                          na_value = "Not observed"){
   
-  label_map <- setNames(option_cols, possible_ranks)
+  label_map <- stats::setNames(option_cols, possible_ranks)
   
   data_options <- data %>%
     dplyr::mutate(id = data[[id_var]]) %>%
-    tidyr::pivot_longer(cols = all_of(option_cols),
+    tidyr::pivot_longer(cols = dplyr::all_of(option_cols),
                         names_to = "Label", values_to = "variable") %>%
     dplyr::mutate(Label = forcats::fct_recode(Label, !!!label_map))
   
