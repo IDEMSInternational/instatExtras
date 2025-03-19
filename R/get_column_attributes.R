@@ -17,7 +17,6 @@
 #' # $dim
 #' # NULL
 #'
-
 get_column_attributes <- function(x, drop = c("class", "levels")) {
   tmp_attr <- attributes(x)
   tmp_attr <- tmp_attr[!names(tmp_attr) %in% drop]

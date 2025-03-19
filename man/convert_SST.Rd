@@ -17,6 +17,9 @@ A list containing the converted data frame and the latitude-longitude data frame
 \description{
 This function converts SST  data from a given file into a structured format. It extracts information such as start year, end year, duration, longitude, latitude, and SST values from the data file. The function then creates a data frame with the extracted information and returns it along with the latitude-longitude data frame.
 }
+\details{
+This function is used in the \code{import_SST} function in the \code{databook} R package.
+}
 \examples{
 # Example usage:
 # Assuming the datafile is "sst_data.csv" and the SST data starts from row 5

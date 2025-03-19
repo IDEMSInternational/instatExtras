@@ -11,6 +11,7 @@
 #' @param display_values If TRUE and the columns contain the same values, display the values. Default is TRUE.
 #'
 #' @return None.
+#' @details This function is used in the "Compare Columns" dialog in R-Instat.
 #' @export
 #'
 #' @examples

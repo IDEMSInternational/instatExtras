@@ -23,6 +23,9 @@ The generated file path for the XY point range data as a character string.
 \description{
 This function generates a file path for XY point range data based on the provided parameters.
 }
+\details{
+This is used in the \code{download_from_IRI} function in the \code{databook} package.
+}
 \examples{
 add_xy_point_range("data", -90, 30, "X", "Y")
 

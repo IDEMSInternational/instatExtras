@@ -43,6 +43,9 @@ None.
 Compare Columns
 Compare two columns and provide information about their values
 }
+\details{
+This function is used in the "Compare Columns" dialog in R-Instat.
+}
 \examples{
 x <- 1:10
 y <- 5:14

@@ -35,6 +35,9 @@ A string representing the path with the XY area range added.
 \description{
 A function that generates a string representing an XY area range to be added to a given path.
 }
+\details{
+This is used in the \code{download_from_IRI} function in the \code{databook} package.
+}
 \examples{
 #Example: Generate an XY area range string with custom dimensions
 #path <- "http://example.com"

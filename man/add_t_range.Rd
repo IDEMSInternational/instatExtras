@@ -21,6 +21,9 @@ A string representing the path with the time range added.
 \description{
 This function generates a string representing a time range to be added to a given path.
 }
+\details{
+This is used in the \code{download_from_IRI} function in the \code{databook} package.
+}
 \examples{
 # Example 1: Generate a time range string with default dimension
 #path <- "http://example.com/"

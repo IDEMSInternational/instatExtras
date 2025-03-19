@@ -325,8 +325,6 @@ convert_pcict_to_posixct <- function(pcict_time) {
   PCICt::as.POSIXct.PCICt(pcict_time)
 }
 
-
-
 subset_nc_dimensions <- function(nc, dim_axes, dim_values, boundary, has_points) {
   start <- c()
   count <- c()

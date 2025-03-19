@@ -8,6 +8,8 @@
 #' 
 #' @export
 #' 
+#' @details This is used in the `download_from_IRI` function in the `databook` package.
+#' 
 #' @examples
 #' add_nc("my_folder/")  # Returns "my_folder/data.nc"
 #' add_nc("/path/to/file.txt")  # Returns "/path/to/file.txtdata.nc"
@@ -30,6 +32,7 @@ add_nc <- function(path) {
 #'
 #' @export
 #'
+#' @details This is used in the `download_from_IRI` function in the `databook` package.
 #' @examples
 #' # Example 1: Generate a time range string with default dimension
 #' #path <- "http://example.com/"
@@ -66,6 +69,7 @@ add_t_range <- function(path, min_date, max_date, dim_t = "T") {
 #'
 #' @export
 #'
+#' @details This is used in the `download_from_IRI` function in the `databook` package.
 #' @examples
 #' #Example: Generate an XY area range string with custom dimensions
 #' #path <- "http://example.com"
@@ -103,6 +107,7 @@ add_xy_area_range <- function(path, min_lon, max_lon, min_lat, max_lat, dim_x = 
 #' @return The generated file path for the XY point range data as a character string.
 #' @export
 #'
+#' @details This is used in the `download_from_IRI` function in the `databook` package.
 #' @examples
 #' add_xy_point_range("data", -90, 30, "X", "Y")
 #'

@@ -24,4 +24,3 @@
 get_years_from_data <- function(datafile) {
   return(stats::na.omit(t(unique(datafile[3, 2:ncol(datafile)]))))
 }
-
