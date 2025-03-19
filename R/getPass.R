@@ -59,13 +59,19 @@
 #' 
 #' @export
 getPass <- function(msg = "PASSWORD: ", noblank = FALSE, forcemask = FALSE) {
-  if (!is.character(msg) || length(msg) != 1 || is.na(msg)) {
+  if (!is.character(msg) ||
+      length(msg) != 1 ||
+      is.na(msg)) {
     stop("argument 'msg' must be a single string")
   }
-  if (!is.logical(noblank) || length(noblank) != 1 || is.na(noblank)) {
+  if (!is.logical(noblank) ||
+      length(noblank) != 1 ||
+      is.na(noblank)) {
     stop("argument 'noblank' must be one of 'TRUE' or 'FALSE'")
   }
-  if (!is.logical(forcemask) || length(forcemask) != 1 || is.na(forcemask)) {
+  if (!is.logical(forcemask) ||
+      length(forcemask) != 1 ||
+      is.na(forcemask)) {
     stop("argument 'forcemask' must be one of 'TRUE' or 'FALSE'")
   }
   
