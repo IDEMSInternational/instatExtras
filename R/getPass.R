@@ -157,10 +157,6 @@ readline_masked_tcltk_window <- function(msg, noblank = FALSE, test_mode = NULL)
     msg <- paste0(msg, "\n(no blank)") 
   }
   
-  if (!is.null(test_mode)){
-    return(test_mode)
-  }
-  
   # Define event actions
   tcreset <- function(){ tcltk::tclvalue(pwdvar) <- "" }
   
@@ -170,6 +166,10 @@ readline_masked_tcltk_window <- function(msg, noblank = FALSE, test_mode = NULL)
   }
   
   tccleanup <- function(){ tcltk::tclvalue(flagvar) <- 0; tcltk::tkdestroy(tt) }
+  
+  if (!is.null(test_mode)){
+    return(test_mode)
+  }
   
   # Main window
   tt <- tcltk::tktoplevel(); tcltk::tktitle(tt) <- "getPass input"; pwdvar <- tcltk::tclVar(""); flagvar <- tcltk::tclVar(0)
