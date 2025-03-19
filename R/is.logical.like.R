@@ -28,7 +28,11 @@
 #' # Output: FALSE
 
 is.logical.like <- function(x) {
-  if(is.logical(x)) return(TRUE)
-  else if(is.numeric(x)) return(all(stats::na.omit(x) %in% c(1,0)))
-  else return(FALSE)
+  if(is.logical(x)){
+    return(TRUE)
+  } else if(is.numeric(x)) {
+    return(all(stats::na.omit(x) %in% c(1,0)))
+  } else {
+    return(FALSE)
+  }
 }

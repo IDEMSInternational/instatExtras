@@ -15,6 +15,9 @@ add_nc(path)
 \description{
 : This function takes a path as input and returns a modified path by appending "data.nc" to it.
 }
+\details{
+This is used in the \code{download_from_IRI} function in the \code{databook} package.
+}
 \examples{
 add_nc("my_folder/")  # Returns "my_folder/data.nc"
 add_nc("/path/to/file.txt")  # Returns "/path/to/file.txtdata.nc"

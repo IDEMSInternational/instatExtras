@@ -24,12 +24,13 @@ return_variable_levels <- function(data){
   categorical_vars <- names(Filter(is.factor, data))
   
   # Generate sorting order for all categorical variables
-  sorting_orders <- purrr::map_chr(categorical_vars, function(var) {
-    levels_var <- stringr::str_flatten(
-      string = paste0("\"", levels(data[[var]]), "\",")
-    )
-    paste0("if (attr === '", var, "') return sortAs([", levels_var, "]);")
-  })
+  sorting_orders <- purrr::map_chr(.x = categorical_vars,
+                                   .f = function(var) {
+                                     levels_var <- stringr::str_flatten(
+                                       string = paste0("\"", levels(data[[var]]), "\",")
+                                     )
+                                     paste0("if (attr === '", var, "') return sortAs([", levels_var, "]);")
+                                   })
   # Construct the JavaScript sorting function
   relevel_variables <- paste0(
     "function(attr) {  

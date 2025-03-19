@@ -44,11 +44,15 @@ read_corpora <- function(data){
         # We want to separate these into separate variables to make the data more usable and readable.
         # We do this by `str_split_fixed`, and `gsub`.
         new_data <- tidyr::as_tibble(unlist(data), rownames = "rowname")
-        split <- stringr::str_split_fixed(string=new_data$rowname, pattern=stringr::coll(pattern="."), n=Inf)
+        split <- stringr::str_split_fixed(string=new_data$rowname,
+                                          pattern=stringr::coll(pattern="."),
+                                          n=Inf)
         split <- gsub("[0-9]$|[0-9][0-9]$","",split)
         # add in the separated list to the value variable, and rename the variables
         data_unlist[[i]] <- cbind(data.frame(split), value = new_data$value)
-        names(data_unlist[[i]]) <- c(paste0("variable", 1:(length(data_unlist[[i]])-1)), "list")
+        names(data_unlist[[i]]) <- c(paste0("variable",
+                                            1:(length(data_unlist[[i]])-1)),
+                                     "list")
       } # end of ifelse lists
     } # end of list
   } # end of for loop
@@ -75,8 +79,15 @@ read_corpora <- function(data){
 #' }
 #' @export
 cbind_unique <- function(x, y, cols){
-  x <- x %>% dplyr::select(c(setdiff(names(x), cols)))
-  x <- dplyr::bind_cols(x = x, y = dplyr::select(y, tidyselect::all_of(cols)))
+  # Select columns from x that are not in cols
+  x_selected <- x %>%
+    dplyr::select(setdiff(names(x), cols))
+  
+  # Select only the specified cols from y and bind them to x
+  result <- dplyr::bind_cols(x_selected,
+                             dplyr::select(y, dplyr::all_of(cols)))
+  
+  return(result)
 }
 
 #' View Object Data
@@ -99,7 +110,7 @@ view_object_data <- function(object, object_format = NULL) {
     file_name <- view_text_object(object)
   } else if (identical(object_format, "html")) {
     file_name <- view_html_object(object)
-  }  else{
+  } else{
     print(object)
   }
   return(file_name)
@@ -343,8 +354,11 @@ get_vignette <- function (package = NULL, lib.loc = NULL, all = TRUE){
     rcode <- s[, "R"]
     pdfext <- sub("^.*\\.", "", pdf)
     sprintf("  <li>%s  -  \n    %s  \n    %s  \n    %s \n  </li>\n", 
-            title, ifelse(nzchar(pdf), sprintf("<a href='%s/%s'>%s</a>&nbsp;", 
-                                               prefix, pdf, toupper(pdfext)), ""), sprintf("<a href='%s/%s'>source</a>&nbsp;", 
+            title, ifelse(nzchar(pdf),
+                          sprintf("<a href='%s/%s'>%s</a>&nbsp;", 
+                                  prefix, pdf, toupper(pdfext)),
+                          ""),
+            sprintf("<a href='%s/%s'>source</a>&nbsp;", 
                                                                                            prefix, src), ifelse(nzchar(rcode), sprintf("<a href='%s/%s'>R code</a>&nbsp;", 
                                                                                                                                        prefix, rcode), ""))
   }
@@ -407,7 +421,9 @@ get_vignette <- function (package = NULL, lib.loc = NULL, all = TRUE){
 getRowHeadersWithText <- function(data, column, searchText, ignore_case = TRUE, use_regex = FALSE, match_entire_cell = FALSE) {
   if (use_regex) {
     # Adjust the search text to match the entire cell if required
-    if (match_entire_cell) searchText <- paste0("^", searchText, "$")
+    if (match_entire_cell){
+      searchText <- paste0("^", searchText, "$")
+    }
     # Find the rows that match the search text using regex
     matchingRows <- stringr::str_detect(data[[column]], stringr::regex(searchText, ignore_case = ignore_case))
   } else if (is.na(searchText)) {
@@ -424,10 +440,10 @@ getRowHeadersWithText <- function(data, column, searchText, ignore_case = TRUE, 
     matchingRows <- grepl(searchText, data[[column]], ignore.case = ignore_case, fixed  = fixed)
   }
   # Get the row headers where the search text is found
-  rowHeaders <- rownames(data)[matchingRows]
+  row_headers <- rownames(data)[matchingRows]
   
   # Return the row headers
-  return(rowHeaders)
+  return(row_headers)
 }
 
 #' Convert Character to List of Numeric Vectors
@@ -484,7 +500,9 @@ getExample <- function(topic, package = NULL, lib.loc = NULL,  character.only = 
     run.dontrun = FALSE, run.donttest = interactive()) {
   if (!character.only) {
     topic <- substitute(topic)
-    if (!is.character(topic)) topic <- deparse(topic)[1L]
+    if (!is.character(topic)){
+      topic <- deparse(topic)[1L] 
+    }
   }
   
   pkgpaths <- find.package(package, lib.loc, verbose = verbose)
@@ -612,16 +630,24 @@ check_github_repo <- function(owner = NULL, repo = NULL, url = NULL) {
 #' frac_den(0.333, 3) # "1/3"
 #'
 #' @export
-frac10 <- function(x) { paste0(round(x * 10), "/", 10) }
+frac10 <- function(x) {
+  paste0(round(x * 10), "/", 10)
+}
 #' @rdname frac10
 #' @export
-frac20 <- function(x) { paste0(round(x * 20), "/", 20) }
+frac20 <- function(x) {
+  paste0(round(x * 20), "/", 20)
+}
 #' @rdname frac10
 #' @export
-frac100 <- function(x) { paste0(round(x * 100), "/", 100) }
+frac100 <- function(x) {
+  paste0(round(x * 100), "/", 100)
+}
 #' @rdname frac10
 #' @export
-frac_den <- function(x, den) { paste0(round(x * den), "/", den) }
+frac_den <- function(x, den) {
+  paste0(round(x * den), "/", den)
+}
 
 #' Monitor Memory Usage
 #'
@@ -676,7 +702,9 @@ set_library_paths <- function(version) {
   library_path <- file.path(Sys.getenv("APPDATA"), "R-Instat", version, "library")
   
   # Create the directory if it doesn't exist
-  if (!dir.exists(library_path)) dir.create(library_path, recursive = TRUE, showWarnings = FALSE)
+  if (!dir.exists(library_path)){
+    dir.create(library_path, recursive = TRUE, showWarnings = FALSE)
+  }
   
   # Update the library paths, setting the new path as the primary one
   .libPaths(c(library_path, .libPaths()))

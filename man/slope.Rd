@@ -21,5 +21,4 @@ Calculate the slope of a linear regression model.
 y <- c(1, 2, 3, 4, 5)
 x <- c(2, 4, 6, 8, 10)
 slope(y, x)
-
 }

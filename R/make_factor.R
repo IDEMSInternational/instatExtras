@@ -33,8 +33,11 @@
 make_factor <- function(x, ordered = is.ordered(x)) {
   if (is.factor(x)) {
     if (ordered != is.ordered(x)) {
-      if (ordered) class(x) <- c("ordered", class(x))
-      else class(x) <- class(x)[class(x) != "ordered"]
+      if (ordered){
+        class(x) <- c("ordered", class(x))
+      } else {
+        class(x) <- class(x)[class(x) != "ordered"]
+      }
     }
     x
   } else if (is.numeric(x)) {

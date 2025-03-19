@@ -21,10 +21,7 @@
 #' x <- c("apple", "banana", "cherry")
 #' salt <- "salty"
 #' hashed_id(x, salt)
-#'
-#' # Output:
-#' # [1] "1A1E6CE0E9A969A9" "1B69B1B8C1D6EF99" "1C10A25AA55025CD"
-
+#' 
 hashed_id <- function(x, salt, algo = "crc32") {
   if (missing(salt)) {
     y <- x
@@ -32,5 +29,6 @@ hashed_id <- function(x, salt, algo = "crc32") {
     y <- paste(x, salt)
   }
   y <- sapply(y, function(X) digest::digest(X, algo = algo))
-  as.character(y)
+  y <- as.character(y)
+  return(y)
 }

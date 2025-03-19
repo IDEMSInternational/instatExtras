@@ -18,7 +18,9 @@
 #' # [[2]]
 #' # [1] "E" "F" "G" "H"
 split_items_in_groups <- function(items, num) {
-  if(length(items) %% num != 0) stop("The number of items must be divisible by the number of groups")
+  if(length(items) %% num != 0){
+    stop("The number of items must be divisible by the number of groups")
+  }
   x <- split(items, rep(1:num, each = length(items)/num))
   return(x)
 }

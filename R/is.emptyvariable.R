@@ -16,5 +16,6 @@
 #' # [1] TRUE
 
 is.emptyvariable <- function(x){
-  return(isTRUE(length(x) == sum(x == "")))
+  get_length_x <- length(x) == sum(x == "")
+  return(isTRUE(get_length_x))
 }

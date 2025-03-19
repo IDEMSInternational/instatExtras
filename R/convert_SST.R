@@ -7,6 +7,7 @@
 #'
 #' @return A list containing the converted data frame and the latitude-longitude data frame.
 #' @export
+#' @details This function is used in the `import_SST` function in the `databook` R package.
 #'
 #' @examples
 #' # Example usage:
@@ -24,7 +25,6 @@
 # # Plot the latitude-longitude data
 #  #coordinates(lat_lon_df) <- ~longitude + latitude
 #  #plot(lat_lon_df, col = my_data$SST_value, pch = 16, main = "SST Data")
-
 #' @import sp
 #' @import raster
 convert_SST <- function(datafile, data_from = 5) {
@@ -40,7 +40,8 @@ convert_SST <- function(datafile, data_from = 5) {
   # Create latitude-longitude dataframe
   lat_lon_df <- lat_lon_dataframe(datafile)
   
-  period <- rep(get_years_from_data(datafile), each = (length(lat) * length(lon)))
+  period <- rep(get_years_from_data(datafile),
+                each = (length(lat) * length(lon)))
   SST_value <- c()
   
   for (k in duration) {
@@ -55,11 +56,10 @@ convert_SST <- function(datafile, data_from = 5) {
     }
     year <- as.data.frame(t(year))
     year <- stack(year)
-    data_from = data_from + length(lat) + 2
+    data_from <- data_from + length(lat) + 2
     g <- as.numeric(year$values)
     SST_value <- append(SST_value, g)
   }
-  
   my_data <- cbind(period, lat_lon_df, SST_value)
   return(list(my_data, lat_lon_df))
 }

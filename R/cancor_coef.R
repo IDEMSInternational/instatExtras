@@ -8,6 +8,8 @@
 #' 
 #' @export
 #' 
+#' @details Seen in the Canonical Correlations dialog in R-Instat
+#' 
 #' @examples
 #'
 #' data <- list(xcoef = c(0.5, 0.3, -0.2), ycoef = c(0.8, -0.4, 0.6))

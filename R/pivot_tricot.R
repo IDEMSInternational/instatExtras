@@ -45,7 +45,8 @@ pivot_tricot <- function(data,
     unique()
   
   data_options <- data_options %>%
-    tidyr::pivot_longer(cols = all_of( c(ends_with(trait_good), ends_with(trait_bad))),
+    tidyr::pivot_longer(cols = dplyr::all_of(c(dplyr::ends_with(trait_good),
+                                               dplyr::ends_with(trait_bad))),
                         names_to = "trait",
                         values_to = "variety") %>%
     dplyr::select(c(id, trait, variety)) %>%

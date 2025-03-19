@@ -77,12 +77,11 @@
 #'           )
 #' # Use the slopegraph function
 #' slopegraph(data, x = Year, y = Value, colour = Group)
-slopegraph <- function(data, x, y, colour, data_label = NULL, 
-                       y_text_size = 3, 
+slopegraph <- function(data, x, y, colour, data_label = NULL, y_text_size = 3,
                        line_thickness = 1, line_colour = "ByGroup", 
-                       data_text_size = 2.5, data_text_colour = "black", data_label_padding = 0.05, 
-                       data_label_line_size = 0, data_label_fill_colour = "white", 
-                       reverse_x_axis = FALSE, 
+                       data_text_size = 2.5, data_text_colour = "black",
+                       data_label_padding = 0.05, data_label_line_size = 0,
+                       data_label_fill_colour = "white", reverse_x_axis = FALSE, 
                        remove_missing = TRUE){
   
   
@@ -159,8 +158,9 @@ slopegraph <- function(data, x, y, colour, data_label = NULL,
   }
   else {
     if (line_colour == "ByGroup") {
-      LineGeom <- list(ggplot2::geom_line(ggplot2::aes(colour = {{colour}}, 
-                                                       alpha = 1), linewidth = line_thickness))
+      LineGeom <- list(ggplot2::geom_line(ggplot2::aes(colour = {{ colour }}, 
+                                                       alpha = 1),
+                                          linewidth = line_thickness))
     } else {
       LineGeom <- list(ggplot2::geom_line(ggplot2::aes_(), linewidth = line_thickness, colour = line_colour))
     }

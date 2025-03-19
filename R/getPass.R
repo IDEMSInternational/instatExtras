@@ -59,24 +59,36 @@
 #' 
 #' @export
 getPass <- function(msg = "PASSWORD: ", noblank = FALSE, forcemask = FALSE) {
-  if (!is.character(msg) || length(msg) != 1 || is.na(msg)) {
+  if (!is.character(msg) ||
+      length(msg) != 1 ||
+      is.na(msg)) {
     stop("argument 'msg' must be a single string")
   }
-  if (!is.logical(noblank) || length(noblank) != 1 || is.na(noblank)) {
+  if (!is.logical(noblank) ||
+      length(noblank) != 1 ||
+      is.na(noblank)) {
     stop("argument 'noblank' must be one of 'TRUE' or 'FALSE'")
   }
-  if (!is.logical(forcemask) || length(forcemask) != 1 || is.na(forcemask)) {
+  if (!is.logical(forcemask) ||
+      length(forcemask) != 1 ||
+      is.na(forcemask)) {
     stop("argument 'forcemask' must be one of 'TRUE' or 'FALSE'")
   }
   
-  if (tolower(.Platform$GUI) == "rstudio") pw <- readline_masked_rstudio(msg = msg, noblank = noblank, forcemask = forcemask)
+  if (tolower(.Platform$GUI) == "rstudio"){
+    pw <- readline_masked_rstudio(msg = msg, noblank = noblank, forcemask = forcemask)
   #else if (isaterm()) pw <- readline_masked_term(msg = msg, showstars = TRUE, noblank = noblank)
-  else if (hastcltk()) pw <- readline_masked_tcltk(msg = msg, noblank = noblank)
-  else if (!forcemask) pw <- getPass_readline(msg)
-  else stop("Masking is not supported on your platform!")
+  } else if (hastcltk()){
+    pw <- readline_masked_tcltk(msg = msg, noblank = noblank)
+  } else if (!forcemask){
+    pw <- getPass_readline(msg)
+  } else stop("Masking is not supported on your platform!")
   
-  if (is.null(pw)) invisible()
-  else pw
+  if (is.null(pw)){
+    invisible()
+  } else {
+    pw
+  }
 }
 
 getPass_readline <- function(...) {
@@ -85,11 +97,9 @@ getPass_readline <- function(...) {
 
 # other functions used in this
 readline_masked_rstudio <- function(msg, forcemask, noblank=FALSE){
-  if (noblank){
-    while (TRUE){
-      pw <- readline_masked_rstudio_window(msg, forcemask)
-      if (is.null(pw) || pw != "")
-        break
+  if (noblank){ while (TRUE){
+    pw <- readline_masked_rstudio_window(msg, forcemask)
+    if (is.null(pw) || pw != "") break
     }
   } else{
     pw <- readline_masked_rstudio_window(msg, forcemask)
@@ -109,8 +119,13 @@ readline_masked_rstudio <- function(msg, forcemask, noblank=FALSE){
 # }
 
 hastcltk <- function(){
-  test <- tryCatch(requireNamespace("tcltk", quietly=TRUE), warning=identity)
-  if (!is.logical(test)) test <- FALSE
+  test <- tryCatch(
+    requireNamespace("tcltk", quietly=TRUE), 
+    warning=identity
+    )
+  if (!is.logical(test)){
+    test <- FALSE
+  }
   test
 }
 
@@ -157,19 +172,17 @@ readline_masked_tcltk_window <- function(msg, noblank = FALSE, test_mode = NULL)
     msg <- paste0(msg, "\n(no blank)") 
   }
   
-  if (!is.null(test_mode)){
-    return(test_mode)
-  }
-  
   # Define event actions
   tcreset <- function(){ tcltk::tclvalue(pwdvar) <- "" }
   
-  tcsubmit <- function(){
-    if (noblank && tcltk::tclvalue(pwdvar) == "") tcltk::tkmessageBox(title = "getPass noblank = TRUE", message = "No blank input please!", parent = textbox)
-    else tcltk::tclvalue(flagvar) <- 1; tcltk::tkdestroy(tt)
-  }
+  tcsubmit <- function(){ if (noblank && tcltk::tclvalue(pwdvar) == "") tcltk::tkmessageBox(title = "getPass noblank = TRUE", message = "No blank input please!", parent = textbox)
+    else tcltk::tclvalue(flagvar) <- 1; tcltk::tkdestroy(tt)}
   
   tccleanup <- function(){ tcltk::tclvalue(flagvar) <- 0; tcltk::tkdestroy(tt) }
+  
+  if (!is.null(test_mode)){
+    return(test_mode)
+  }
   
   # Main window
   tt <- tcltk::tktoplevel(); tcltk::tktitle(tt) <- "getPass input"; pwdvar <- tcltk::tclVar(""); flagvar <- tcltk::tclVar(0)

@@ -20,8 +20,15 @@
 #'# years <- get_years_from_data(datafile)
 #'# years
 #'#
-
 get_years_from_data <- function(datafile) {
-  return(stats::na.omit(t(unique(datafile[3, 2:ncol(datafile)]))))
+  # Extract the row containing year values (row 3, excluding the first column)
+  year_values <- datafile[3, 2:ncol(datafile)]
+  
+  # Get unique values
+  unique_years <- unique(year_values)
+  
+  # Remove NAs and transpose
+  t_years <- stats::na.omit(t(unique_years))
+  
+  return(t_years)
 }
-
