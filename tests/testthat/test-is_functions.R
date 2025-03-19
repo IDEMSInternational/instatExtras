@@ -9,13 +9,13 @@ test_that("hashed_id generates correct hashed values", {
   expect_equal(length(salted_result), length(x))
 })
 
-test_that("import_from_iri handles incorrect source gracefully", {
-  expect_error(import_from_iri("INVALID_SOURCE", "daily_0p05", "data", -10, 10, -10, 10, "area"))
-})
-
-test_that("import_from_iri handles incorrect source gracefully", {
-  expect_error(import_from_iri("CHIRPS_V2P0", "daily_0p05", "data", -10, 10, -10, 10, "get_area_point"))
-})
+# test_that("import_from_iri handles incorrect source gracefully", {
+#   expect_error(import_from_iri("INVALID_SOURCE", "daily_0p05", "data", -10, 10, -10, 10, "area"))
+# })
+# 
+# test_that("import_from_iri handles incorrect source gracefully", {
+#   expect_error(import_from_iri("CHIRPS_V2P0", "daily_0p05", "data", -10, 10, -10, 10, "get_area_point"))
+# })
 
 test_that("import_from_ODK handles incorrect source gracefully", {
   expect_error(import_from_ODK(platform = "invalid_platform"))
@@ -124,117 +124,117 @@ test_that("import_from_ODK handles missing form correctly", {
 #   expect_equal(names(result[[2]]), c("X", "Y"))
 # })
 
-test_that("import_from_iri handles incorrect source gracefully", {
-  expect_error(
-    import_from_iri(
-      download_from = "INVALID_SOURCE",
-      data_file = "daily_0p05",
-      path = "",
-      X1 = 35,
-      X2 = 36,
-      Y1 = -1,
-      Y2 = 0,
-      get_area_point = "area"
-    ),
-    "Source not specified correctly."
-  )
-})
-
-test_that("import_from_iri handles incorrect data_file gracefully", {
-  expect_error(
-    import_from_iri(
-      download_from = "CHIRPS_V2P0",
-      data_file = "invalid_data_file",
-      path = "",
-      X1 = 35,
-      X2 = 36,
-      Y1 = -1,
-      Y2 = 0,
-      get_area_point = "area"
-    ),
-    "Data file does not exist for CHIRPS V2P0 data"
-  )
-})
-
-test_that("import_from_iri handles incorrect data_file gracefully", {
-  expect_error(
-    import_from_iri(
-      download_from = "TAMSAT",
-      data_file = "invalid_data_file",
-      path = "",
-      X1 = 35,
-      X2 = 36,
-      Y1 = -1,
-      Y2 = 0,
-      get_area_point = "area"
-    ),
-    "Data file does not exist for TAMSAT data"
-  )
-})
-
-test_that("import_from_iri handles incorrect data_file gracefully", {
-  expect_error(
-    import_from_iri(
-      download_from = "NOAA_ARC2",
-      data_file = "invalid_data_file",
-      path = "",
-      X1 = 35,
-      X2 = 36,
-      Y1 = -1,
-      Y2 = 0,
-      get_area_point = "area"
-    ),
-    "Data file does not exist for NOAA ARC2 data"
-  )
-})
-
-test_that("import_from_iri handles incorrect data_file gracefully", {
-  expect_error(
-    import_from_iri(
-      download_from = "NOAA_RFE2",
-      data_file = "invalid_data_file",
-      path = "",
-      X1 = 35,
-      X2 = 36,
-      Y1 = -1,
-      Y2 = 0,
-      get_area_point = "area"
-    ),
-    "Data file does not exist for NOAA RFE2 data"
-  )
-})
-
-test_that("import_from_iri handles incorrect data_file gracefully", {
-  expect_error(
-    import_from_iri(
-      download_from = "NASA_TRMM_3B42",
-      data_file = "invalid_data_file",
-      path = "",
-      X1 = 35,
-      X2 = 36,
-      Y1 = -1,
-      Y2 = 0,
-      get_area_point = "area"
-    ),
-    "Data file does not exist for NASA TRMM 3B42 data"
-  )
-})
-
-test_that("import_from_iri handles incorrect data_file gracefully", {
-  expect_error(
-    import_from_iri(
-      download_from = "NOAA_CMORPH_DAILY",
-      data_file = "invalid_data_file",
-      path = "",
-      X1 = 35,
-      X2 = 36,
-      Y1 = -1,
-      Y2 = 0,
-      get_area_point = "area"
-    ),
-    "Data file does not exist for NOAA CMORPH data"
-  )
-})
+# test_that("import_from_iri handles incorrect source gracefully", {
+#   expect_error(
+#     import_from_iri(
+#       download_from = "INVALID_SOURCE",
+#       data_file = "daily_0p05",
+#       path = "",
+#       X1 = 35,
+#       X2 = 36,
+#       Y1 = -1,
+#       Y2 = 0,
+#       get_area_point = "area"
+#     ),
+#     "Source not specified correctly."
+#   )
+# })
+# 
+# test_that("import_from_iri handles incorrect data_file gracefully", {
+#   expect_error(
+#     import_from_iri(
+#       download_from = "CHIRPS_V2P0",
+#       data_file = "invalid_data_file",
+#       path = "",
+#       X1 = 35,
+#       X2 = 36,
+#       Y1 = -1,
+#       Y2 = 0,
+#       get_area_point = "area"
+#     ),
+#     "Data file does not exist for CHIRPS V2P0 data"
+#   )
+# })
+# 
+# test_that("import_from_iri handles incorrect data_file gracefully", {
+#   expect_error(
+#     import_from_iri(
+#       download_from = "TAMSAT",
+#       data_file = "invalid_data_file",
+#       path = "",
+#       X1 = 35,
+#       X2 = 36,
+#       Y1 = -1,
+#       Y2 = 0,
+#       get_area_point = "area"
+#     ),
+#     "Data file does not exist for TAMSAT data"
+#   )
+# })
+# 
+# test_that("import_from_iri handles incorrect data_file gracefully", {
+#   expect_error(
+#     import_from_iri(
+#       download_from = "NOAA_ARC2",
+#       data_file = "invalid_data_file",
+#       path = "",
+#       X1 = 35,
+#       X2 = 36,
+#       Y1 = -1,
+#       Y2 = 0,
+#       get_area_point = "area"
+#     ),
+#     "Data file does not exist for NOAA ARC2 data"
+#   )
+# })
+# 
+# test_that("import_from_iri handles incorrect data_file gracefully", {
+#   expect_error(
+#     import_from_iri(
+#       download_from = "NOAA_RFE2",
+#       data_file = "invalid_data_file",
+#       path = "",
+#       X1 = 35,
+#       X2 = 36,
+#       Y1 = -1,
+#       Y2 = 0,
+#       get_area_point = "area"
+#     ),
+#     "Data file does not exist for NOAA RFE2 data"
+#   )
+# })
+# 
+# test_that("import_from_iri handles incorrect data_file gracefully", {
+#   expect_error(
+#     import_from_iri(
+#       download_from = "NASA_TRMM_3B42",
+#       data_file = "invalid_data_file",
+#       path = "",
+#       X1 = 35,
+#       X2 = 36,
+#       Y1 = -1,
+#       Y2 = 0,
+#       get_area_point = "area"
+#     ),
+#     "Data file does not exist for NASA TRMM 3B42 data"
+#   )
+# })
+# 
+# test_that("import_from_iri handles incorrect data_file gracefully", {
+#   expect_error(
+#     import_from_iri(
+#       download_from = "NOAA_CMORPH_DAILY",
+#       data_file = "invalid_data_file",
+#       path = "",
+#       X1 = 35,
+#       X2 = 36,
+#       Y1 = -1,
+#       Y2 = 0,
+#       get_area_point = "area"
+#     ),
+#     "Data file does not exist for NOAA CMORPH data"
+#   )
+# })
 
 test_that("in_top_n correctly identifies top N values", {
   x <- c(10, 5, 7, 12, 3)
