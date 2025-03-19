@@ -38,7 +38,7 @@ convert_to_character_matrix <- function(data, format_decimal_places = TRUE, deci
     if(!format_decimal_places){
       decimal_places=rep(NA, ncol(data)) 
     } else if(missing(decimal_places)){
-      decimal_places = sapply(data, instatExtras::get_default_significant_figures)
+      decimal_places = sapply(data, get_default_significant_figures)
     } 
     i = 1
     for (curr_col in colnames(data)) {
@@ -47,11 +47,12 @@ convert_to_character_matrix <- function(data, format_decimal_places = TRUE, deci
       if ("sfc" %in% class(data[[i]])) {
         out[, i] <- sf::st_as_text(data[[i]])
       } else if (is.na(decimal_places[i])) {
-        #use as.character() for non numeric column vales because format() adds extra spaces to the text
-        #which are recognised oddly by the R.Net
+        #use as.character() for non numeric column vales because format()
+        # adds extra spaces to the text which are recognised oddly by the R.Net
         out[, i] <- as.character(data[[i]])
       } else {
-        out[,i] <- format(data[[i]], digits = decimal_places[i], scientific = is_scientific[i])
+        out[,i] <- format(data[[i]], digits = decimal_places[i],
+                          scientific = is_scientific[i])
       }
       if (!is.null(na_display)) {
         out[is.na(data[[i]]), i] <- na_display

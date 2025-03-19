@@ -19,7 +19,10 @@
 #' y <- 5:14
 #' compare_columns(x, y)
 #'
-compare_columns <- function(x, y, use_unique = TRUE, sort_values = TRUE, firstnotsecond = TRUE, secondnotfirst = TRUE, display_intersection = FALSE, display_union = FALSE, display_values = TRUE) {
+compare_columns <- function(x, y, use_unique = TRUE, sort_values = TRUE,
+                            firstnotsecond = TRUE, secondnotfirst = TRUE,
+                            display_intersection = FALSE, display_union = FALSE,
+                            display_values = TRUE) {
   x_name <- deparse(substitute(x))
   y_name <- deparse(substitute(y))
   if(use_unique) {
@@ -67,7 +70,8 @@ compare_columns <- function(x, y, use_unique = TRUE, sort_values = TRUE, firstno
       cat("\n \n")
     }
     if(display_union){
-      cat(paste0("Union (Values that appear in either column): ", paste0("'", dplyr::union(x, y), "'", collapse = ", ")))
+      cat(paste0("Union (Values that appear in either column): ",
+                 paste0("'", dplyr::union(x, y), "'", collapse = ", ")))
     }
   }
 }

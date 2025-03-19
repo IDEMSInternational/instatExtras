@@ -24,8 +24,11 @@ get_years_from_data <- function(datafile) {
   # Extract the row containing year values (row 3, excluding the first column)
   year_values <- datafile[3, 2:ncol(datafile)]
   
-  # Remove NAs and ensure unique values
-  unique_years <- stats::na.omit(t(unique(year_values)))
+  # Get unique values
+  unique_years <- unique(year_values)
   
-  return(unique_years)
+  # Remove NAs and transpose
+  t_years <- stats::na.omit(t(unique_years))
+  
+  return(t_years)
 }
