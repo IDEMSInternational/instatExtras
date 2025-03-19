@@ -25,7 +25,7 @@ return_variable_levels <- function(data){
   
   # Generate sorting order for all categorical variables
   sorting_orders <- purrr::map_chr(.x = categorical_vars,
-                                   .f = ~function(var) {
+                                   .f = function(var) {
                                      levels_var <- stringr::str_flatten(
                                        string = paste0("\"", levels(data[[var]]), "\",")
                                      )
