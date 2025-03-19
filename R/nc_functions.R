@@ -310,11 +310,6 @@ close_nc_file <- function(nc) {
   ncdf4::nc_close(nc)
 }
 
-# Wrapper for processing an individual NetCDF file
-process_nc_file <- function(nc, vars, keep_raw_time, include_metadata, boundary, lon_points, lat_points, id_points, show_requested_points, great_circle_dist) {
-  nc_as_data_frame(nc, vars, keep_raw_time, include_metadata, boundary, lon_points, lat_points, id_points, show_requested_points, great_circle_dist)
-}
-
 # Wrapper for getting time series
 get_nc_time_series <- function(nc, time.dim.name) {
   ncdf4.helpers::nc.get.time.series(nc, time.dim.name = time.dim.name)
