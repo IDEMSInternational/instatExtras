@@ -13,7 +13,7 @@
 [![Codecov test
 coverage](https://codecov.io/gh/IDEMSInternational/instatExtras/branch/main/graph/badge.svg)](https://app.codecov.io/gh/IDEMSInternational/instatExtras?branch=main)
 [![Lifecycle:
-experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+experimental](https://img.shields.io/badge/lifecycle-stable-green.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 [![license](https://img.shields.io/badge/license-LGPL%20(%3E=%203)-lightgrey.svg)](https://www.gnu.org/licenses/lgpl-3.0.en.html)
 <!-- badges: end -->
 
