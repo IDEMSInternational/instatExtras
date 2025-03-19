@@ -32,6 +32,4 @@ x <- c("apple", "banana", "cherry")
 salt <- "salty"
 hashed_id(x, salt)
 
-# Output:
-# [1] "1A1E6CE0E9A969A9" "1B69B1B8C1D6EF99" "1C10A25AA55025CD"
 }

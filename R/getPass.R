@@ -119,8 +119,13 @@ readline_masked_rstudio <- function(msg, forcemask, noblank=FALSE){
 # }
 
 hastcltk <- function(){
-  test <- tryCatch(requireNamespace("tcltk", quietly=TRUE), warning=identity)
-  if (!is.logical(test)) test <- FALSE
+  test <- tryCatch(
+    requireNamespace("tcltk", quietly=TRUE), 
+    warning=identity
+    )
+  if (!is.logical(test)){
+    test <- FALSE
+  }
   test
 }
 
@@ -170,10 +175,8 @@ readline_masked_tcltk_window <- function(msg, noblank = FALSE, test_mode = NULL)
   # Define event actions
   tcreset <- function(){ tcltk::tclvalue(pwdvar) <- "" }
   
-  tcsubmit <- function(){
-    if (noblank && tcltk::tclvalue(pwdvar) == "") tcltk::tkmessageBox(title = "getPass noblank = TRUE", message = "No blank input please!", parent = textbox)
-    else tcltk::tclvalue(flagvar) <- 1; tcltk::tkdestroy(tt)
-  }
+  tcsubmit <- function(){ if (noblank && tcltk::tclvalue(pwdvar) == "") tcltk::tkmessageBox(title = "getPass noblank = TRUE", message = "No blank input please!", parent = textbox)
+    else tcltk::tclvalue(flagvar) <- 1; tcltk::tkdestroy(tt)}
   
   tccleanup <- function(){ tcltk::tclvalue(flagvar) <- 0; tcltk::tkdestroy(tt) }
   
