@@ -12,6 +12,9 @@
 #' get_default_significant_figures(x)
 get_default_significant_figures <- function(data) {
   default_digits <- getOption("digits")
-  if(is.numeric(data) || is.complex(data)) return(default_digits)
-  else return(NA)  
+  if(is.numeric(data) || is.complex(data)){
+    return(default_digits)
+  } else { 
+    return(NA)
+  }
 }

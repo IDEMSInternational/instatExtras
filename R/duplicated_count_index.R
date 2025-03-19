@@ -25,10 +25,10 @@ duplicated_count_index<-function(x, type = "count"){
     x<-data.frame(x)
     
     #calculate the frequency of each combo. (using plyr:: because the function name is used in other packages so need explicit-ness)
-    counts<-plyr::count(x)
+    counts <- plyr::count(x)
     
-    #merge onto dataset. Adding a call to suppressMessages() because join() likes to tell you stuff a bit unneccesarily otherwise.
-    x<-suppressMessages(plyr::join(x, counts))
+    #merge onto dataset. Adding a call to suppressMessages() because join() likes to tell you stuff a bit unnecessarily otherwise.
+    x <- suppressMessages(plyr::join(x, counts))
     
     #return column. Minus 1 so that the number represents number of other matches (i.e. doesn't include itself); so zero for unique, 1 for 1 match etc
     return(x$freq-1)
@@ -37,15 +37,17 @@ duplicated_count_index<-function(x, type = "count"){
     #make sure x is a dataframe or can be coerced into a dataframe
     x<-data.frame(x)
     
-    x$hash<-apply(x, 1, paste, collapse = ";;")
-    x$id<-1:nrow(x)
+    x$hash <- apply(x, 1, paste, collapse = ";;")
+    x$id <- 1:nrow(x)
     
-    x<-x[order(x$hash),]
-    x$count<-1
+    x <- x[order(x$hash),]
+    x$count <- 1
     for(i in 2:nrow(x)){
-      x$count[i]<-ifelse(x$hash[i]==x$hash[i-1],x$count[i-1]+1,1)
+      x$count[i] <- ifelse(x$hash[i] == x$hash[i-1],
+                           x$count[i-1]+1,
+                           1)
     }
-    x<-x[order(x$id),]
+    x <- x[order(x$id),]
     
     return(x$count)
   }

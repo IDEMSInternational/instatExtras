@@ -21,6 +21,8 @@
 #' 
 get_installed_packages_with_data <- function(with_data = TRUE) {
   all_installed_packages <- .packages(all.available = TRUE)
-  if (with_data) all_installed_packages <- unique(utils::data(package = all_installed_packages)[["results"]][,1]) 
+  if (with_data){
+    all_installed_packages <- unique(utils::data(package = all_installed_packages)[["results"]][,1]) 
+  }
   return(all_installed_packages)
 }

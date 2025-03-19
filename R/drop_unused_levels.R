@@ -34,7 +34,9 @@
 #' # 4 orange  red 4
 drop_unused_levels <- function(data, columns) {
   for (i in seq_along(columns)) {
-    if (is.factor(data[[columns[i]]])) data[[columns[i]]] <- droplevels(data[[columns[i]]])
+    if (is.factor(data[[columns[i]]])){
+      data[[columns[i]]] <- droplevels(data[[columns[i]]])
+    }
   }
   return(data)
 }

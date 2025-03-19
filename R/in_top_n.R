@@ -26,8 +26,11 @@ in_top_n <- function(x, n = 10, wt, fun = sum) {
     dat$wt <- wt
     dat <- dat %>% 
       dplyr::group_by(x) %>%
-      dplyr::summarise(fq = as.function(fun)(stats::na.omit(wt))) %>% dplyr::arrange(-fq)
+      dplyr::summarise(fq = as.function(fun)(stats::na.omit(wt))) %>%
+      dplyr::arrange(-fq)
+  } else {
+    dat <- dat %>%
+      dplyr::count(x, sort = TRUE, name = "fq")
   }
-  else dat <- dat %>% dplyr::count(x, sort = TRUE, name = "fq")
   return(x %in% dat$x[1:n])
 }
