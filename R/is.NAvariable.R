@@ -22,6 +22,7 @@
 #' # Output: FALSE
 
 is.NAvariable <- function(x){
-  return(isTRUE(length(x) == sum(is.na(x))))
+  get_length_x <- length(x) == sum(is.na(x))
+  return(isTRUE(get_length_x))
 }
 

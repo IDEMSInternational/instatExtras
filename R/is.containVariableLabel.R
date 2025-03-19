@@ -19,5 +19,6 @@
 #' is.containVariableLabel(vec)  
 #' 
 is.containVariableLabel <- function(x){
-  return(isTRUE(sjlabelled::get_label(x) != ""))
+  get_label_x <- sjlabelled::get_label(x) != ""
+  return(isTRUE(get_label_x))
 }
