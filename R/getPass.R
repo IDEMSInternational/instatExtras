@@ -75,8 +75,11 @@ getPass <- function(msg = "PASSWORD: ", noblank = FALSE, forcemask = FALSE) {
   else if (!forcemask) pw <- getPass_readline(msg)
   else stop("Masking is not supported on your platform!")
   
-  if (is.null(pw)) invisible()
-  else pw
+  if (is.null(pw)){
+    invisible()
+  } else {
+    pw
+  }
 }
 
 getPass_readline <- function(...) {
@@ -85,11 +88,9 @@ getPass_readline <- function(...) {
 
 # other functions used in this
 readline_masked_rstudio <- function(msg, forcemask, noblank=FALSE){
-  if (noblank){
-    while (TRUE){
-      pw <- readline_masked_rstudio_window(msg, forcemask)
-      if (is.null(pw) || pw != "")
-        break
+  if (noblank){ while (TRUE){
+    pw <- readline_masked_rstudio_window(msg, forcemask)
+    if (is.null(pw) || pw != "") break
     }
   } else{
     pw <- readline_masked_rstudio_window(msg, forcemask)
