@@ -44,11 +44,16 @@ add_nc <- function(path) {
 add_t_range <- function(path, min_date, max_date, dim_t = "T") {
   paste0(
     path, dim_t, "/",
-    "(", lubridate::day(min_date), "%20", lubridate::month(min_date, label = TRUE),
-    "%20", lubridate::year(min_date), ")", "/",
-    "(", lubridate::day(max_date), "%20", lubridate::month(max_date, label = TRUE),
-    "%20", lubridate::year(max_date), ")", "/",
-    "RANGEEDGES", "/"
+    "(", lubridate::day(min_date),
+    "%20", lubridate::month(min_date, label = TRUE),
+    "%20", lubridate::year(min_date),
+    ")",
+    "/",
+    "(", lubridate::day(max_date),
+    "%20", lubridate::month(max_date, label = TRUE),
+    "%20", lubridate::year(max_date),
+    ")",
+    "/", "RANGEEDGES", "/"
   )
 }
 
@@ -83,12 +88,24 @@ add_t_range <- function(path, min_date, max_date, dim_t = "T") {
 add_xy_area_range <- function(path, min_lon, max_lon, min_lat, max_lat, dim_x = "X", dim_y = "Y") {
   paste0(
     path, "/", dim_x, "/",
-    "(", ifelse(min_lon < 0, paste0(abs(min_lon), "W"), paste0(min_lon, "E")), ")", "/",
-    "(", ifelse(max_lon < 0, paste0(abs(max_lon), "W"), paste0(max_lon, "E")), ")", "/",
+    "(", ifelse(min_lon < 0,
+                paste0(abs(min_lon), "W"),
+                paste0(min_lon, "E")),
+    ")", "/",
+    "(", ifelse(max_lon < 0,
+                paste0(abs(max_lon), "W"),
+                paste0(max_lon, "E")),
+    ")", "/",
     "RANGEEDGES", "/",
     dim_y, "/",
-    "(", ifelse(min_lat < 0, paste0(abs(min_lat), "S"), paste0(min_lat, "N")), ")", "/",
-    "(", ifelse(max_lat < 0, paste0(abs(max_lat), "S"), paste0(max_lat, "N")), ")", "/",
+    "(", ifelse(min_lat < 0,
+                paste0(abs(min_lat), "S"),
+                paste0(min_lat, "N")),
+    ")", "/",
+    "(", ifelse(max_lat < 0,
+                paste0(abs(max_lat), "S"),
+                paste0(max_lat, "N")),
+    ")", "/",
     "RANGEEDGES", "/"
   )
 }
@@ -114,9 +131,13 @@ add_xy_area_range <- function(path, min_lon, max_lon, min_lat, max_lat, dim_x = 
 add_xy_point_range <- function(path, min_lon, min_lat, dim_x = "X", dim_y = "Y"){
   paste0(
     path, "/", dim_x, "/", "(",
-    ifelse(min_lon < 0, paste0(abs(min_lon), "W"), paste0(min_lon, "E")),
+    ifelse(min_lon < 0,
+           paste0(abs(min_lon), "W"),
+           paste0(min_lon, "E")),
     ")", "/", "VALUES", "/", dim_y, "/", "(",
-    ifelse(min_lat < 0, paste0(abs(min_lat), "S"), paste0(min_lat, "N")),
+    ifelse(min_lat < 0,
+           paste0(abs(min_lat), "S"),
+           paste0(min_lat, "N")),
     ")", "/", "VALUES", "/"
   )
 }
