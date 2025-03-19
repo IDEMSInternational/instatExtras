@@ -19,7 +19,11 @@
 #' data <- c("A", "B", "C", "D", "E")
 #' sample <- summary_sample(x = data, size = 4, replace = TRUE)
 summary_sample <- function(x, size, replace = FALSE){
-  if(length(x)==0){return(NA)}
-  else if(length(x)==1){return(x)}
-  else{sample(x = x, size = size, replace = replace)}
+  if(length(x) == 0) {
+    return(NA)
+  } else if (length(x) == 1) {
+    return(x)
+  } else {
+    return(sample(x = x, size = size, replace = replace))
+  }
 }
