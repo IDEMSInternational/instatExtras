@@ -502,3 +502,78 @@ test_that("nc_as_data_frame throws error for invalid boundary dimensions", {
 # Close and remove test NetCDF file
 close_nc_file(nc)
 file.remove(test_nc_file)
+
+
+###
+
+test_that("plot_network works with basic rankings object", {
+  R <- matrix(c(1, 2, 0, 0,
+                4, 1, 2, 3,
+                2, 4, 1, 3,
+                1, 2, 3, 0,
+                2, 1, 3, 0,
+                1, 0, 3, 2), nrow = 6, byrow = TRUE)
+  colnames(R) <- c("apple", "banana", "orange", "pear")
+  R <- as.rankings(R)
+  
+  p <- plot_network(R)
+  expect_s3_class(p, "gg")
+})
+
+test_that("plot_network works with grouped_rankings", {
+  R <- matrix(c(1, 2, 3, 0,
+                1, 3, 2, 0), nrow = 2, byrow = TRUE)
+  colnames(R) <- c("a", "b", "c", "d")
+  R <- group(as.rankings(R), index = c(1, 1))
+  
+  p <- plot_network(R)
+  expect_s3_class(p, "gg")
+})
+
+test_that("plot_network works with fluctuate_widths = TRUE", {
+  R <- matrix(c(1, 2, 3, 0,
+                2, 1, 3, 0), nrow = 2, byrow = TRUE)
+  colnames(R) <- c("a", "b", "c", "d")
+  R <- as.rankings(R)
+  
+  p <- plot_network(R, fluctuate_widths = TRUE)
+  expect_s3_class(p, "gg")
+})
+
+test_that("plot_network assigns column names if missing", {
+  R <- matrix(c(1, 2, 3, 0,
+                2, 1, 3, 0), nrow = 2, byrow = TRUE)
+  R <- as.rankings(R)
+  
+  p <- plot_network(R)
+  expect_s3_class(p, "gg")
+})
+
+test_that("btdata handles matrix input correctly", {
+  mat <- matrix(c(0, 2, 1,
+                  3, 0, 1,
+                  4, 2, 0), nrow = 3)
+  colnames(mat) <- rownames(mat) <- c("A", "B", "C")
+  res <- btdata(mat, return_graph = TRUE)
+  expect_s3_class(res, "btdata")
+  expect_true("graph" %in% names(res))
+})
+
+test_that("btdata errors on non-square matrix", {
+  m <- matrix(1:6, nrow = 2)
+  expect_error(btdata(m), "must be a square")
+})
+
+test_that("btdata handles table input", {
+  tbl <- as.table(matrix(c(0, 2, 1,
+                           3, 0, 1,
+                           4, 2, 0), nrow = 3))
+  dimnames(tbl) <- list(c("A", "B", "C"), c("A", "B", "C"))
+  res <- btdata(tbl)
+  expect_s3_class(res, "btdata")
+})
+
+test_that("btdata errors on undirected graph", {
+  g <- make_ring(3)
+  expect_error(btdata(g), "x must be a 3 or 4 column dataframe, a directed igraph object, or square matrix or contingency table.")
+})

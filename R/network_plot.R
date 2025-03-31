@@ -93,31 +93,7 @@ btdata = function(x, return_graph = FALSE) {
     attr(x, "call") = NULL
   }
   
-  # if x is a df
-  if (is.data.frame(x)) {
-    if (!(ncol(x) %in% 3:4 )) stop("If x is a dataframe, it must have 3 or 4 columns.")
-    wins = pairs_to_matrix(x)
-    g = igraph::graph_from_adjacency_matrix(wins, weighted = TRUE, diag = FALSE)
-  }
-  
-  # if x is a graph
-  else if (igraph::is_igraph(x)) {
-    if(!igraph::is.directed(x))  stop("If x is a graph, it must be a directed igraph object")
-    
-    # check for names
-    if(!is.null(igraph::V(x)$name)) {
-      
-      arg = deparse(substitute(x))
-      
-      if(anyDuplicated(igraph::V(x)$name) > 0) stop(paste0("If x is a graph, vertex names must be unique. Consider fixing with V(", arg, ")$name = make.names(V(", arg, ")$name, unique = TRUE)"))
-    }
-    
-    wins = graph_to_matrix(x)
-    g = x
-  }
-  
-  else if ((methods::is(x, "Matrix") | is.matrix(x) )) {
-    
+  if ((methods::is(x, "Matrix") | is.matrix(x) )) {
     # check dimensions/content
     if (dim(x)[1] != dim(x)[2]) stop("If x is a matrix or table, it must be a square")
     if(is.matrix(x)) {if (!is.numeric(x)) stop("If x is a matrix or table, all elements must be numeric")}
@@ -155,29 +131,4 @@ btdata = function(x, return_graph = FALSE) {
   if (return_graph) result$graph = g
   class(result) = c("btdata", "list")
   result
-}
-
-summary.btdata = function(object, ...){
-  if (!inherits(object, "btdata")) stop("object should be a 'btdata' object")
-  K = nrow(object$wins)
-  num_comps = length(object$components)
-  connected = num_comps == 1
-  components_greater_than_one = Filter(function(x) length(x) > 1, object$components)
-  my_tab = table(sapply(object$components, length))
-  my_df = as.data.frame(my_tab)
-  
-  colnames(my_df) = c("Component size", "Freq")
-  
-  density = Matrix::mean(object$wins != 0)
-  
-  cat("Number of items:", K, "\n")
-  cat("Density of wins matrix:", density, "\n")
-  cat("Fully-connected:", connected, "\n")
-  
-  
-  if (num_comps > 1) {
-    cat("Number of fully-connected components:", num_comps, "\n")
-    cat("Summary of fully-connected components: \n")
-    print(my_df)
-  }
 }
