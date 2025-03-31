@@ -514,7 +514,7 @@ test_that("plot_network works with basic rankings object", {
                 2, 1, 3, 0,
                 1, 0, 3, 2), nrow = 6, byrow = TRUE)
   colnames(R) <- c("apple", "banana", "orange", "pear")
-  R <- as.rankings(R)
+  R <- PlackettLuce::as.rankings(R)
   
   p <- plot_network(R)
   expect_s3_class(p, "gg")
@@ -524,7 +524,7 @@ test_that("plot_network works with fluctuate_widths = TRUE", {
   R <- matrix(c(1, 2, 3, 0,
                 2, 1, 3, 0), nrow = 2, byrow = TRUE)
   colnames(R) <- c("a", "b", "c", "d")
-  R <- as.rankings(R)
+  R <- PlackettLuce::as.rankings(R)
   
   p <- plot_network(R, fluctuate_widths = TRUE)
   expect_s3_class(p, "gg")
@@ -533,7 +533,7 @@ test_that("plot_network works with fluctuate_widths = TRUE", {
 test_that("plot_network assigns column names if missing", {
   R <- matrix(c(1, 2, 3, 0,
                 2, 1, 3, 0), nrow = 2, byrow = TRUE)
-  R <- as.rankings(R)
+  R <- PlackettLuce::as.rankings(R)
   
   p <- plot_network(R)
   expect_s3_class(p, "gg")
