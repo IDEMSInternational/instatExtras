@@ -30,11 +30,6 @@ plot_network <- function(object, fluctuate_widths = FALSE, ...) {
     stop("Packages 'ggraph' and 'tidygraph' are required.")
   }
   
-  # Convert grouped rankings to regular rankings
-  if (inherits(object, "grouped_rankings")) {
-    object <- as.rankings(object)
-  }
-  
   R <- object
   
   # Ensure column names are present

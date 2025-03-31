@@ -520,16 +520,6 @@ test_that("plot_network works with basic rankings object", {
   expect_s3_class(p, "gg")
 })
 
-test_that("plot_network works with grouped_rankings", {
-  R <- matrix(c(1, 2, 3, 0,
-                1, 3, 2, 0), nrow = 2, byrow = TRUE)
-  colnames(R) <- c("a", "b", "c", "d")
-  R <- group(as.rankings(R), index = c(1, 1))
-  
-  p <- plot_network(R)
-  expect_s3_class(p, "gg")
-})
-
 test_that("plot_network works with fluctuate_widths = TRUE", {
   R <- matrix(c(1, 2, 3, 0,
                 2, 1, 3, 0), nrow = 2, byrow = TRUE)
@@ -574,6 +564,6 @@ test_that("btdata handles table input", {
 })
 
 test_that("btdata errors on undirected graph", {
-  g <- make_ring(3)
+  g <- igraph::make_ring(3)
   expect_error(btdata(g), "x must be a 3 or 4 column dataframe, a directed igraph object, or square matrix or contingency table.")
 })
