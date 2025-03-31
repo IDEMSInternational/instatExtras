@@ -17,7 +17,7 @@
 #'              2, 1, 3, 0,
 #'              1, 0, 3, 2), nrow = 6, byrow = TRUE)
 #' colnames(R) = c("apple", "banana", "orange", "pear")
-#' R = as.rankings(R)
+#' R = PlackettLuce::as.rankings(R)
 #' 
 #' plot_network(R, fluctuate_widths = TRUE)
 plot_network <- function(object, fluctuate_widths = FALSE, ...) {
