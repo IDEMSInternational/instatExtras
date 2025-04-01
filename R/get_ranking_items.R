@@ -1,17 +1,14 @@
-#' Get ranking items based on variable names.
+#' Get Ranking Items from a Rankings Object
 #'
-#' This function retrieves specific items from a rankings object based on variable names.
+#' Extracts specified ranking variables from a rankings object.
 #'
-#' @param data A data frame containing variable names and corresponding indices.
-#'   Defaults to the result of `get_index_names`.
-#' @param vars_to_get A character vector of variable names to retrieve.
-#' @param index The column name in `data` containing the indices for `rankings_object`.
-#'   Defaults to `rankings_index`.
-#' @param rankings_object A list-like object containing the ranked items.
+#' @param data A data frame (default is `get_index_names`) containing variable metadata,
+#'   including a column that matches the `index` argument.
+#' @param vars_to_get A character vector of variable names to extract from the `rankings_object`.
+#' @param index The name of the column in `data` used to index or filter (default is `rankings_index`).
+#' @param rankings_object A named list or object where each element corresponds to a ranking variable.
 #'
 #' @return A list containing the retrieved items from `rankings_object` corresponding to `vars_to_get`.
-#'
-#' @importFrom dplyr filter pull
 #'
 #' @examples
 #' # Example data setup:

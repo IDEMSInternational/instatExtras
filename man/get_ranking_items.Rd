@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_ranking_items.R
 \name{get_ranking_items}
 \alias{get_ranking_items}
-\title{Get ranking items based on variable names.}
+\title{Get Ranking Items from a Rankings Object}
 \usage{
 get_ranking_items(
   data = get_index_names,
@@ -12,21 +12,20 @@ get_ranking_items(
 )
 }
 \arguments{
-\item{data}{A data frame containing variable names and corresponding indices.
-Defaults to the result of \code{get_index_names}.}
+\item{data}{A data frame (default is \code{get_index_names}) containing variable metadata,
+including a column that matches the \code{index} argument.}
 
-\item{vars_to_get}{A character vector of variable names to retrieve.}
+\item{vars_to_get}{A character vector of variable names to extract from the \code{rankings_object}.}
 
-\item{index}{The column name in \code{data} containing the indices for \code{rankings_object}.
-Defaults to \code{rankings_index}.}
+\item{index}{The name of the column in \code{data} used to index or filter (default is \code{rankings_index}).}
 
-\item{rankings_object}{A list-like object containing the ranked items.}
+\item{rankings_object}{A named list or object where each element corresponds to a ranking variable.}
 }
 \value{
 A list containing the retrieved items from \code{rankings_object} corresponding to \code{vars_to_get}.
 }
 \description{
-This function retrieves specific items from a rankings object based on variable names.
+Extracts specified ranking variables from a rankings object.
 }
 \examples{
 # Example data setup:
