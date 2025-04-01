@@ -10,41 +10,26 @@
 #' @examples
 #' library("PlackettLuce")
 #' 
-#' R = matrix(c(1, 2, 0, 0,
+#' object = matrix(c(1, 2, 0, 0,
 #'              4, 1, 2, 3,
 #'              2, 4, 1, 3,
 #'              1, 2, 3, 0,
 #'              2, 1, 3, 0,
 #'              1, 0, 3, 2), nrow = 6, byrow = TRUE)
-#' colnames(R) = c("apple", "banana", "orange", "pear")
-#' R = PlackettLuce::as.rankings(R)
+#' colnames(object) = c("apple", "banana", "orange", "pear")
+#' object = PlackettLuce::as.rankings(object)
 #' 
-#' plot_network(R, fluctuate_widths = TRUE)
+#' plot_network(object, fluctuate_widths = TRUE)
 plot_network <- function(object, fluctuate_widths = FALSE, ...) {
-  
-  if (!requireNamespace("PlackettLuce", quietly = TRUE)) {
-    stop("Package 'PlackettLuce' is required.")
-  }
-  if (!requireNamespace("ggraph", quietly = TRUE) ||
-      !requireNamespace("tidygraph", quietly = TRUE)) {
-    stop("Packages 'ggraph' and 'tidygraph' are required.")
-  }
-  
-  R <- object
-  
   # Ensure column names are present
-  if (is.null(colnames(R))) {
-    colnames(R) <- paste0("Item", seq_len(ncol(R)))
+  if (is.null(colnames(object))) {
+    colnames(object) <- paste0("Item", seq_len(ncol(object)))
   }
   
   # Create PlackettLuce::adjacency matrix and convert to graph
-  adj <- PlackettLuce::adjacency(R)
-  dimnames(adj) <- list(colnames(R), colnames(R))
+  adj <- PlackettLuce::adjacency(object)
+  dimnames(adj) <- list(colnames(object), colnames(object))
   
-  # Use a helper to convert to graph (assumes btdata is defined)
-  if (!exists("btdata", mode = "function")) {
-    stop("The function 'btdata' must be available in the environment.")
-  }
   adj_graph <- btdata(adj, return_graph = TRUE)$graph
   net_tbl <- tidygraph::as_tbl_graph(adj_graph)
   

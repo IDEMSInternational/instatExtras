@@ -22,14 +22,14 @@ Visualise a ranking network using \code{ggplot2} and \code{ggraph}
 \examples{
 library("PlackettLuce")
 
-R = matrix(c(1, 2, 0, 0,
+object = matrix(c(1, 2, 0, 0,
              4, 1, 2, 3,
              2, 4, 1, 3,
              1, 2, 3, 0,
              2, 1, 3, 0,
              1, 0, 3, 2), nrow = 6, byrow = TRUE)
-colnames(R) = c("apple", "banana", "orange", "pear")
-R = PlackettLuce::as.rankings(R)
+colnames(object) = c("apple", "banana", "orange", "pear")
+object = PlackettLuce::as.rankings(object)
 
-plot_network(R, fluctuate_widths = TRUE)
+plot_network(object, fluctuate_widths = TRUE)
 }
