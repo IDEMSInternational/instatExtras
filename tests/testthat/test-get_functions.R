@@ -316,7 +316,7 @@ test_that("has_fun returns expected values", {
 # get_ranking_items
 test_that("get_ranking_items returns expected values", {
   
-  data <- data.frame(
+  data_frame <- data.frame(
     Name = c("id", "variety", "lastassessment_grainquality", "lastassessment_yield"),
     label = c("id", "variety", NA, NA),
     class = c("character", "character", "numeric", "numeric"),
@@ -345,19 +345,33 @@ test_that("get_ranking_items returns expected values", {
   
   # Example 1: Get rankings for 'lastassessment_grainquality' and 'lastassessment_yield'
   vars_to_get <- c("lastassessment_grainquality", "lastassessment_yield")
-  result1 <- get_ranking_items(data, vars_to_get, "rankings_index", rankings_object)
-
+  result1 <- get_ranking_items(data_frame, vars_to_get, "rankings_index", rankings_object)
+  testthat::expect_equal(result1, list(rankings_object$lastassessment_grainquality, rankings_object$lastassessment_yield))
+  
   # Example 2: Get rankings for just 'lastassessment_grainquality'
   vars_to_get2 <- c("lastassessment_grainquality")
-  result2 <- get_ranking_items(data, vars_to_get2, "rankings_index", rankings_object)
+  result2 <- get_ranking_items(data_frame, vars_to_get2, "rankings_index", rankings_object)
+  testthat::expect_equal(result2, list(rankings_object$lastassessment_grainquality))
 
   # Example 3: using the default data parameter.
-  get_index_names <- data # setting up get_index_names for example 3
   rankings_index <- "rankings_index" # setting rankings_index for example 3
   vars_to_get3 <- c("lastassessment_yield")
-  result3 <- get_ranking_items(vars_to_get = vars_to_get3, rankings_object = rankings_object)
-
-  testthat::expect_equal(result1, list(rankings_object$lastassessment_grainquality, rankings_object$lastassessment_yield))
-  testthat::expect_equal(result2, list(rankings_object$lastassessment_grainquality))
+  result3 <- get_ranking_items(data_frame, vars_to_get = vars_to_get3, rankings_object = rankings_object)
   testthat::expect_equal(result3, list(rankings_object$lastassessment_yield))
+
+  # Use the same test data from above
+  vars_to_get <- c("lastassessment_grainquality", "lastassessment_yield")
+  
+  result <- get_ranking_items(
+    data = data_frame,
+    vars_to_get = vars_to_get,
+    index = "rankings_index",
+    rankings_object = rankings_object
+  )
+  
+  expect_type(result, "list")
+  expect_length(result, 2)
+  expect_equal(names(result), NULL)  # lapply returns unnamed list here
+  expect_true(all(sapply(result, is.character)))
+  expect_equal(length(result[[1]]), 6)  # Each ranking has 6 entries
 })
