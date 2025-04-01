@@ -58,10 +58,29 @@
 #' print(result3)
 get_ranking_items <- function(data = get_index_names,
                               vars_to_get,
-                              index = rankings_index,
-                              rankings_object){
+                              index = "rankings_index",
+                              rankings_object) {
+  if (!is.character(vars_to_get)) {
+    stop("`vars_to_get` must be a character vector.")
+  }
+  
+  if (length(vars_to_get) == 0) {
+    return(list())
+  }
+  
+  missing_vars <- setdiff(vars_to_get, data$Name)
+  if (length(missing_vars) > 0) {
+    stop("Some vars_to_get are not found in the data: ", paste(missing_vars, collapse = ", "))
+  }
+  
+  missing_in_object <- setdiff(vars_to_get, names(rankings_object))
+  if (length(missing_in_object) > 0) {
+    stop("Some vars_to_get are not in the rankings_object: ", paste(missing_in_object, collapse = ", "))
+  }
+  
   multiple_vars_index <- data %>%
     dplyr::filter(Name %in% vars_to_get) %>%
     dplyr::pull(index)
+  
   lapply(vars_to_get, function(i) rankings_object[[i]])
 }
