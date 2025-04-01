@@ -360,4 +360,4 @@ test_that("get_ranking_items returns expected values", {
   testthat::expect_equal(result1, list(rankings_object$lastassessment_grainquality, rankings_object$lastassessment_yield))
   testthat::expect_equal(result2, list(rankings_object$lastassessment_grainquality))
   testthat::expect_equal(result3, list(rankings_object$lastassessment_yield))
-}
+})
