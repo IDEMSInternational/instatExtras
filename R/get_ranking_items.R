@@ -1,0 +1,70 @@
+#' Get ranking items based on variable names.
+#'
+#' This function retrieves specific items from a rankings object based on variable names.
+#'
+#' @param data A data frame containing variable names and corresponding indices.
+#'   Defaults to the result of `get_index_names`.
+#' @param vars_to_get A character vector of variable names to retrieve.
+#' @param index The column name in `data` containing the indices for `rankings_object`.
+#'   Defaults to `rankings_index`.
+#' @param rankings_object A list-like object containing the ranked items.
+#'
+#' @return A list containing the retrieved items from `rankings_object` corresponding to `vars_to_get`.
+#'
+#' @importFrom dplyr filter pull
+#'
+#' @examples
+#' # Example data setup:
+#' data <- data.frame(
+#'   Name = c("id", "variety", "lastassessment_grainquality", "lastassessment_yield"),
+#'   label = c("id", "variety", NA, NA),
+#'   class = c("character", "character", "numeric", "numeric"),
+#'   Dependent_Columns = c("count_all", "count_all", NA, NA),
+#'   Has_Dependants = c(TRUE, TRUE, NA, NA),
+#'   Is_Hidden = c(FALSE, FALSE, FALSE, FALSE),
+#'   Is_Key = c(TRUE, TRUE, FALSE, FALSE),
+#'   rankings_index = c(NA, NA, 2, 4),
+#'   Scientific = c(FALSE, FALSE, FALSE, FALSE),
+#'   Signif_Figures = c(NA, NA, 7, 7),
+#'   Tricot_Type = c("id", "variety", "traits", "traits")
+#' )
+#'
+#' rankings_object <- list(
+#'   lastassessment_grainquality = c(
+#'     "CSW18 > PBW502 > HW2045", "CSW18 > HD2985 > PBW502",
+#'     "DBW17 > RAJ4120 > HW2045", "CSW18 > PBW343 > RAJ4120",
+#'     "PBW343 > HI1563 > HW2045", "K9107 > HD2824 > PBW502"
+#'   ),
+#'   lastassessment_yield = c(
+#'     "CSW18 > PBW502 > HW2045", "CSW18 > HD2985 > PBW502",
+#'     "DBW17 > RAJ4120 > HW2045", "CSW18 > PBW343 > RAJ4120",
+#'     "PBW343 > HI1563 > HW2045", "K9107 > HD2824 > PBW502"
+#'   )
+#' )
+#'
+#' # Example 1: Get rankings for 'lastassessment_grainquality' and 'lastassessment_yield'
+#' vars_to_get <- c("lastassessment_grainquality", "lastassessment_yield")
+#' result1 <- get_ranking_items(data, vars_to_get, "rankings_index", rankings_object)
+#' print(result1)
+#'
+#' # Example 2: Get rankings for just 'lastassessment_grainquality'
+#' vars_to_get2 <- c("lastassessment_grainquality")
+#' result2 <- get_ranking_items(data, vars_to_get2, "rankings_index", rankings_object)
+#' print(result2)
+#'
+#' # Example 3: using the default data parameter.
+#'
+#' get_index_names <- data # setting up get_index_names for example 3
+#' rankings_index <- "rankings_index" # setting rankings_index for example 3
+#' vars_to_get3 <- c("lastassessment_yield")
+#' result3 <- get_ranking_items(vars_to_get = vars_to_get3, rankings_object = rankings_object)
+#' print(result3)
+get_ranking_items <- function(data = get_index_names,
+                              vars_to_get,
+                              index = rankings_index,
+                              rankings_object){
+  multiple_vars_index <- data %>%
+    dplyr::filter(Name %in% vars_to_get) %>%
+    dplyr::pull(index)
+  lapply(vars_to_get, function(i) rankings_object[[i]])
+}
