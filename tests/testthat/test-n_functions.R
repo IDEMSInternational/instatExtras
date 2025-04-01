@@ -576,7 +576,7 @@ test_that("btdata errors if base matrix contains non-numeric values", {
 })
 
 test_that("btdata errors if Matrix class contains non-numeric values", {
-  m <- Matrix(c(TRUE, FALSE, TRUE, FALSE), nrow = 2, sparse = TRUE)
+  m <- Matrix::Matrix(c(TRUE, FALSE, TRUE, FALSE), nrow = 2, sparse = TRUE)
   colnames(m) <- rownames(m) <- c("A", "B")
   expect_error(btdata(m),
                "If x is a matrix or table, all elements must be numeric")
@@ -603,4 +603,3 @@ test_that("btdata errors if row/col names are duplicated", {
   expect_error(btdata(m), 
                "these must be unique")
 })
-
