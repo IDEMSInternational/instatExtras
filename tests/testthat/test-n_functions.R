@@ -567,3 +567,40 @@ test_that("btdata errors on undirected graph", {
   g <- igraph::make_ring(3)
   expect_error(btdata(g), "x must be a 3 or 4 column dataframe, a directed igraph object, or square matrix or contingency table.")
 })
+
+test_that("btdata errors if base matrix contains non-numeric values", {
+  m <- matrix(c("a", "b", "c", "d"), nrow = 2)
+  colnames(m) <- rownames(m) <- c("A", "B")
+  expect_error(btdata(m), 
+               "If x is a matrix or table, all elements must be numeric")
+})
+
+test_that("btdata errors if Matrix class contains non-numeric values", {
+  m <- Matrix(c(TRUE, FALSE, TRUE, FALSE), nrow = 2, sparse = TRUE)
+  colnames(m) <- rownames(m) <- c("A", "B")
+  expect_error(btdata(m),
+               "If x is a matrix or table, all elements must be numeric")
+})
+
+test_that("btdata errors if matrix contains negative values", {
+  m <- matrix(c(0, -1, 3, 4), nrow = 2)
+  colnames(m) <- rownames(m) <- c("A", "B")
+  expect_error(btdata(m), 
+               "If x is a matrix or table, all elements must be non-negative")
+})
+
+test_that("btdata errors if row and column names don't match", {
+  m <- matrix(c(0, 1, 2, 0), nrow = 2)
+  rownames(m) <- c("A", "B")
+  colnames(m) <- c("B", "A")  # Not identical in order
+  expect_error(btdata(m), 
+               "If x is a matrix or table, rownames and colnames of x should be the same")
+})
+
+test_that("btdata errors if row/col names are duplicated", {
+  m <- matrix(c(0, 1, 1, 0), nrow = 2)
+  rownames(m) <- colnames(m) <- c("A", "A")  # duplicated
+  expect_error(btdata(m), 
+               "these must be unique")
+})
+
