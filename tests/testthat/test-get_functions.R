@@ -312,3 +312,52 @@ test_that("has_fun returns expected values", {
   mockery::stub(has_fun, "rstudioapi::hasFun", mock_hasFun_false)
   expect_false(has_fun("nonExistentFunction"))
 })
+
+# get_ranking_items
+test_that("get_ranking_items returns expected values", {
+  
+  data <- data.frame(
+    Name = c("id", "variety", "lastassessment_grainquality", "lastassessment_yield"),
+    label = c("id", "variety", NA, NA),
+    class = c("character", "character", "numeric", "numeric"),
+    Dependent_Columns = c("count_all", "count_all", NA, NA),
+    Has_Dependants = c(TRUE, TRUE, NA, NA),
+    Is_Hidden = c(FALSE, FALSE, FALSE, FALSE),
+    Is_Key = c(TRUE, TRUE, FALSE, FALSE),
+    rankings_index = c(NA, NA, 2, 4),
+    Scientific = c(FALSE, FALSE, FALSE, FALSE),
+    Signif_Figures = c(NA, NA, 7, 7),
+    Tricot_Type = c("id", "variety", "traits", "traits")
+  )
+  
+  rankings_object <- list(
+    lastassessment_grainquality = c(
+      "CSW18 > PBW502 > HW2045", "CSW18 > HD2985 > PBW502",
+      "DBW17 > RAJ4120 > HW2045", "CSW18 > PBW343 > RAJ4120",
+      "PBW343 > HI1563 > HW2045", "K9107 > HD2824 > PBW502"
+    ),
+    lastassessment_yield = c(
+      "CSW18 > PBW502 > HW2045", "CSW18 > HD2985 > PBW502",
+      "DBW17 > RAJ4120 > HW2045", "CSW18 > PBW343 > RAJ4120",
+      "PBW343 > HI1563 > HW2045", "K9107 > HD2824 > PBW502"
+    )
+  )
+  
+  # Example 1: Get rankings for 'lastassessment_grainquality' and 'lastassessment_yield'
+  vars_to_get <- c("lastassessment_grainquality", "lastassessment_yield")
+  result1 <- get_ranking_items(data, vars_to_get, "rankings_index", rankings_object)
+
+  # Example 2: Get rankings for just 'lastassessment_grainquality'
+  vars_to_get2 <- c("lastassessment_grainquality")
+  result2 <- get_ranking_items(data, vars_to_get2, "rankings_index", rankings_object)
+
+  # Example 3: using the default data parameter.
+  get_index_names <- data # setting up get_index_names for example 3
+  rankings_index <- "rankings_index" # setting rankings_index for example 3
+  vars_to_get3 <- c("lastassessment_yield")
+  result3 <- get_ranking_items(vars_to_get = vars_to_get3, rankings_object = rankings_object)
+
+  testthat::expect_equal(result1, list(rankings_object$lastassessment_grainquality, rankings_object$lastassessment_yield))
+  testthat::expect_equal(result2, list(rankings_object$lastassessment_grainquality))
+  testthat::expect_equal(result3, list(rankings_object$lastassessment_yield))
+}
