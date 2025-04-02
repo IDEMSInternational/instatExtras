@@ -10,6 +10,7 @@
 #'
 #' @return A list containing the retrieved items from `rankings_object` corresponding to `vars_to_get`.
 #'
+#' @export
 #' @examples
 #' # Example data setup:
 #' data <- data.frame(

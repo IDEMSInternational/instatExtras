@@ -7,7 +7,7 @@
 get_ranking_items(
   data = get_index_names,
   vars_to_get,
-  index = rankings_index,
+  index = "rankings_index",
   rankings_object
 )
 }
