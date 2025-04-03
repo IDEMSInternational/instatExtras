@@ -35,6 +35,7 @@ Imports:
   Matrix,
   methods,
   PCICt,
+  PlackettLuce,
   plyr,
   pingr,
   purrr,
@@ -50,7 +51,6 @@ Imports:
 Suggests: 
     gosset,
     mockery,
-    PlackettLuce,
     rcorpora,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
