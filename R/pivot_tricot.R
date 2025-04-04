@@ -3,15 +3,24 @@
 #' This function transforms Tricot (Triadic Comparison of Technologies) data 
 #' into a tidy format, assigning ranks based on trait evaluations.
 #'
-#' @param data A data frame containing Tricot rankings and trait evaluations.
-#' @param id_var Character string specifying the ID column name. Default is `"id"`.
-#' @param option_cols A character vector of column names representing the options evaluated. 
-#'   Default is `c("option_a", "option_b", "option_c")`.
-#' @param possible_ranks A character vector specifying the possible rank values.
-#'   Default is `c("A", "B", "C")`.
-#' @param trait_good Character string indicating the suffix for positive traits. Default is `"_pos"`.
-#' @param trait_bad Character string indicating the suffix for negative traits. Default is `"_neg"`.
-#' @param na_value The value used to indicate missing observations. Default is `"Not observed"`.
+#' It supports input either as a single dataset (`data`) or as two datasets:
+#' one with trait-wise rankings (`data_id_variety_trait`) and one with option labels and traits.
+#'
+#' The function assumes a tricot setup where three options (e.g. crops, varieties) are ranked per trait.
+#' Rankings may be extracted from columns ending in a suffix such as `_pos` or `_neg`, or explicitly provided.
+#'
+#' @param data A data frame containing option columns and trait ranking indicators (e.g. columns ending in `_pos` or `_neg`).
+#' @param data_id_col The name of the ID column in `data`. Default is `"id"`.
+#' @param data_id_variety_trait A data frame containing ID, variety, trait, and rank columns.
+#' @param data_id_variety_trait_id_col The name of the ID column in `data_id_variety_trait`. Default is `"id"`.
+#' @param variety_col The name of the variety column in `data_id_variety_trait`.
+#' @param trait_col The name of the trait column in `data_id_variety_trait`.
+#' @param rank_col The name of the rank column in `data_id_variety_trait`.
+#' @param option_cols A character vector of column names in `data` that store the option labels (e.g. `"option_a"`, `"option_b"`, `"option_c"`).
+#' @param possible_ranks A character vector mapping to `option_cols`, indicating rank labels (e.g. `"A"`, `"B"`, `"C"`).
+#' @param trait_good A suffix string (e.g. `"_pos"`) used to identify columns in `data` where a variety is "preferred" for a trait. Default is `"_pos"`.
+#' @param trait_bad A suffix string (e.g. `"_neg"`) used to identify columns in `data` where a variety is "not preferred" for a trait. Default is `"_neg"`.
+#' @param na_value A value used to indicate when a trait was not observed or is missing. Default is `"Not observed"`.
 #'
 #' @return A tibble with the transformed Tricot data, containing columns:
 #'   - `id`: Identifier for each observation.
@@ -22,60 +31,151 @@
 #' @export
 #'
 #' @examples
+#' library(gosset)
 #' # Read in tricot data from the `gosset` library
-#' cassava_pivot <- pivot_tricot(gosset::cassava)
-pivot_tricot <- function(data,
-                         id_var = "id",
+#' cassava_pivot <- pivot_tricot(cassava)
+#' 
+#' # Example using nicabean data - if we have ID-Variety-Trait Level data
+#' data(nicabean)
+#' nicabean_by_id_item_trait <- nicabean$trial
+#' nicabean_by_id <- nicabean$covar 
+#' nicabean_by_id_variety <- pivot_tricot(data_id_variety_trait = nicabean_by_id_item_trait, # B
+#'                                        data_id_variety_trait_id_col = "id",
+#'                                        variety_col = "item",
+#'                                        trait_col = "trait",
+#'                                        rank_col = "rank")
+#' 
+#' # Example using breadwheat data - if we have just ID-Level data 
+#' data(breadwheat)
+#' breadwheat_by_id_variety <- pivot_tricot(data = breadwheat,
+#'                                          data_id_col = "participant_name",
+#'                                          option_cols = c("variety_a", "variety_b", "variety_c"),
+#'                                          trait_good = "best", trait_bad = "_worst")
+#' 
+#' # Example using nicabean data - if we have both data and data_id_variety_trait data
+#' nicabean_by_id$Vigor_pos = "A"
+#' nicabean_by_id$Vigor_neg = "C"
+#' nicabean_by_id_variety_2 <- pivot_tricot(data = nicabean_by_id,
+#'                                          data_id_col = "id",
+#'                                          option_cols = c("variety_a", "variety_b", "variety_c"),
+#'                                          data_id_variety_trait = nicabean_by_id_item_trait,
+#'                                          data_id_variety_trait_id_col = "id",
+#'                                          variety_col = "item",
+#'                                          trait_col = "trait",
+#'                                          rank_col = "rank")
+pivot_tricot <- function(data = NULL, data_id_col = "id", data_id_variety_trait = NULL,
+                         data_id_variety_trait_id_col = "id",
+                         variety_col = NULL,
+                         trait_col = NULL, rank_col = NULL,
                          option_cols = c("option_a", "option_b", "option_c"),
-                         possible_ranks = c("A", "B", "C"),
-                         trait_good = "_pos",
-                         trait_bad = "_neg",
-                         na_value = "Not observed"){
+                         possible_ranks = c("A", "B", "C"), trait_good = "_pos", 
+                         trait_bad = "_neg", na_value = "Not observed") {
   
-  label_map <- stats::setNames(option_cols, possible_ranks)
+  # Input checks
+  if (is.null(data) & is.null(data_id_variety_trait)) {
+    stop("At least one of `data` or `data_id_variety_trait` must be provided.")
+  }
   
-  data_options <- data %>%
-    dplyr::mutate(id = data[[id_var]]) %>%
-    tidyr::pivot_longer(cols = dplyr::all_of(option_cols),
-                        names_to = "Label", values_to = "variable") %>%
-    dplyr::mutate(Label = forcats::fct_recode(Label, !!!label_map))
+  if (!is.null(data) & is.null(data_id_col)) {
+    stop("If `data` is provided, `data_id_col` must also be specified.")
+  }
   
-  data_options_id <- data_options %>%
-    dplyr::select(c(id, variety = Label, variable)) %>%
-    unique()
+  if (!is.null(data_id_variety_trait)) {
+    if (is.null(data_id_variety_trait_id_col) | is.null(variety_col) | is.null(trait_col) | is.null(rank_col)) {
+      stop("If `data_id_variety_trait` is provided, then `data_id_variety_trait_id_col`, `variety_col`, `trait_col`, and `rank_col` must also be provided.")
+    }
+  }
   
-  data_options <- data_options %>%
-    tidyr::pivot_longer(cols = dplyr::all_of(c(dplyr::ends_with(trait_good),
-                                               dplyr::ends_with(trait_bad))),
-                        names_to = "trait",
-                        values_to = "variety") %>%
-    dplyr::select(c(id, trait, variety)) %>%
-    dplyr::mutate(rank = ifelse(grepl(trait_good, trait), 1, 3)) %>%
-    dplyr::mutate(trait = sub("(_[^_]*)$", "", trait)) %>%
-    dplyr::filter(!is.na(variety)) %>%
-    dplyr::group_by(id, trait) %>%
-    dplyr::mutate(variety = if (dplyr::n_distinct(variety) == 1) NA else variety) %>%
-    dplyr::filter(!is.na(variety)) %>%
-    dplyr::ungroup() %>%
-    unique()
+  # Handle data_id_variety_trait if relevant columns are given
+  if (!is.null(variety_col) & !is.null(trait_col) & !is.null(rank_col)) {
+    if (is.null(data_id_variety_trait)) data_id_variety_trait <- data
+    
+    data_options_a <- data_id_variety_trait %>%
+      tidyr::pivot_wider(names_from = dplyr::all_of(trait_col),
+                         values_from = dplyr::all_of(rank_col))
+    
+    lookup <- c(id = data_id_variety_trait_id_col, variety = variety_col)
+    data_options_a <- dplyr::rename(data_options_a, dplyr::all_of(lookup))
+  }
   
-  rank_2 <- data_options %>%
-    dplyr::group_by(id, trait) %>%
-    dplyr::filter(variety != na_value) %>%
-    dplyr::count() %>%
-    dplyr::mutate(rank = 2) %>%
-    dplyr::filter(n == 2)
+  # Handle data
+  if (!is.null(data)) {
+    matching_cols <- data %>% dplyr::select(dplyr::ends_with(trait_good), dplyr::ends_with(trait_bad))
+    
+    if (ncol(matching_cols) > 0) {
+      label_map <- stats::setNames(option_cols, possible_ranks)
+      
+      data_options <- data %>%
+        dplyr::mutate(id = data[[data_id_col]]) %>% 
+        tidyr::pivot_longer(cols = dplyr::all_of(option_cols), names_to = "Label", values_to = "variable") %>% 
+        dplyr::mutate(Label = forcats::fct_recode(Label, !!!label_map))
+      
+      data_options_id <- data_options %>%
+        dplyr::select(c(id, variety = Label, variable)) %>%
+        unique()
+      
+      data_options <- data %>%
+        dplyr::mutate(id = data[[data_id_col]]) %>%
+        tidyr::pivot_longer(cols = dplyr::all_of(c(dplyr::ends_with(trait_good), 
+                                                   dplyr::ends_with(trait_bad))),
+                            names_to = "trait", values_to = "variety") %>%
+        dplyr::select(c(id, trait, variety)) %>%
+        dplyr::mutate(rank = ifelse(grepl(trait_good, trait), 1, 3)) %>%
+        dplyr::mutate(trait = sub("(_[^_]*)$", "", trait)) %>%
+        dplyr::filter(!is.na(variety)) %>%
+        dplyr::group_by(id, trait) %>%
+        dplyr::mutate(variety = if (dplyr::n_distinct(variety) == 1) NA else variety) %>%
+        dplyr::filter(!is.na(variety)) %>%
+        dplyr::ungroup() %>%
+        unique()
+      
+      rank_2 <- data_options %>%
+        dplyr::group_by(id, trait) %>%
+        dplyr::filter(variety != na_value) %>%
+        dplyr::count() %>%
+        dplyr::mutate(rank = 2) %>%
+        dplyr::filter(n == 2)
+      
+      data_options_b <- data_options %>%
+        dplyr::full_join(rank_2) %>%
+        dplyr::group_by(id, trait) %>%
+        dplyr::mutate(variety = ifelse(is.na(variety), setdiff(possible_ranks, variety)[1], variety)) %>%
+        dplyr::ungroup() %>%
+        dplyr::arrange(id, trait) %>%
+        dplyr::full_join(data_options_id) %>%
+        dplyr::select(c(id, trait, rank, variety = variable)) %>%
+        tidyr::pivot_wider(names_from = trait, values_from = rank) %>%
+        dplyr::filter(!is.na(variety))
+    } else {
+      stop(paste0("No columns ending with ", trait_good, " or ", trait_bad, " found in `data`."))
+    }
+  }
   
-  data_options <- data_options %>%
-    dplyr::full_join(rank_2) %>%
-    dplyr::group_by(id, trait) %>%
-    dplyr::mutate(variety = ifelse(is.na(variety), setdiff(possible_ranks, variety)[1], variety)) %>%
-    dplyr::ungroup() %>%
-    dplyr::arrange(id, trait) %>%
-    dplyr::full_join(data_options_id) %>%
-    dplyr::select(c(id, trait, rank, variety = variable)) %>%
-    tidyr::pivot_wider(names_from = trait, values_from = rank) %>%
-    dplyr::filter(!is.na(variety))
+  # Combine if both datasets are available
+  if (!is.null(data) & !is.null(data_id_variety_trait)) {
+    message("Using both `data` and `data_id_variety_trait`")
+    if (!exists("data_options_a") | !exists("data_options_b")) stop("Missing intermediate objects `data_options_a` or `data_options_b`")
+    
+    data_options <- dplyr::full_join(data_options_a, data_options_b)
+    
+    if (nrow(data_options_a) == nrow(data_options_b)) {
+      if (nrow(data_options) != nrow(data_options_a)) {
+        IDs_to_check <- data_options %>%
+          dplyr::group_by(id) %>%
+          dplyr::count() %>%
+          dplyr::filter(n > 3) %>%
+          dplyr::pull(id)
+        warning("Using both data frames has caused repeats in trait columns.\nSome traits in `data` differ from `data_id_variety_trait` for the same ID and variety combination.\nCheck IDs: ",
+                paste0(IDs_to_check, collapse = ", "))
+      }
+    }
+  } else if (!is.null(data)) {
+    if (!exists("data_options_b")) stop("`data_options_b` was not created. Check your `data` inputs.")
+    data_options <- data_options_b
+  } else {
+    if (!exists("data_options_a")) stop("`data_options_a` was not created. Check your `data_id_variety_trait` inputs.")
+    data_options <- data_options_a
+  }
   
   return(data_options)
 }
