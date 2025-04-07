@@ -100,6 +100,7 @@ test_that("package_check handles different package states correctly", {
   expect_equal(result[[1]], "5")
 })
 
+library(gosset)
 test_that("pivot_tricot works as expected", {
   data(nicabean)
   nicabean_by_id_item_trait <- nicabean$trial # D
