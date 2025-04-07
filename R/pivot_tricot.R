@@ -88,8 +88,7 @@ pivot_tricot <- function(data = NULL, data_id_col = "id", data_id_variety_trait 
   
   # Handle data_id_variety_trait if relevant columns are given
   if (!is.null(variety_col) & !is.null(trait_col) & !is.null(rank_col)) {
-    if (is.null(data_id_variety_trait)) data_id_variety_trait <- data
-    
+
     data_options_a <- data_id_variety_trait %>%
       tidyr::pivot_wider(names_from = dplyr::all_of(trait_col),
                          values_from = dplyr::all_of(rank_col))
@@ -154,7 +153,6 @@ pivot_tricot <- function(data = NULL, data_id_col = "id", data_id_variety_trait 
   # Combine if both datasets are available
   if (!is.null(data) & !is.null(data_id_variety_trait)) {
     message("Using both `data` and `data_id_variety_trait`")
-    if (!exists("data_options_a") | !exists("data_options_b")) stop("Missing intermediate objects `data_options_a` or `data_options_b`")
     
     data_options <- dplyr::full_join(data_options_a, data_options_b)
     
@@ -170,10 +168,8 @@ pivot_tricot <- function(data = NULL, data_id_col = "id", data_id_variety_trait 
       }
     }
   } else if (!is.null(data)) {
-    if (!exists("data_options_b")) stop("`data_options_b` was not created. Check your `data` inputs.")
     data_options <- data_options_b
   } else {
-    if (!exists("data_options_a")) stop("`data_options_a` was not created. Check your `data_id_variety_trait` inputs.")
     data_options <- data_options_a
   }
   
