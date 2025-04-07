@@ -101,7 +101,6 @@ test_that("package_check handles different package states correctly", {
 })
 
 test_that("pivot_tricot works as expected", {
-  library(gosset)
   data(nicabean)
   nicabean_by_id_item_trait <- nicabean$trial # D
   nicabean_by_id <- nicabean$covar # A 
@@ -124,6 +123,12 @@ test_that("pivot_tricot works as expected", {
                               trait_col = "trait",
                               rank_col = "rank"))
   
+  expect_error(pivot_tricot(data = nicabean_by_id_item_trait,
+                              data_id_variety_trait_id_col = "id",
+                              variety_col = "item",
+                              trait_col = "trait",
+                              rank_col = "rank"))
+  
   data(breadwheat)
   nicabean_by_id_variety_3 <- pivot_tricot(data = breadwheat,
                                            data_id_col = "participant_name",
@@ -132,3 +137,18 @@ test_that("pivot_tricot works as expected", {
   expect_true("id" %in% names(nicabean_by_id_variety_3))
   expect_true("variety" %in% names(nicabean_by_id_variety_3))
 })
+
+test_that("pivot_tricot works as expected", {
+  data(breadwheat)
+  
+  expect_error(pivot_tricot())
+  expect_error(pivot_tricot(data = breadwheat))
+  expect_error(pivot_tricot(data_id_variety_trait = breadwheat))
+  
+})
+
+
+
+
+
+
