@@ -27,7 +27,7 @@ summarise_data_levels <- function(data_list, id_cols = c("id", "participant_id",
                                   trait_cols = c("trait", "traits")) {
   purrr::map_dfr(names(data_list), function(name) {
     res <- find_data_level(data_list[[name]], id_cols = id_cols, variety_cols = variety_cols, trait_cols = trait_cols)
-    tibble::tibble(
+    dplyr::tibble(
       dataset = name,
       level = res$level,
       id_col = res$id_col %||% NA,

@@ -40,7 +40,7 @@ detect_tricot_structure <- function(data,
     
     if (length(matched_suffix) == 1) {
       values <- unique(na.omit(as.character(data[[col]])))
-      tibble::tibble(
+      dplyr::tibble(
         column = col,
         suffix = matched_suffix,
         values = list(values)
@@ -55,7 +55,7 @@ detect_tricot_structure <- function(data,
     
     if (length(matched_suffix) == 1) {
       values <- unique(na.omit(as.character(data[[col]])))
-      tibble::tibble(
+      dplyr::tibble(
         column = col,
         suffix = matched_suffix,
         values = list(values)
