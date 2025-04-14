@@ -46,3 +46,21 @@ test_that("duplicated_cases handles NA values correctly", {
   result <- duplicated_cases(col_name, tolerance = 0.01)
   expect_equal(result, c(1, NA, 1, 1, 1, NA, 1))
 })
+
+# detect_tricot_structure
+test_that("detect_tricot_structure finds option, trait, and rank structure", {
+  df <- tibble::tibble(
+    id = 1:3,
+    option_a = c("x", "y", "z"),
+    option_b = c("x", "y", "z"),
+    colour_pos = c("A", "B", "C"),
+    taste_neg = c("C", "B", "Not observed")
+  )
+  
+  res <- detect_tricot_structure(df)
+  
+  expect_equal(res$option_cols, c("option_a", "option_b"))
+  expect_true("_pos" %in% res$trait_good_cols)
+  expect_true("_neg" %in% res$trait_bad_cols)
+  expect_equal(sort(res$ranks), c("A", "B", "C"))
+})
