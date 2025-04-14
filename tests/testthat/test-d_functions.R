@@ -49,7 +49,7 @@ test_that("duplicated_cases handles NA values correctly", {
 
 # detect_tricot_structure
 test_that("detect_tricot_structure finds option, trait, and rank structure", {
-  df <- tibble::tibble(
+  df <- dplyr::tibble(
     id = 1:3,
     option_a = c("x", "y", "z"),
     option_b = c("x", "y", "z"),
