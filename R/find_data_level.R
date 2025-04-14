@@ -74,7 +74,7 @@ find_data_level <- function(data,
   
   results <- purrr::map(marker_combinations, function(cols) {
     grouped <- data_renamed %>% dplyr::distinct(dplyr::across(dplyr::all_of(cols)))
-    tibble::tibble(
+    dplyr::tibble(
       level = paste(cols, collapse = "-"),
       is_unique = nrow(grouped) == nrow(data_renamed)
     )
