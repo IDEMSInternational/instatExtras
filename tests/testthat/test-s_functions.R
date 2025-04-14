@@ -130,10 +130,15 @@ test_that("slopegraph converts factor x to ordered", {
 
 # summarise_data_levels
 test_that("summarise_data_levels summarises multiple datasets", {
-  df1 <- tibble::tibble(ID = 1:3, item = letters[1:3], trait = rep("height", 3))
-  df2 <- tibble::tibble(id = 1:5)
+  df1 <- dplyr::tibble(ID = 1:3, item = letters[1:3], trait = rep("height", 3))
+  df2 <- dplyr::tibble(id = 1:5)
   summary <- summarise_data_levels(list(one = df1, two = df2))
   expect_equal(nrow(summary), 2)
   expect_true(all(c("level", "id_col", "variety_col") %in% names(summary)))
 })
 
+test_that("summarise_data_levels throws 0 in print if all non-marker varibales", {
+  summary <- summarise_data_levels(list(one = mtcars, two = mtcars))
+  expect_equal(nrow(summary), 2)
+  expect_true(summary$print[1] == "Tricot Data not found.")
+})

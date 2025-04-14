@@ -1,6 +1,6 @@
 
 test_that("find_data_level works with full ID-Variety-Trait structure", {
-  df <- tibble::tibble(
+  df <- dplyr::tibble(
     ID = rep(1:3, each = 2),
     item = rep(c("A", "B"), 3),
     trait = c("height", "height", "yield", "yield", "height", "height"),
@@ -13,7 +13,7 @@ test_that("find_data_level works with full ID-Variety-Trait structure", {
 })
 
 test_that("find_data_level falls back to id level", {
-  df <- tibble::tibble(id = 1:5)
+  df <- dplyr::tibble(id = 1:5)
   res <- find_data_level(df)
   expect_equal(res$level, "id")
   expect_equal(res$id_col, "id")
@@ -22,7 +22,7 @@ test_that("find_data_level falls back to id level", {
 })
 
 test_that("find_data_level handles duplicate columns (chooses unique)", {
-  df <- tibble::tibble(
+  df <- dplyr::tibble(
     participant_id = 1:5,
     ID = c(1, 1, 2, 2, 3)  # not unique
   )
@@ -31,7 +31,7 @@ test_that("find_data_level handles duplicate columns (chooses unique)", {
 })
 
 test_that("find_data_level handles no matching columns", {
-  df <- tibble::tibble(x = 1:5)
+  df <- dplyr::tibble(x = 1:5)
   res <- find_data_level(df)
   expect_equal(res$level, "No marker columns found.")
   expect_true(is.null(res$id_col))
