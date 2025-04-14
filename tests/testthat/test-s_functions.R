@@ -137,3 +137,8 @@ test_that("summarise_data_levels summarises multiple datasets", {
   expect_true(all(c("level", "id_col", "variety_col") %in% names(summary)))
 })
 
+test_that("summarise_data_levels throws 0 in print if all non-marker varibales", {
+  summary <- summarise_data_levels(list(one = mtcars, two = mtcars))
+  expect_equal(nrow(summary), 2)
+  expect_true(summary$print[1] == "Tricot Data not found.")
+})
