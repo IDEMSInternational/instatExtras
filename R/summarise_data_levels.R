@@ -25,7 +25,7 @@
 summarise_data_levels <- function(data_list, id_cols = c("id", "participant_id", "participant_name", "ID"),
                                   variety_cols = c("variety", "varieties", "item", "items", "Genotype", "genotype"),
                                   trait_cols = c("trait", "traits")) {
-  purrr::map_dfr(names(data_list), function(name) {
+  output_data_levels <- purrr::map_dfr(names(data_list), function(name) {
     res <- find_data_level(data_list[[name]], id_cols = id_cols, variety_cols = variety_cols, trait_cols = trait_cols)
     dplyr::tibble(
       dataset = name,
@@ -35,4 +35,10 @@ summarise_data_levels <- function(data_list, id_cols = c("id", "participant_id",
       trait_col = res$trait_col %||% NA,
     )
   })
+  if (all(output_data_levels$level == "No marker columns found.")){
+    output_data_levels$print <- "Tricot Data not found."
+  } else {
+    output_data_levels$print <- paste0(output_data_levels$dataset, " level: ", output_data_levels$level, collapse = "; ")
+  }
+  return(output_data_levels)
 }
