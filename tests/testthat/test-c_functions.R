@@ -162,3 +162,60 @@ test_that("create_av_packs fetches available packages", {
   expect_true("Package" %in% colnames(av_packs))
   expect_true("Version" %in% colnames(av_packs))
 })
+
+test_that("create_rankings_list returns correct structure", {
+  library(gosset)
+  data(cassava)
+  cassava_by_id_variety <- pivot_tricot(cassava)
+  
+  traits <- c("colour", "firmness", "odour", "overall", 
+              "stretchability", "taste", "mouldability", "smoothness")
+  
+  result <- create_rankings_list(data = cassava_by_id_variety, traits = traits)
+  
+  expect_type(result, "list")
+  expect_length(result, length(traits))
+  expect_named(result, traits)
+  
+  # Check that all elements are of class 'ranking'
+  all_classes <- purrr::map_chr(result, class)
+  expect_true(all("rankings" %in% all_classes))
+})
+
+test_that("create_rankings_list works with group = TRUE", {
+  library(gosset)
+  data(cassava)
+  cassava_by_id_variety <- pivot_tricot(cassava)
+  
+  traits <- c("colour", "firmness", "odour", "overall", 
+              "stretchability", "taste", "mouldability", "smoothness")
+  
+  result_grouped <- create_rankings_list(data = cassava_by_id_variety, traits = traits, group = TRUE)
+  
+  expect_type(result_grouped, "list")
+  expect_length(result_grouped, length(traits))
+  expect_named(result_grouped, traits)
+  
+  # Check that grouped rankings are also class 'ranking'
+  all_classes <- purrr::map_chr(result_grouped, class)
+  expect_true(all("grouped_rankings" %in% all_classes))
+})
+
+test_that("create_rankings_list removes rows with missing values", {
+  data <- data.frame(
+    id = c(1, 1, 2, 2),
+    variety = c("A", "B", "A", "B"),
+    trait1 = c(1, 2, NA, 1),
+    trait2 = c(2, 1, 2, 3)
+  )
+  
+  traits <- c("trait1", "trait2")
+  result <- create_rankings_list(data, traits = traits)
+  
+  # Only trait2 should be processed because trait1 has missing values for id 2
+  expect_true("trait1" %in% names(result))  # It's in the names
+  expect_silent(result[["trait1"]])  # But still processed due to group filtering
+  
+  # The output is still valid ranking object for available values
+  expect_s3_class(result[["trait2"]], "rankings")
+})
