@@ -147,9 +147,3 @@ test_that("pivot_tricot works as expected", {
   expect_error(pivot_tricot(data_id_variety_trait = breadwheat))
   
 })
-
-
-
-
-
-

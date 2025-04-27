@@ -24,9 +24,10 @@
 #'
 #' @return A tibble with the transformed Tricot data, containing columns:
 #'   - `id`: Identifier for each observation.
-#'   - `trait`: Trait being evaluated.
+#'   - `dummy_variety`: (Optional). The dummy variable that variety is associated to.
 #'   - `rank`: The rank assigned to each variety.
 #'   - `variety`: The variety name.
+#'   - And a set of trait variables
 #'
 #' @export
 #'
@@ -101,18 +102,18 @@ pivot_tricot <- function(data = NULL, data_id_col = "id", data_id_variety_trait 
   if (!is.null(data)) {
     matching_cols <- data %>% dplyr::select(dplyr::ends_with(trait_good), dplyr::ends_with(trait_bad))
     
+    label_map <- stats::setNames(option_cols, possible_ranks)
+    
+    data_options <- data %>%
+      dplyr::mutate(id = data[[data_id_col]]) %>% 
+      tidyr::pivot_longer(cols = dplyr::all_of(option_cols), names_to = "Label", values_to = "variable") %>% 
+      dplyr::mutate(Label = forcats::fct_recode(Label, !!!label_map))
+    
+    data_options_id <- data_options %>%
+      dplyr::select(c(id, variety = Label, variable)) %>%
+      unique()
+    
     if (ncol(matching_cols) > 0) {
-      label_map <- stats::setNames(option_cols, possible_ranks)
-      
-      data_options <- data %>%
-        dplyr::mutate(id = data[[data_id_col]]) %>% 
-        tidyr::pivot_longer(cols = dplyr::all_of(option_cols), names_to = "Label", values_to = "variable") %>% 
-        dplyr::mutate(Label = forcats::fct_recode(Label, !!!label_map))
-      
-      data_options_id <- data_options %>%
-        dplyr::select(c(id, variety = Label, variable)) %>%
-        unique()
-      
       data_options <- data %>%
         dplyr::mutate(id = data[[data_id_col]]) %>%
         tidyr::pivot_longer(cols = dplyr::all_of(c(dplyr::ends_with(trait_good), 
@@ -142,16 +143,22 @@ pivot_tricot <- function(data = NULL, data_id_col = "id", data_id_variety_trait 
         dplyr::ungroup() %>%
         dplyr::arrange(id, trait) %>%
         dplyr::full_join(data_options_id) %>%
-        dplyr::select(c(id, trait, rank, variety = variable)) %>%
+        dplyr::select(c(id, trait, rank, dummy_variety = variety, variety = variable)) %>%
         tidyr::pivot_wider(names_from = trait, values_from = rank) %>%
         dplyr::filter(!is.na(variety))
     } else {
-      stop(paste0("No columns ending with ", trait_good, " or ", trait_bad, " found in `data`."))
+      if (!is.null(data_id_variety_trait)){
+        data_options_id <- data_options_id %>%
+          dplyr::select(c(id, dummy_variety = variety, variable))
+        data_options_a <- dplyr::full_join(data_options_a, data_options_id, by = c("id" = "id", "variety" = "variable"))
+      } else {
+        stop(paste0("No columns ending with ", trait_good, " or ", trait_bad, " found in `data`."))
+      }
     }
   }
   
   # Combine if both datasets are available
-  if (!is.null(data) & !is.null(data_id_variety_trait)) {
+  if ((!is.null(data) & !is.null(data_id_variety_trait)) && ncol(matching_cols) > 0) {
     message("Using both `data` and `data_id_variety_trait`")
     
     data_options <- dplyr::full_join(data_options_a, data_options_b)
@@ -167,10 +174,10 @@ pivot_tricot <- function(data = NULL, data_id_col = "id", data_id_variety_trait 
                 paste0(IDs_to_check, collapse = ", "))
       }
     }
-  } else if (!is.null(data)) {
-    data_options <- data_options_b
-  } else {
+  } else if (!is.null(data_id_variety_trait)) {
     data_options <- data_options_a
+  } else {
+    data_options <- data_options_b
   }
   
   return(data_options)
