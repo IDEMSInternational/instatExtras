@@ -48,9 +48,10 @@ pivot_tricot(
 A tibble with the transformed Tricot data, containing columns:
 \itemize{
 \item \code{id}: Identifier for each observation.
-\item \code{trait}: Trait being evaluated.
+\item \code{dummy_variety}: (Optional). The dummy variable that variety is associated to.
 \item \code{rank}: The rank assigned to each variety.
 \item \code{variety}: The variety name.
+\item And a set of trait variables
 }
 }
 \description{
