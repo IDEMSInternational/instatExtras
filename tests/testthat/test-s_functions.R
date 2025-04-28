@@ -142,3 +142,12 @@ test_that("summarise_data_levels throws 0 in print if all non-marker varibales",
   expect_equal(nrow(summary), 2)
   expect_true(summary$print[1] == "Tricot Data not found.")
 })
+
+
+test_that("summarise_data_levels gives the same output if a string is given vs a data frame", {
+  one <- mtcars
+  two <- mtcars
+  summary1 <- summarise_data_levels(list(one = mtcars, two = mtcars))
+  summary2 <- summarise_data_levels(c("one", "two"))
+  expect_equal(summary1, summary2)
+})
