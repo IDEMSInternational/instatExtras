@@ -38,4 +38,6 @@ data1 <- data.frame(id = 1:3)
 data2 <- data.frame(id = 1:3, variety = letters[1:3])
 summarise_data_levels(list(data1 = data1, data2 = data2))
 
+# or you can give a character vector
+summarise_data_levels(data_list = c("data1", "data2"))
 }
