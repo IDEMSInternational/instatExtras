@@ -20,16 +20,14 @@
 #' data1 <- data.frame(id = 1:3)
 #' data2 <- data.frame(id = 1:3, variety = letters[1:3])
 #' summarise_data_levels(list(data1 = data1, data2 = data2))
-#'
-#' # or you can give a character vector
-#' summarise_data_levels(data_list = c("data1", "data2"))
+#' 
 #' @export
 summarise_data_levels <- function(data_list, id_cols = c("id", "participant_id", "participant_name", "ID"),
                                   variety_cols = c("variety", "varieties", "item", "items", "Genotype", "genotype"),
                                   trait_cols = c("trait", "traits")) {
   # If data_list is a character vector, get the datasets from the environment
-  if (is.character(data_list)) {
-    data_list <- setNames(lapply(data_list, function(x) get(x, envir = .GlobalEnv)), data_list)
+  if (is.character(data_list) & exists("data_book", inherits = TRUE)) {
+    data_list <- setNames(lapply(data_list, function(x) data_book$get_data_frame(x)), data_list)
   }
   
   output_data_levels <- purrr::map_dfr(names(data_list), function(name) {
