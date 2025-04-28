@@ -145,9 +145,7 @@ test_that("summarise_data_levels throws 0 in print if all non-marker varibales",
 
 
 test_that("summarise_data_levels gives the same output if a string is given vs a data frame", {
-  one <- mtcars
-  two <- mtcars
-  summary1 <- summarise_data_levels(list(one = mtcars, two = mtcars))
-  summary2 <- summarise_data_levels(c("one", "two"))
+  summary1 <- summarise_data_levels(list(mtcars = mtcars))
+  summary2 <- summarise_data_levels(c("mtcars"))
   expect_equal(summary1, summary2)
 })
