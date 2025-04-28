@@ -20,7 +20,6 @@
 #' data1 <- data.frame(id = 1:3)
 #' data2 <- data.frame(id = 1:3, variety = letters[1:3])
 #' summarise_data_levels(list(data1 = data1, data2 = data2))
-#' 
 #' @export
 summarise_data_levels <- function(data_list, id_cols = c("id", "participant_id", "participant_name", "ID"),
                                   variety_cols = c("variety", "varieties", "item", "items", "Genotype", "genotype"),
