@@ -249,5 +249,5 @@ test_that("check_data_levels summarises normally when valid", {
   data_good <- data.frame(id = 1:3, variety = c("A", "B", "C"))
   levels_good <- summarise_data_levels(list(data1 = data_good))
   
-  expect_equal(check_data_levels(levels_good), "3")
+  expect_equal(check_data_levels(levels_good), "data1 level: id")
 })
