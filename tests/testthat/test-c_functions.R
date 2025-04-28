@@ -219,3 +219,35 @@ test_that("create_rankings_list removes rows with missing values", {
   # The output is still valid ranking object for available values
   expect_s3_class(result[["trait2"]], "rankings")
 })
+
+test_that("check_data_levels handles missing ID correctly", {
+  data_no_id <- data.frame(variety = c("A", "B", "C"))
+  levels_no_id <- summarise_data_levels(list(data1 = data_no_id))
+  
+  expect_equal(check_data_levels(levels_no_id), "0")
+})
+
+test_that("check_data_levels detects duplicate levels", {
+  data_id1 <- data.frame(id = 1:3)
+  data_id2 <- data.frame(id = 4:6)
+  levels_duplicate_id <- summarise_data_levels(list(data1 = data_id1, data2 = data_id2))
+  levels_duplicate_id$level[1] <- "id"
+  levels_duplicate_id$level[2] <- "id" # manually duplicate
+  
+  expect_equal(check_data_levels(levels_duplicate_id), "1")
+})
+
+test_that("check_data_levels detects missing Tricot data", {
+  data_empty <- data.frame(x = 1:3)
+  levels_no_marker <- summarise_data_levels(list(data1 = data_empty))
+  levels_no_marker$level <- "No marker columns found."
+  
+  expect_equal(check_data_levels(levels_no_marker), "2")
+})
+
+test_that("check_data_levels summarises normally when valid", {
+  data_good <- data.frame(id = 1:3, variety = c("A", "B", "C"))
+  levels_good <- summarise_data_levels(list(data1 = data_good))
+  
+  expect_equal(check_data_levels(levels_good), "3")
+})
