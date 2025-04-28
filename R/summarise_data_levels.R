@@ -26,8 +26,13 @@ summarise_data_levels <- function(data_list, id_cols = c("id", "participant_id",
                                   variety_cols = c("variety", "varieties", "item", "items", "Genotype", "genotype"),
                                   trait_cols = c("trait", "traits")) {
   # If data_list is a character vector, get the datasets from the environment
-  if (is.character(data_list) & exists("data_book", inherits = TRUE)) {
-    data_list <- setNames(lapply(data_list, function(x) data_book$get_data_frame(x)), data_list)
+  if (is.character(data_list)){
+    if (exists("data_book", inherits = TRUE)) {
+      data_list <- setNames(lapply(data_list, function(x) data_book$get_data_frame(x)), data_list)
+      if (length(data_list) == 0 || all(sapply(data_list, nrow) == 0)) stop("Try giving data_list as variable not string.")
+    } else {
+      stop("Give data_list as variable not string.")
+    }
   }
   
   output_data_levels <- purrr::map_dfr(names(data_list), function(name) {
