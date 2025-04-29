@@ -155,6 +155,7 @@ view_graph_object <- function(graph_object){
     #as of 07/09/2022 just return the object. Important for RStudio to display the object
     #for grob objects draw them first
     if ("grob" %in% object_class_names) grid::grid.draw(graph_object)
+    else if ("patchwork" %in% object_class_names) patchwork::wrap_plots(graph_object)
     return(graph_object)
   }
   
@@ -164,6 +165,7 @@ view_graph_object <- function(graph_object){
   #save the object as a graph file depending on the object type
   grDevices::png(file = file_name, width = 4000, height = 4000, res = 500)
   if ("grob" %in% object_class_names) grid::grid.draw(graph_object)
+  else if ("patchwork" %in% object_class_names) patchwork::wrap_plots(graph_object)
   else print(graph_object)
   grDevices::dev.off() #todo. use graphics.off() which one is better?
   
@@ -588,7 +590,10 @@ check_github_repo <- function(owner = NULL, repo = NULL, url = NULL) {
     repo <- basename(url)
   }
   if (requireNamespace(repo, quietly = TRUE)) {
+    print("a")
+    print(utils::packageDescription(repo))
     local_sha <- utils::packageDescription(repo)$GithubSHA1
+    print(local_sha)
     if (!is.null(local_sha)) {
       latest_commit <- tryCatch({
         response <- gh::gh("/repos/:owner/:repo/commits", owner = owner, repo = repo, .limit = 1)
@@ -596,6 +601,7 @@ check_github_repo <- function(owner = NULL, repo = NULL, url = NULL) {
       }, error = function(e) {
         return(NULL)
       })
+      print(latest_commit)
       if (!is.null(latest_commit)) {
         if (local_sha == latest_commit) return(0)
         else return(1)
