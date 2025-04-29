@@ -40,3 +40,19 @@ test_that("getHelpFile throws an error for invalid file argument", {
   expect_error(getHelpFile("nonexistent/path/to/helpfile"), 
                "invalid 'file' argument")
 })
+
+test_that("error if vars_to_get not in rankings_object", {
+  # Fake data
+  data <- data.frame(Name = c("var1", "var2", "var3"))
+  
+  # rankings_object missing one variable
+  rankings_object <- list(var1 = 1:5, var2 = 6:10)
+  
+  # vars_to_get includes a variable that doesn't exist in rankings_object
+  vars_to_get <- c("var1", "var2", "var3")  # var3 missing in rankings_object
+  
+  expect_error(
+    get_ranking_items(data = data, vars_to_get = vars_to_get, index = "rankings_index", rankings_object = rankings_object),
+    regexp = "Some vars_to_get are not in the rankings_object: var3"
+  )
+})
