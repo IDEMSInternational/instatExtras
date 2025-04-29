@@ -155,7 +155,7 @@ view_graph_object <- function(graph_object){
     #as of 07/09/2022 just return the object. Important for RStudio to display the object
     #for grob objects draw them first
     if ("grob" %in% object_class_names) grid::grid.draw(graph_object)
-    else if ("patchwork" %in% object_class_names) patchwork::wrap_plots(graph_object)
+    else if ("patchwork" %in% object_class_names) print(patchwork::wrap_plots(graph_object))
     return(graph_object)
   }
   
@@ -165,7 +165,7 @@ view_graph_object <- function(graph_object){
   #save the object as a graph file depending on the object type
   grDevices::png(file = file_name, width = 4000, height = 4000, res = 500)
   if ("grob" %in% object_class_names) grid::grid.draw(graph_object)
-  else if ("patchwork" %in% object_class_names) patchwork::wrap_plots(graph_object)
+  else if ("patchwork" %in% object_class_names) print(patchwork::wrap_plots(graph_object))
   else print(graph_object)
   grDevices::dev.off() #todo. use graphics.off() which one is better?
   
