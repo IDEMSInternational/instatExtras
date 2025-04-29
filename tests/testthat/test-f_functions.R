@@ -36,3 +36,32 @@ test_that("find_data_level handles no matching columns", {
   expect_equal(res$level, "No marker columns found.")
   expect_true(is.null(res$id_col))
 })
+
+test_that("message when no unique column among possible matches", {
+  df <- data.frame(
+    id = c(1, 1, 2, 2),
+    participant_id = c(1, 1, 2, 2),
+    item = c("A", "B", "A", "B"),
+    trait = c("height", "height", "weight", "weight")
+  )
+  
+  expect_message(
+    find_data_level(df, id_cols = c("id", "participant_id")),
+    regexp = "No unique column among possible matches for 'id'. Ignoring this marker type."
+  )
+})
+
+test_that("returns correct level when no combination uniquely identifies", {
+  df <- data.frame(
+    id = c(1, 1, 2, 2),
+    item = c("A", "A", "A", "A"),
+    trait = c("height", "height", "height", "height")
+  )
+  
+  result <- find_data_level(df)
+  
+  expect_equal(
+    result$level,
+    "No combination of markers uniquely identifies the data rows."
+  )
+})

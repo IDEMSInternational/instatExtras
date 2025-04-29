@@ -162,3 +162,22 @@ test_that("pivot_tricot adds new variable", {
                                          rank_col = "rank")
   expect_true("dummy_variety" %in% names(nicabean_by_id_variety))
 })
+
+test_that("error if data is provided but data_id_col is NULL", {
+  fake_data <- data.frame(option_a = c("A", "B"), option_b = c("B", "C"), option_c = c("C", "A"))
+  
+  expect_error(
+    pivot_tricot(data = fake_data, data_id_col = NULL),
+    regexp = "If `data` is provided, `data_id_col` must also be specified."
+  )
+})
+
+test_that("error if no columns ending with trait_good or trait_bad found in data", {
+  fake_data <- data.frame(id = 1:2, option_a = c("A", "B"), option_b = c("B", "C"), option_c = c("C", "A"))
+  
+  # Here, we'll set trait_good and trait_bad to something impossible to match
+  expect_error(
+    pivot_tricot(data = fake_data, data_id_col = "id", trait_good = "_positive", trait_bad = "_negative"),
+    regexp = "No columns ending with _positive or _negative found in `data`."
+  )
+})
