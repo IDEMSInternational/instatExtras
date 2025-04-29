@@ -53,4 +53,6 @@ Suggests:
     mockery,
     rcorpora,
     testthat (>= 3.0.0)
+Depends:
+    curl (>= 6.2.1)
 Config/testthat/edition: 3
