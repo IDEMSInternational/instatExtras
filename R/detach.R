@@ -9,9 +9,14 @@
 #' @param character.only Logical. If `TRUE`, `name` is treated as a character string and not evaluated (default `FALSE`).
 #' @param force Logical. If `TRUE`, forces unloading of the namespace even if other namespaces depend on it.
 #'
-#' @return This function is used for its side effect (detaching a package). Returns `NULL` invisibly if the package is not attached.
+#' @return This function is used for its side effect (detaching a package). 
 #' 
 #' @export
-detach_package <- function(name, pos = 2L, unload = TRUE, character.only = FALSE, force = FALSE){
-  if (name %in% search()) detach(name = name, pos = pos, unload = unload, character.only = character.only, force = force)
+detach_package <- function(name, unload = TRUE) {
+  if (name %in% search()) {
+    detach(name = name, unload = unload, character.only = TRUE)
+    return(paste(name, "detached successfully"))
+  } else {
+    return(paste(name, "not attached"))
+  }
 }
