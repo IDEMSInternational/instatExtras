@@ -446,3 +446,28 @@ test_that("get_ranking_items errors if vars_to_get is not character", {
     "`vars_to_get` must be a character vector"
   )
 })
+
+test_that("generate_summary_tables() returns a gt table with correct title and structure", {
+  # Sample input data
+  input_data <- tibble::tibble(
+    `summary-variable` = rep("my__summary", 3),
+    variable = c("A", "B", "C"),
+    value = c(10, 20, 30)
+  )
+  
+  # Call the function
+  result <- generate_summary_tables(input_data, variable = "variable", second_factor = NULL)
+  
+  # Test 1: Output is a gt_tbl object
+  expect_s3_class(result, "gt_tbl")
+  
+  # Test 2: The title is set correctly (i.e., "__" replaced with space)
+  expect_equal(result$`_heading`$title, "my summary")
+  
+  # Test 3: The 'summary-variable' column has been removed
+  expect_false("summary-variable" %in% names(result$`_data`))
+  
+  # Test 4: The rest of the table data remains unchanged
+  expect_equal(result$`_data`$variable, c("A", "B", "C"))
+  expect_equal(result$`_data`$value, c(10, 20, 30))
+})
