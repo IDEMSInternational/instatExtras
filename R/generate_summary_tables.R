@@ -10,10 +10,6 @@
 #'
 #' @return A `gt` table with formatted styling and an automatically generated title.
 #' @export
-#'
-#' @examples
-#' # Example usage:
-#' generate_summary_tables(data, "yield", "fertgrp")
 generate_summary_tables <- function(table_data, variable, second_factor) {
   # Extract unique value from 'summary-variable' to use as title
   summary_title <- table_data$`summary-variable` %>%
