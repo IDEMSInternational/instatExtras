@@ -10,12 +10,6 @@ detach_package(name, unload = TRUE)
 \item{name}{A character string naming the package to be detached (e.g., \code{"package:ggplot2"}).}
 
 \item{unload}{Logical. If \code{TRUE}, the namespace is also unloaded (default \code{TRUE}).}
-
-\item{pos}{An integer indicating the position in the search path (default is 2).}
-
-\item{character.only}{Logical. If \code{TRUE}, \code{name} is treated as a character string and not evaluated (default \code{FALSE}).}
-
-\item{force}{Logical. If \code{TRUE}, forces unloading of the namespace even if other namespaces depend on it.}
 }
 \value{
 This function is used for its side effect (detaching a package).
