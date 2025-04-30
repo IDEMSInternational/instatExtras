@@ -12,6 +12,6 @@
 #' @return This function is used for its side effect (detaching a package). Returns `NULL` invisibly if the package is not attached.
 #' 
 #' @export
-detach <- function(name, pos = 2L, unload = TRUE, character.only = FALSE, force = FALSE){
+detach_package <- function(name, pos = 2L, unload = TRUE, character.only = FALSE, force = FALSE){
   if (name %in% search()) detach(name = name, pos = pos, unload = unload, character.only = character.only, force = force)
 }
