@@ -21,7 +21,3 @@ This function creates a styled summary table using \code{gt}, formatted with
 a title extracted from the \code{summary-variable} column. The table is designed
 to display summarized data while dropping the \code{summary-variable} column.
 }
-\examples{
-# Example usage:
-generate_summary_tables(data, "yield", "fertgrp")
-}
