@@ -4,27 +4,21 @@
 \alias{detach_package}
 \title{Detach a Package If Attached}
 \usage{
-detach_package(
-  name,
-  pos = 2L,
-  unload = TRUE,
-  character.only = FALSE,
-  force = FALSE
-)
+detach_package(name, unload = TRUE)
 }
 \arguments{
 \item{name}{A character string naming the package to be detached (e.g., \code{"package:ggplot2"}).}
 
-\item{pos}{An integer indicating the position in the search path (default is 2).}
-
 \item{unload}{Logical. If \code{TRUE}, the namespace is also unloaded (default \code{TRUE}).}
+
+\item{pos}{An integer indicating the position in the search path (default is 2).}
 
 \item{character.only}{Logical. If \code{TRUE}, \code{name} is treated as a character string and not evaluated (default \code{FALSE}).}
 
 \item{force}{Logical. If \code{TRUE}, forces unloading of the namespace even if other namespaces depend on it.}
 }
 \value{
-This function is used for its side effect (detaching a package). Returns \code{NULL} invisibly if the package is not attached.
+This function is used for its side effect (detaching a package).
 }
 \description{
 Safely detaches a package from the R search path only if it is currently attached.
