@@ -4,10 +4,7 @@
 #' This prevents errors caused by trying to detach a package that is not loaded.
 #'
 #' @param name A character string naming the package to be detached (e.g., `"package:ggplot2"`).
-#' @param pos An integer indicating the position in the search path (default is 2).
 #' @param unload Logical. If `TRUE`, the namespace is also unloaded (default `TRUE`).
-#' @param character.only Logical. If `TRUE`, `name` is treated as a character string and not evaluated (default `FALSE`).
-#' @param force Logical. If `TRUE`, forces unloading of the namespace even if other namespaces depend on it.
 #'
 #' @return This function is used for its side effect (detaching a package). 
 #' 
