@@ -56,5 +56,5 @@ Suggests:
     testthat (>= 3.0.0),
     tibble
 Depends:
-    curl (>= 6.2.1)
+    curl (>= 6.1.0)
 Config/testthat/edition: 3
