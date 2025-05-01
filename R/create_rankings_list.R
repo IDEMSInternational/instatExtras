@@ -37,5 +37,8 @@ create_rankings_list <- function(data, traits = traits, id = "id", variety = "va
                              ascending = TRUE)
     })
   names(rankings_list) <- traits
+  cat("----------------\n")
+  cat("Created Rankings Object")
+  cat("----------------\n")
   return(rankings_list)
 }
