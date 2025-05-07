@@ -4,14 +4,10 @@
 \alias{generate_summary_tables}
 \title{Generate Summary Tables}
 \usage{
-generate_summary_tables(table_data, variable, second_factor)
+generate_summary_tables(table_data)
 }
 \arguments{
 \item{table_data}{A data frame containing the summary data, including a \code{summary-variable} column.}
-
-\item{variable}{A character string representing the main variable to summarize.}
-
-\item{second_factor}{A character string representing the secondary factor for grouping.}
 }
 \value{
 A \code{gt} table with formatted styling and an automatically generated title.

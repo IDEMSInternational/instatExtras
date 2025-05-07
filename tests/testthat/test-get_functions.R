@@ -454,9 +454,7 @@ test_that("generate_summary_tables() returns a gt table with correct title and s
     variable = c("A", "B", "C"),
     value = c(10, 20, 30)
   )
-  
-  # Call the function
-  result <- generate_summary_tables(input_data, variable = "variable", second_factor = NULL)
+  result <- generate_summary_tables(input_data)
   
   # Test 1: Output is a gt_tbl object
   expect_s3_class(result, "gt_tbl")
@@ -470,4 +468,61 @@ test_that("generate_summary_tables() returns a gt table with correct title and s
   # Test 4: The rest of the table data remains unchanged
   expect_equal(result$`_data`$variable, c("A", "B", "C"))
   expect_equal(result$`_data`$value, c(10, 20, 30))
+})
+
+test_that("Table title is generated from `summary-variable`", {
+  df <- tibble::tibble(
+    `summary-variable` = rep("My__Summary", 3),
+    col1 = 1:3,
+    col2 = 4:6
+  )
+  
+  gt_table <- generate_summary_tables(df)
+  
+  expect_s3_class(gt_table, "gt_tbl")
+  expect_equal(gt_table$`_heading`$title, "My Summary")
+})
+
+test_that("Table title is generated from unique summary and variable", {
+  df <- data.frame(
+    summary = rep("Mean", 3),
+    variable = rep("Age", 3),
+    col1 = 1:3
+  )
+  
+  gt_table <- generate_summary_tables(df)
+  expect_equal(gt_table$`_heading`$title, "Mean Age")
+})
+
+test_that("Table title is generated from unique summary only", {
+  df <- data.frame(
+    summary = rep("Total", 3),
+    variable = c("Age", "Gender", "Income"),
+    col1 = 1:3
+  )
+  
+  gt_table <- generate_summary_tables(df)
+  expect_equal(gt_table$`_heading`$title, "Total")
+})
+
+test_that("Table title is generated from unique variable only", {
+  df <- data.frame(
+    summary = c("Total", "Mean", "Median"),
+    variable = rep("Income", 3),
+    col1 = 1:3
+  )
+  
+  gt_table <- generate_summary_tables(df)
+  expect_equal(gt_table$`_heading`$title, "Income")
+})
+
+test_that("Table title is empty if multiple summary and variable values", {
+  df <- data.frame(
+    summary = c("Total", "Mean"),
+    variable = c("Income", "Age"),
+    col1 = 1:2
+  )
+  
+  gt_table <- generate_summary_tables(df)
+  expect_equal(gt_table$`_heading`$title, "")
 })
