@@ -526,3 +526,4 @@ test_that("Table title is empty if multiple summary and variable values", {
   gt_table <- generate_summary_tables(df)
   expect_equal(gt_table$`_heading`$title, "")
 })
+
