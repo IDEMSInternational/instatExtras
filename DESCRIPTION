@@ -1,11 +1,12 @@
 Package: instatExtras
 Title: A set of functions used in R-Instat
-Version: 0.2.3.7
+Version: 0.2.3.8
 Authors@R: c(
     person("Danny", "Parsons", , role = "aut"),
     person("Lily", "Clements", , "lily@idems.international", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-8864-0552")),
     person("Antoine", "Ntalumeso", , role = "aut"),
+    person("Francis", "Torgbor", , role = "aut"),
     person("Stephen", "Lloyd", , role = "aut"))
 Description: This package contains a set of functions used in R-Instat. This includes functions written specifically for R-Instat, as well functions written elsewhere that are modified for use in R-Instat.
 License: LGPL (>= 3)
