@@ -37,4 +37,6 @@ Returns the most granular level at which rows are uniquely identified, along wit
 df <- data.frame(ID = 1:3, item = letters[1:3], trait = rep("height", 3))
 find_data_level(df)
 
+df <- data.frame(ID = c(1:3, 1:3), variety = c(1,1,1,3,3,3))
+find_data_level(df)
 }
