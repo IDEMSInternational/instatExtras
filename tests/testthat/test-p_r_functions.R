@@ -105,8 +105,8 @@ test_that("pivot_tricot works as expected", {
   data(nicabean)
   nicabean_by_id_item_trait <- nicabean$trial # D
   nicabean_by_id <- nicabean$covar # A 
-  nicabean_by_id_variety <- pivot_tricot(data_id_variety_trait = nicabean_by_id_item_trait, # B
-                                         data_id_variety_trait_id_col = "id",
+  nicabean_by_id_variety <- pivot_tricot(data_plot_trait = nicabean_by_id_item_trait, # B
+                                         data_plot_trait_id_col = "id",
                                          variety_col = "item",
                                          trait_col = "trait",
                                          rank_col = "rank")
@@ -118,14 +118,14 @@ test_that("pivot_tricot works as expected", {
   expect_warning(pivot_tricot(data = nicabean_by_id,
                               data_id_col = "id",
                               option_cols = c("variety_a", "variety_b", "variety_c"),
-                              data_id_variety_trait = nicabean_by_id_item_trait,
-                              data_id_variety_trait_id_col = "id",
+                              data_plot_trait = nicabean_by_id_item_trait,
+                              data_plot_trait_id_col = "id",
                               variety_col = "item",
                               trait_col = "trait",
                               rank_col = "rank"))
   
   expect_error(pivot_tricot(data = nicabean_by_id_item_trait,
-                              data_id_variety_trait_id_col = "id",
+                            data_plot_trait_id_col = "id",
                               variety_col = "item",
                               trait_col = "trait",
                               rank_col = "rank"))
@@ -155,8 +155,8 @@ test_that("pivot_tricot adds new variable", {
   nicabean_by_id_variety <- pivot_tricot(data = nicabean_by_id, # B
                                          data_id_col = "id",
                                          option_cols = c("variety_a", "variety_b", "variety_c"),
-                                         data_id_variety_trait = nicabean_by_id_item_trait, # B
-                                         data_id_variety_trait_id_col = "id",
+                                         data_plot_trait = nicabean_by_id_item_trait, # B
+                                         data_plot_trait_id_col = "id",
                                          variety_col = "item",
                                          trait_col = "trait",
                                          rank_col = "rank")
