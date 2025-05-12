@@ -7,8 +7,8 @@
 pivot_tricot(
   data = NULL,
   data_id_col = "id",
-  data_id_variety_trait = NULL,
-  data_id_variety_trait_id_col = "id",
+  data_plot_trait = NULL,
+  data_plot_trait_id_col = "id",
   variety_col = NULL,
   trait_col = NULL,
   rank_col = NULL,
@@ -24,15 +24,15 @@ pivot_tricot(
 
 \item{data_id_col}{The name of the ID column in \code{data}. Default is \code{"id"}.}
 
-\item{data_id_variety_trait}{A data frame containing ID, variety, trait, and rank columns.}
+\item{data_plot_trait}{A data frame containing ID, variety, trait, and rank columns.}
 
-\item{data_id_variety_trait_id_col}{The name of the ID column in \code{data_id_variety_trait}. Default is \code{"id"}.}
+\item{data_plot_trait_id_col}{The name of the ID column in \code{data_plot_trait}. Default is \code{"id"}.}
 
-\item{variety_col}{The name of the variety column in \code{data_id_variety_trait}.}
+\item{variety_col}{The name of the variety column in \code{data_plot_trait}.}
 
-\item{trait_col}{The name of the trait column in \code{data_id_variety_trait}.}
+\item{trait_col}{The name of the trait column in \code{data_plot_trait}.}
 
-\item{rank_col}{The name of the rank column in \code{data_id_variety_trait}.}
+\item{rank_col}{The name of the rank column in \code{data_plot_trait}.}
 
 \item{option_cols}{A character vector of column names in \code{data} that store the option labels (e.g. \code{"option_a"}, \code{"option_b"}, \code{"option_c"}).}
 
@@ -60,7 +60,7 @@ into a tidy format, assigning ranks based on trait evaluations.
 }
 \details{
 It supports input either as a single dataset (\code{data}) or as two datasets:
-one with trait-wise rankings (\code{data_id_variety_trait}) and one with option labels and traits.
+one with trait-wise rankings (\code{data_plot_trait}) and one with option labels and traits.
 
 The function assumes a tricot setup where three options (e.g. crops, varieties) are ranked per trait.
 Rankings may be extracted from columns ending in a suffix such as \verb{_pos} or \verb{_neg}, or explicitly provided.
@@ -70,31 +70,31 @@ library(gosset)
 # Read in tricot data from the `gosset` library
 cassava_pivot <- pivot_tricot(cassava)
 
-# Example using nicabean data - if we have ID-Variety-Trait Level data
+# Example using nicabean data - if we have Plot-Trait Level data
 data(nicabean)
 nicabean_by_id_item_trait <- nicabean$trial
 nicabean_by_id <- nicabean$covar 
-nicabean_by_id_variety <- pivot_tricot(data_id_variety_trait = nicabean_by_id_item_trait, # B
-                                       data_id_variety_trait_id_col = "id",
+nicabean_by_plot <- pivot_tricot(data_plot_trait = nicabean_by_id_item_trait, # B
+                                       data_plot_trait_id_col = "id",
                                        variety_col = "item",
                                        trait_col = "trait",
                                        rank_col = "rank")
 
 # Example using breadwheat data - if we have just ID-Level data 
 data(breadwheat)
-breadwheat_by_id_variety <- pivot_tricot(data = breadwheat,
+breadwheat_by_plot <- pivot_tricot(data = breadwheat,
                                          data_id_col = "participant_name",
                                          option_cols = c("variety_a", "variety_b", "variety_c"),
                                          trait_good = "best", trait_bad = "_worst")
 
-# Example using nicabean data - if we have both data and data_id_variety_trait data
+# Example using nicabean data - if we have both data and data_plot_trait data
 nicabean_by_id$Vigor_pos = "A"
 nicabean_by_id$Vigor_neg = "C"
-nicabean_by_id_variety_2 <- pivot_tricot(data = nicabean_by_id,
+nicabean_by_plot_2 <- pivot_tricot(data = nicabean_by_id,
                                          data_id_col = "id",
                                          option_cols = c("variety_a", "variety_b", "variety_c"),
-                                         data_id_variety_trait = nicabean_by_id_item_trait,
-                                         data_id_variety_trait_id_col = "id",
+                                         data_plot_trait = nicabean_by_id_item_trait,
+                                         data_plot_trait_id_col = "id",
                                          variety_col = "item",
                                          trait_col = "trait",
                                          rank_col = "rank")

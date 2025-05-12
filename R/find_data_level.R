@@ -10,7 +10,7 @@
 #'
 #' @return A named list with the following elements:
 #' \describe{
-#'   \item{level}{The detected level of the dataset, such as `"id"`, `"id-variety"`, `"id-variety-trait"`, etc.}
+#'   \item{level}{The detected level of the dataset, such as `"id"`, `"plot"`, `"plot-trait"`, etc.}
 #'   \item{id_col}{The name of the column identified as the ID column (if found).}
 #'   \item{variety_col}{The name of the variety column (if found).}
 #'   \item{trait_col}{The name of the trait column (if found).}

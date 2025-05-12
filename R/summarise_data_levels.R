@@ -10,7 +10,7 @@
 #' @return A tibble summarising the data level structure of each dataset. Columns include:
 #' \describe{
 #'   \item{dataset}{The name of the dataset.}
-#'   \item{level}{The data level (e.g. `"id"`, `"id-variety"`).}
+#'   \item{level}{The data level (e.g. `"id"`, `"plot"`).}
 #'   \item{id_col}{The column used as the ID (if detected).}
 #'   \item{variety_col}{The column used for varieties (if detected).}
 #'   \item{trait_col}{The column used for traits (if detected).}

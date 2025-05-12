@@ -4,18 +4,18 @@
 #' into a tidy format, assigning ranks based on trait evaluations.
 #'
 #' It supports input either as a single dataset (`data`) or as two datasets:
-#' one with trait-wise rankings (`data_id_variety_trait`) and one with option labels and traits.
+#' one with trait-wise rankings (`data_plot_trait`) and one with option labels and traits.
 #'
 #' The function assumes a tricot setup where three options (e.g. crops, varieties) are ranked per trait.
 #' Rankings may be extracted from columns ending in a suffix such as `_pos` or `_neg`, or explicitly provided.
 #'
 #' @param data A data frame containing option columns and trait ranking indicators (e.g. columns ending in `_pos` or `_neg`).
 #' @param data_id_col The name of the ID column in `data`. Default is `"id"`.
-#' @param data_id_variety_trait A data frame containing ID, variety, trait, and rank columns.
-#' @param data_id_variety_trait_id_col The name of the ID column in `data_id_variety_trait`. Default is `"id"`.
-#' @param variety_col The name of the variety column in `data_id_variety_trait`.
-#' @param trait_col The name of the trait column in `data_id_variety_trait`.
-#' @param rank_col The name of the rank column in `data_id_variety_trait`.
+#' @param data_plot_trait A data frame containing ID, variety, trait, and rank columns.
+#' @param data_plot_trait_id_col The name of the ID column in `data_plot_trait`. Default is `"id"`.
+#' @param variety_col The name of the variety column in `data_plot_trait`.
+#' @param trait_col The name of the trait column in `data_plot_trait`.
+#' @param rank_col The name of the rank column in `data_plot_trait`.
 #' @param option_cols A character vector of column names in `data` that store the option labels (e.g. `"option_a"`, `"option_b"`, `"option_c"`).
 #' @param possible_ranks A character vector mapping to `option_cols`, indicating rank labels (e.g. `"A"`, `"B"`, `"C"`).
 #' @param trait_good A suffix string (e.g. `"_pos"`) used to identify columns in `data` where a variety is "preferred" for a trait. Default is `"_pos"`.
@@ -36,36 +36,36 @@
 #' # Read in tricot data from the `gosset` library
 #' cassava_pivot <- pivot_tricot(cassava)
 #' 
-#' # Example using nicabean data - if we have ID-Variety-Trait Level data
+#' # Example using nicabean data - if we have Plot-Trait Level data
 #' data(nicabean)
 #' nicabean_by_id_item_trait <- nicabean$trial
 #' nicabean_by_id <- nicabean$covar 
-#' nicabean_by_id_variety <- pivot_tricot(data_id_variety_trait = nicabean_by_id_item_trait, # B
-#'                                        data_id_variety_trait_id_col = "id",
+#' nicabean_by_plot <- pivot_tricot(data_plot_trait = nicabean_by_id_item_trait, # B
+#'                                        data_plot_trait_id_col = "id",
 #'                                        variety_col = "item",
 #'                                        trait_col = "trait",
 #'                                        rank_col = "rank")
 #' 
 #' # Example using breadwheat data - if we have just ID-Level data 
 #' data(breadwheat)
-#' breadwheat_by_id_variety <- pivot_tricot(data = breadwheat,
+#' breadwheat_by_plot <- pivot_tricot(data = breadwheat,
 #'                                          data_id_col = "participant_name",
 #'                                          option_cols = c("variety_a", "variety_b", "variety_c"),
 #'                                          trait_good = "best", trait_bad = "_worst")
 #' 
-#' # Example using nicabean data - if we have both data and data_id_variety_trait data
+#' # Example using nicabean data - if we have both data and data_plot_trait data
 #' nicabean_by_id$Vigor_pos = "A"
 #' nicabean_by_id$Vigor_neg = "C"
-#' nicabean_by_id_variety_2 <- pivot_tricot(data = nicabean_by_id,
+#' nicabean_by_plot_2 <- pivot_tricot(data = nicabean_by_id,
 #'                                          data_id_col = "id",
 #'                                          option_cols = c("variety_a", "variety_b", "variety_c"),
-#'                                          data_id_variety_trait = nicabean_by_id_item_trait,
-#'                                          data_id_variety_trait_id_col = "id",
+#'                                          data_plot_trait = nicabean_by_id_item_trait,
+#'                                          data_plot_trait_id_col = "id",
 #'                                          variety_col = "item",
 #'                                          trait_col = "trait",
 #'                                          rank_col = "rank")
-pivot_tricot <- function(data = NULL, data_id_col = "id", data_id_variety_trait = NULL,
-                         data_id_variety_trait_id_col = "id",
+pivot_tricot <- function(data = NULL, data_id_col = "id", data_plot_trait = NULL,
+                         data_plot_trait_id_col = "id",
                          variety_col = NULL,
                          trait_col = NULL, rank_col = NULL,
                          option_cols = c("option_a", "option_b", "option_c"),
@@ -73,28 +73,28 @@ pivot_tricot <- function(data = NULL, data_id_col = "id", data_id_variety_trait 
                          trait_bad = "_neg", na_value = "Not observed") {
   
   # Input checks
-  if (is.null(data) & is.null(data_id_variety_trait)) {
-    stop("At least one of `data` or `data_id_variety_trait` must be provided.")
+  if (is.null(data) & is.null(data_plot_trait)) {
+    stop("At least one of `data` or `data_plot_trait` must be provided.")
   }
   
   if (!is.null(data) & is.null(data_id_col)) {
     stop("If `data` is provided, `data_id_col` must also be specified.")
   }
   
-  if (!is.null(data_id_variety_trait)) {
-    if (is.null(data_id_variety_trait_id_col) | is.null(variety_col) | is.null(trait_col) | is.null(rank_col)) {
-      stop("If `data_id_variety_trait` is provided, then `data_id_variety_trait_id_col`, `variety_col`, `trait_col`, and `rank_col` must also be provided.")
+  if (!is.null(data_plot_trait)) {
+    if (is.null(data_plot_trait_id_col) | is.null(variety_col) | is.null(trait_col) | is.null(rank_col)) {
+      stop("If `data_plot_trait` is provided, then `data_plot_trait_id_col`, `variety_col`, `trait_col`, and `rank_col` must also be provided.")
     }
   }
   
-  # Handle data_id_variety_trait if relevant columns are given
+  # Handle data_plot_trait if relevant columns are given
   if (!is.null(variety_col) & !is.null(trait_col) & !is.null(rank_col)) {
 
-    data_options_a <- data_id_variety_trait %>%
+    data_options_a <- data_plot_trait %>%
       tidyr::pivot_wider(names_from = dplyr::all_of(trait_col),
                          values_from = dplyr::all_of(rank_col))
     
-    lookup <- c(id = data_id_variety_trait_id_col, variety = variety_col)
+    lookup <- c(id = data_plot_trait_id_col, variety = variety_col)
     data_options_a <- dplyr::rename(data_options_a, dplyr::all_of(lookup))
   }
   
@@ -147,7 +147,7 @@ pivot_tricot <- function(data = NULL, data_id_col = "id", data_id_variety_trait 
         tidyr::pivot_wider(names_from = trait, values_from = rank) %>%
         dplyr::filter(!is.na(variety))
     } else {
-      if (!is.null(data_id_variety_trait)){
+      if (!is.null(data_plot_trait)){
         data_options_id <- data_options_id %>%
           dplyr::select(c(id, dummy_variety = variety, variable))
         data_options_a <- dplyr::full_join(data_options_a, data_options_id, by = c("id" = "id", "variety" = "variable"))
@@ -158,8 +158,8 @@ pivot_tricot <- function(data = NULL, data_id_col = "id", data_id_variety_trait 
   }
   
   # Combine if both datasets are available
-  if ((!is.null(data) & !is.null(data_id_variety_trait)) && ncol(matching_cols) > 0) {
-    message("Using both `data` and `data_id_variety_trait`")
+  if ((!is.null(data) & !is.null(data_plot_trait)) && ncol(matching_cols) > 0) {
+    message("Using both `data` and `data_plot_trait`")
     
     data_options <- dplyr::full_join(data_options_a, data_options_b)
     
@@ -170,11 +170,11 @@ pivot_tricot <- function(data = NULL, data_id_col = "id", data_id_variety_trait 
           dplyr::count() %>%
           dplyr::filter(n > 3) %>%
           dplyr::pull(id)
-        warning("Using both data frames has caused repeats in trait columns.\nSome traits in `data` differ from `data_id_variety_trait` for the same ID and variety combination.\nCheck IDs: ",
+        warning("Using both data frames has caused repeats in trait columns.\nSome traits in `data` differ from `data_plot_trait` for the same ID and variety combination.\nCheck IDs: ",
                 paste0(IDs_to_check, collapse = ", "))
       }
     }
-  } else if (!is.null(data_id_variety_trait)) {
+  } else if (!is.null(data_plot_trait)) {
     data_options <- data_options_a
   } else {
     data_options <- data_options_b
