@@ -23,7 +23,7 @@ find_data_level(
 \value{
 A named list with the following elements:
 \describe{
-\item{level}{The detected level of the dataset, such as \code{"id"}, \code{"id-variety"}, \code{"id-variety-trait"}, etc.}
+\item{level}{The detected level of the dataset, such as \code{"id"}, \code{"plot"}, \code{"plot-trait"}, etc.}
 \item{id_col}{The name of the column identified as the ID column (if found).}
 \item{variety_col}{The name of the variety column (if found).}
 \item{trait_col}{The name of the trait column (if found).}
