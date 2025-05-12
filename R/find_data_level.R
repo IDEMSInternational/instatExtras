@@ -19,7 +19,9 @@
 #' @examples
 #' df <- data.frame(ID = 1:3, item = letters[1:3], trait = rep("height", 3))
 #' find_data_level(df)
-#'
+#' 
+#' df <- data.frame(ID = c(1:3, 1:3), variety = c(1,1,1,3,3,3))
+#' find_data_level(df)
 #' @export
 find_data_level <- function(data,
                             id_cols = c("id", "participant_id", "participant_name", "ID"),
@@ -87,11 +89,18 @@ find_data_level <- function(data,
       dplyr::filter(is_unique) %>%
       dplyr::arrange(lengths(strsplit(level, "-"))) %>%
       dplyr::slice(1)
-    paste0(best$level)
+    level_raw <- best$level
+    
+    # Rename specific levels
+    level_standard <- dplyr::case_when(
+      level_raw == "id-variety" ~ "plot",
+      level_raw == "id-variety-trait" ~ "plot-trait",
+      TRUE ~ level_raw
+    )
   } else {
     "No combination of markers uniquely identifies the data rows."
   }
-  
+
   return(list(
     level = level_string,
     id_col = selected_cols$id,
