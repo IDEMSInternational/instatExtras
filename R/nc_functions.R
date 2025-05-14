@@ -277,7 +277,7 @@ multiple_nc_as_data_frame <- function(path, vars, keep_raw_time = TRUE, include_
   return(merged_data)
 }
 
-get_nc_attribute <- function(nc, dimension, attr) {
+get_nc_attribute <- function(nc, dimension, attr = NA) {
   ncdf4::ncatt_get(nc, dimension, attr)
 }
 
