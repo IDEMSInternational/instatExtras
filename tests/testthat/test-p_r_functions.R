@@ -184,6 +184,7 @@ test_that("error if no columns ending with trait_good or trait_bad found in data
 
 test_that("plot_pltree runs and returns a ggplot object", {
   library(psychotree)
+  library(PlackettLuce)
   
   # using the example from plackettluce
   ## Germany's Next Topmodel 2007 data
