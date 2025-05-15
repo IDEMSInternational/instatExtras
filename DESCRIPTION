@@ -34,11 +34,12 @@ Imports:
   magrittr,
   Matrix,
   methods,
+  partykit,
   patchwork,
   PCICt,
+  pingr,
   PlackettLuce,
   plyr,
-  pingr,
   purrr,
   raster,
   rlang,
@@ -55,6 +56,7 @@ Remotes:
 Suggests: 
     gosset,
     mockery,
+    psychotree,
     rcorpora,
     testthat (>= 3.0.0),
     tibble

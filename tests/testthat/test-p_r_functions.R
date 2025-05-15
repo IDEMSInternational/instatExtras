@@ -181,3 +181,47 @@ test_that("error if no columns ending with trait_good or trait_bad found in data
     regexp = "No columns ending with _positive or _negative found in `data`."
   )
 })
+
+test_that("plot_pltree runs and returns a ggplot object", {
+  library(psychotree)
+  
+  # using the example from plackettluce
+  ## Germany's Next Topmodel 2007 data
+  data("Topmodel2007", package = "psychotree")
+  ## convert paircomp object to grouped rankings
+  R <- as.grouped_rankings(Topmodel2007$preference)
+  ## rankings are grouped by judge
+  print(R[1:2,], max = 4)
+  ## Topmodel2007[, -1] gives covariate values for each judge
+  print(Topmodel2007[1:2, -1])
+  
+  ## fit partition model based on all variables except preference
+  ## set npseudo = 0 as all judges rank all models
+  tm_tree <- pltree(R ~ ., data = Topmodel2007[, -1], minsize = 5,
+                    npseudo = 0)
+  
+  ## log-abilities, zero sum contrast
+  itempar(tm_tree, log = TRUE)
+  
+  # Simulate a small rankings dataset
+  R <- matrix(c(1, 2, 3,
+                1, NA, 2,
+                2, 1, 3,
+                3, 1, 2,
+                2, 3, 1), byrow = TRUE, ncol = 3)
+  
+  ## plot shows abilities constrained to sum to 1
+  plot(tm_tree, abbreviate = 1, yscale = c(0, 0.5))
+  ## instead show log-abilities with Anja as reference (need to used index)
+  plot(tm_tree, abbreviate = 1, worth = FALSE, ref = 6,
+       yscale = c(-1.5, 2.2))
+  
+  p <- plot_pltree(tm_tree)
+  
+  expect_s3_class(p, "ggplot")  # patchwork returns a ggplot subclass
+})
+
+test_that("plot_pltree gives informative error on invalid input", {
+  expect_error(plot_pltree())
+})
+
