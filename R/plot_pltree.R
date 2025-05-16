@@ -1,48 +1,65 @@
-#' Plot a Plackett-Luce Tree with Node Worth Parameters
+#' Plot a Plackett-Luce Tree using ggplot2
 #'
-#' This function takes a `PlackettLuce` model tree (fitted using `pltree()` from the `PlackettLuce` package)
-#' and visualises the structure of the tree alongside dotplots showing the worth parameters and confidence intervals
-#' at each terminal node.
+#' Recursively plots a tree structure and terminal node worth dotplots using only ggplot2.
+#' Each terminal node's worths are displayed in a separate facet below the tree.
 #'
-#' @param tree A fitted Plackett-Luce model tree, typically an object of class `party` or `pltree`.
+#' @param tree A fitted PlackettLuce model tree (class "party").
 #'
-#' @return A combined `ggplot` object containing the tree structure (split variable and level labels) above,
-#' and dotplots of worth parameters at terminal nodes below. Each dotplot shows point estimates and confidence
-#' intervals for each item within the node.
-#'
-#' @details
-#' The function identifies the terminal nodes of the tree and extracts fitted Plackett-Luce models from each.
-#' Worth parameters and their 95% confidence intervals are computed for each item.
-#' The root node's split variable, p-value, and groupings are used to draw a schematic tree.
-#' 
-#' The resulting plot combines:
-#' \itemize{
-#'   \item A tree diagram summarising the root node's split (currently assumes only one split)
-#'   \item Dotplots of worth parameters for each terminal node
-#' }
-#' 
-#' @note Requires `ggplot2`, `patchwork`, `partykit`, `purrr`, `tidyr`, and `dplyr`.
-#'
-#' @examples
-#' \dontrun{
-#'   tree <- pltree(rankings ~ covariate, data = your_data)
-#'   plot_pltree(tree)
-#' }
-#' 
+#' @return A ggplot2 object showing the tree and corresponding worth dotplots.
 #' @export
-plot_pltree <- function (tree){
-  terminal_ids <- partykit::nodeids(tree, terminal = TRUE)
+plot_pltree <- function(tree) {
+  # Recursive tree layout ----------------------------------------------------
+  layout_tree <- function(node, x = 1, y = 0, depth = 0, counter = 1) {
+    this_id <- partykit::id_node(node)
+    is_terminal <- partykit::is.terminal(node)
+    label <- if (!is_terminal) {
+      split <- partykit::split_node(node)
+      var_name <- names(attr(tree, "data"))[split$varid]
+      paste0(var_name, "\np = ", formatC(partykit::info_node(node)$p.value, format = "e", digits = 2))
+    } else {
+      paste("Node", this_id)
+    }
+    
+    layout <- tidyr::tibble(id = this_id,
+                            label = label,
+                            x = x,
+                            y = -depth,
+                            terminal = is_terminal)
+    
+    if (is_terminal) return(layout)
+    
+    kids <- partykit::kids_node(node)
+    n_kids <- length(kids)
+    x_positions <- seq(x - 0.5, x + 0.5, length.out = n_kids)
+    
+    child_layouts <- purrr::map2_dfr(kids, x_positions,
+                                     ~ layout_tree(.x, x = .y, y = y - 1, depth = depth + 1))
+    
+    dplyr::bind_rows(layout, child_layouts)
+  }
+  
+  get_edges <- function(layout) {
+    edges <- layout %>%
+      dplyr::inner_join(layout, by = character(), suffix = c("_parent", "_child")) %>%
+      dplyr::filter(y_child == y_parent - 1,
+                    abs(x_child - x_parent) <= 0.51)
+    return(edges)
+  }
+  
   root_node <- partykit::node_party(tree)
+  layout <- layout_tree(root_node)
+  
+  edges <- ggraph::get_edges(layout)
+  
+  # Worth data ---------------------------------------------------------------
+  terminal_ids <- layout %>% filter(terminal) %>% pull(id)
   
   find_node_by_id <- function(node, id) {
-    if (partykit::id_node(node) == id) 
-      return(node)
-    if (is.terminal(node)) 
-      return(NULL)
+    if (partykit::id_node(node) == id) return(node)
+    if (partykit::is.terminal(node)) return(NULL)
     for (kid in partykit::kids_node(node)) {
       result <- find_node_by_id(kid, id)
-      if (!is.null(result)) 
-        return(result)
+      if (!is.null(result)) return(result)
     }
     return(NULL)
   }
@@ -50,85 +67,45 @@ plot_pltree <- function (tree){
   worth_data <- purrr::map_dfr(terminal_ids, function(nid) {
     node <- find_node_by_id(root_node, nid)
     model <- partykit::info_node(node)$object
-    worth <- coef(model)
+    worth <- as.numeric(coef(model))
     se <- sqrt(diag(vcov(model)))
     n <- length(model$rankings)
     tidyr::tibble(
       node = paste0("Node ", nid),
-      item = names(worth), 
-      worth = as.numeric(worth),
+      item = names(coef(model)),
+      worth = worth,
       lower = worth - 1.96 * se,
       upper = worth + 1.96 * se,
-      n = n)
-  })
-  
-  worth_data <- worth_data %>%
+      n = n
+    )
+  }) %>%
     dplyr::mutate(item = factor(item, levels = rev(unique(item))),
-                  item_label = paste0(item, " (", round(worth, 2), ")"),
                   node_label = paste0(node, " (n = ", n, ")"))
   
-  # Get root node info
-  split_var_index <- partykit::split_node(root_node)$varid
+  # Tree plot ----------------------------------------------------------------
+  tree_plot <- ggplot2::ggplot() +
+    ggplot2::geom_segment(data = edges,
+                          ggplot2::aes(x = x_parent, y = y_parent, xend = x_child, yend = y_child),
+                          color = "grey40") +
+    ggplot2::geom_label(data = layout,
+                        ggplot2::aes(x = x, y = y, label = label),
+                        fill = "white", size = 3.5, label.size = 0.3) +
+    ggplot2::theme_void()
   
-  if (!is.null(split_var_index)){
-    # Get root node info
-    root_node <- partykit::node_party(tree)
-    split_var_index <- partykit::split_node(root_node)$varid
-    split_var_name <- names(tree$data)[split_var_index]
-    split_levels <- levels(tree$data[[split_var_name]])
-    split_index <- partykit::split_node(root_node)$index
-    
-    left_levels <- split_levels[split_index == 1]
-    right_levels <- split_levels[split_index == 2]
-    
-    left_label <- paste(left_levels, collapse = ", ")
-    right_label <- paste(right_levels, collapse = ", ")
-    
-    left_label <- paste(left_levels, collapse = ", ")
-    right_label <- paste(right_levels, collapse = ", ")
-    
-    edges <- tidyr::tibble(
-      x = c(1, 1),
-      xend = c(0.5, 1.5),
-      y = c(2, 2),
-      yend = c(1, 1),
-      label = c(left_label, right_label),
-      label_x = c(0.75, 1.25),
-      label_y = c(1.5, 1.5)
-    )
-    
-    p_val <- partykit::info_node(root_node)$p.value
-    p_val_label <- formatC(p_val, format = "e", digits = 2)
-    root_label <- paste0(split_var_name, "\np = ", p_val_label)
-    
-    tree_plot <- ggplot2::ggplot() +
-      ggplot2::geom_segment(data = edges, ggplot2::aes(x = x, y = y, xend = xend, yend = yend), linewidth = 0.8, color = "gray40") + 
-      ggplot2::geom_label(ggplot2::aes(x = 1, y = 2.15, label = root_label),
-                          size = 3.5, label.size = 0.3,
-                          fill = "white", inherit.aes = FALSE) + 
-      ggplot2::geom_text(data = edges, ggplot2::aes(x = label_x, y = label_y,  label = label), size = 3.5) +
-      ggplot2::theme_void()
-    dotplot <- ggplot2::ggplot(worth_data, ggplot2::aes(x = worth, y = item)) + 
-      ggplot2::geom_point(size = 2) +
-      ggplot2::geom_text(ggplot2::aes(label = round(worth, 2)), hjust = -0.3, size = 3)
-    #ggplot2::facet_wrap(~node_label, nrow = 1) +
-    ggplot2::scale_y_discrete()
-    
-    p <- tree_plot/dotplot + patchwork::plot_layout(heights = c(1, 3))
-  } else {
-    zval <- qnorm((1 + 0.95) / 2)
-    p <- ggplot2::ggplot(worth_data, ggplot2::aes(x = worth, y = reorder(item, worth))) +
-      ggplot2::geom_point(size = 2)
-  }
-  p <- p + 
+  # Dotplot ------------------------------------------------------------------
+  dotplot <- ggplot2::ggplot(worth_data, ggplot2::aes(x = worth, y = item)) +
+    ggplot2::geom_point(size = 2) +
+    ggplot2::geom_errorbarh(ggplot2::aes(xmin = lower, xmax = upper), height = 0.2, color = "blue") +
+    ggplot2::geom_text(ggplot2::aes(label = round(worth, 2)), hjust = -0.3, size = 3) +
     ggplot2::geom_vline(xintercept = 0, linetype = "dashed", color = "grey60") +
     ggplot2::facet_wrap(~ node_label, nrow = 1) +
-    ggplot2::geom_errorbarh(ggplot2::aes(xmin = lower, xmax = upper), height = 0.2, color = "blue") +
     ggplot2::theme_minimal() +
-    ggplot2::theme(strip.text = ggplot2::element_text(face = "bold"),
-                   axis.title.y = ggplot2::element_blank(),
-                   axis.title.x = ggplot2::element_text(size = 10), 
-                   axis.text.y = ggplot2::element_text(size = 8)) +
+    theme(strip.text = ggplot2::element_text(face = "bold"),
+          axis.title.y = ggplot2::element_blank(),
+          axis.title.x = ggplot2::element_text(size = 10),
+          axis.text.y = ggplot2::element_text(size = 8)) +
     ggplot2::labs(x = "Worth Parameter")
-  return(p)
+  
+  # Combine ------------------------------------------------------------------
+  tree_plot / dotplot + patchwork::plot_layout(heights = c(1, 3))
 }
