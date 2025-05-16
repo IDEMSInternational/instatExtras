@@ -12,6 +12,7 @@
 #' @examples
 #' count_differences(c(1, 2, NA), c(1, 3, NA))     # 1 difference (2 vs 3)
 #' count_differences(c("a", "b"), c("a", "c"))     # 1 difference
+#' count_differences(c("a", "b"), c(1, 2))     # NA because different type
 #' count_differences(c(TRUE, NA), c(TRUE, FALSE)) # 1 difference (NA vs FALSE)
 #'
 #' @export
