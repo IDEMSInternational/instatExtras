@@ -2,41 +2,17 @@
 % Please edit documentation in R/plot_pltree.R
 \name{plot_pltree}
 \alias{plot_pltree}
-\title{Plot a Plackett-Luce Tree with Node Worth Parameters}
+\title{Plot a Plackett-Luce Tree using ggplot2}
 \usage{
 plot_pltree(tree)
 }
 \arguments{
-\item{tree}{A fitted Plackett-Luce model tree, typically an object of class \code{party} or \code{pltree}.}
+\item{tree}{A fitted PlackettLuce model tree (class "party").}
 }
 \value{
-A combined \code{ggplot} object containing the tree structure (split variable and level labels) above,
-and dotplots of worth parameters at terminal nodes below. Each dotplot shows point estimates and confidence
-intervals for each item within the node.
+A ggplot2 object showing the tree and corresponding worth dotplots.
 }
 \description{
-This function takes a \code{PlackettLuce} model tree (fitted using \code{pltree()} from the \code{PlackettLuce} package)
-and visualises the structure of the tree alongside dotplots showing the worth parameters and confidence intervals
-at each terminal node.
-}
-\details{
-The function identifies the terminal nodes of the tree and extracts fitted Plackett-Luce models from each.
-Worth parameters and their 95\% confidence intervals are computed for each item.
-The root node's split variable, p-value, and groupings are used to draw a schematic tree.
-
-The resulting plot combines:
-\itemize{
-\item A tree diagram summarising the root node's split (currently assumes only one split)
-\item Dotplots of worth parameters for each terminal node
-}
-}
-\note{
-Requires \code{ggplot2}, \code{patchwork}, \code{partykit}, \code{purrr}, \code{tidyr}, and \code{dplyr}.
-}
-\examples{
-\dontrun{
-  tree <- pltree(rankings ~ covariate, data = your_data)
-  plot_pltree(tree)
-}
-
+Recursively plots a tree structure and terminal node worth dotplots using only ggplot2.
+Each terminal node's worths are displayed in a separate facet below the tree.
 }
