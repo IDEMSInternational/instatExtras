@@ -63,7 +63,7 @@ plot_pltree <- function(tree) {
     child_layouts <- dplyr::bind_rows(purrr::map(results, "layout"))
     all_edges <- dplyr::bind_rows(purrr::map(results, "edges"))
     
-    list(layout = bind_rows(node_layout, child_layouts), edges = all_edges)
+    list(layout = dplyr::bind_rows(node_layout, child_layouts), edges = all_edges)
   }
   
   root_node <- partykit::node_party(tree)
