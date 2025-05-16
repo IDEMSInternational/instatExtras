@@ -105,10 +105,10 @@ plot_pltree <- function(tree) {
     ggplot2::geom_vline(xintercept = 0, linetype = "dashed", color = "grey60") +
     ggplot2::facet_wrap(~ node_label, nrow = 1) +
     ggplot2::theme_minimal() +
-    theme(strip.text = ggplot2::element_text(face = "bold"),
-          axis.title.y = ggplot2::element_blank(),
-          axis.title.x = ggplot2::element_text(size = 10),
-          axis.text.y = ggplot2::element_text(size = 8)) +
+    ggplot2::theme(strip.text = ggplot2::element_text(face = "bold"),
+                   axis.title.y = ggplot2::element_blank(),
+                   axis.title.x = ggplot2::element_text(size = 10),
+                   axis.text.y = ggplot2::element_text(size = 8)) +
     ggplot2::labs(x = "Worth Parameter")
   
   # Combine ------------------------------------------------------------------
