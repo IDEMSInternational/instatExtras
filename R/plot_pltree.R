@@ -9,12 +9,14 @@
 #' @export
 plot_pltree <- function(tree) {
   # Recursive tree layout ----------------------------------------------------
-  layout_tree <- function(node, x = 1, y = 0, depth = 0, counter = 1) {
+  tree_data <- model.frame(tree)
+  
+  layout_tree <- function(node, x = 1, y = 0, depth = 0) {
     this_id <- partykit::id_node(node)
     is_terminal <- partykit::is.terminal(node)
     label <- if (!is_terminal) {
       split <- partykit::split_node(node)
-      var_name <- names(attr(tree, "data"))[split$varid]
+      var_name <- names(tree_data)[split$varid]
       paste0(var_name, "\np = ",
              formatC(partykit::info_node(node)$p.value,
                      format = "e",
@@ -23,41 +25,53 @@ plot_pltree <- function(tree) {
       paste("Node", this_id)
     }
     
-    layout <- tidyr::tibble(id = this_id,
-                            label = label,
-                            x = x,
-                            y = -depth,
-                            terminal = is_terminal)
+    node_layout <- tidyr::tibble(id = this_id,
+                                 label = label,
+                                 x = x,
+                                 y = -depth,
+                                 terminal = is_terminal)
+    edge_labels <- tidyr::tibble()
     
-    if (is_terminal) return(layout)
+    if (is_terminal) return(list(layout = node_layout, edges = edge_labels))
     
     kids <- partykit::kids_node(node)
+    split <- partykit::split_node(node)
+    split_var <- names(tree_data)[split$varid]
+    split_levels <- levels(tree_data[[split_var]])
+    split_index <- split$index
     n_kids <- length(kids)
     x_positions <- seq(x - 0.5, x + 0.5, length.out = n_kids)
     
-    child_layouts <- purrr::map2_dfr(kids, x_positions,
-                                     ~ layout_tree(.x, x = .y, y = y - 1, depth = depth + 1))
+    results <- purrr::map2(kids, seq_len(n_kids), function(kid, i) {
+      kid_result <- layout_tree(kid, x = x_positions[i], y = y - 1, depth = depth + 1)
+      levels_this_kid <- split_levels[split_index == i]
+      edge_label <- paste(levels_this_kid, collapse = ", ")
+      edge <- dplyr::tibble(
+        parent = this_id,
+        child = partykit::id_node(kid),
+        x = x,
+        y = -depth,
+        xend = x_positions[i],
+        yend = -(depth + 1),
+        label = edge_label,
+        label_x = (x + x_positions[i]) / 2,
+        label_y = -(depth + 0.5)
+      )
+      list(layout = kid_result$layout, edges = bind_rows(kid_result$edges, edge))
+    })
     
-    dplyr::bind_rows(layout, child_layouts)
-  }
-  
-  get_edges <- function(layout) {
-    edges <- layout %>%
-      dplyr::inner_join(layout, by = character(), suffix = c("_parent", "_child")) %>%
-      dplyr::filter(y_child == y_parent - 1,
-                    abs(x_child - x_parent) <= 0.51)
-    return(edges)
+    child_layouts <- dplyr::bind_rows(purrr::map(results, "layout"))
+    all_edges <- dplyr::bind_rows(purrr::map(results, "edges"))
+    
+    list(layout = bind_rows(node_layout, child_layouts), edges = all_edges)
   }
   
   root_node <- partykit::node_party(tree)
-  layout <- layout_tree(root_node)
+  layout_result <- layout_tree(root_node)
+  layout <- layout_result$layout
+  edges <- layout_result$edges
   
-  edges <- get_edges(layout)
-  
-  # Worth data ---------------------------------------------------------------
-  terminal_ids <- layout %>%
-    dplyr::filter(terminal) %>%
-    dplyr::pull(id)
+  terminal_ids <- layout %>% filter(terminal) %>% pull(id)
   
   find_node_by_id <- function(node, id) {
     if (partykit::id_node(node) == id) return(node)
@@ -75,7 +89,7 @@ plot_pltree <- function(tree) {
     worth <- as.numeric(coef(model))
     se <- sqrt(diag(vcov(model)))
     n <- length(model$rankings)
-    tidyr::tibble(
+    tibble::tibble(
       node = paste0("Node ", nid),
       item = names(coef(model)),
       worth = worth,
@@ -84,20 +98,25 @@ plot_pltree <- function(tree) {
       n = n
     )
   }) %>%
-    dplyr::mutate(item = factor(item,levels = rev(unique(item))),
+    dplyr::mutate(item = factor(item, levels = rev(unique(item))),
                   node_label = paste0(node, " (n = ", n, ")"))
   
-  # Tree plot ----------------------------------------------------------------
-  tree_plot <- ggplot2::ggplot() +
-    ggplot2::geom_segment(data = edges,
-                          ggplot2::aes(x = x_parent, y = y_parent, xend = x_child, yend = y_child),
-                          color = "grey40") +
+  tree_plot <- ggplot2::ggplot()
+  if (nrow(edges) > 0){
+    tree_plot <- tree_plot +
+      ggplot2::geom_segment(data = edges,
+                            ggplot2::aes(x = x, y = y, xend = xend, yend = yend),
+                            color = "grey40") +
+      ggplot2::geom_text(data = edges,
+                         ggplot2::aes(x = label_x, y = label_y, label = label),
+                         size = 3.2)
+  }
+  tree_plot <- tree_plot +
     ggplot2::geom_label(data = layout,
                         ggplot2::aes(x = x, y = y, label = label),
                         fill = "white", size = 3.5, label.size = 0.3) +
     ggplot2::theme_void()
   
-  # Dotplot ------------------------------------------------------------------
   dotplot <- ggplot2::ggplot(worth_data, ggplot2::aes(x = worth, y = item)) +
     ggplot2::geom_point(size = 2) +
     ggplot2::geom_errorbarh(ggplot2::aes(xmin = lower, xmax = upper), height = 0.2, color = "blue") +
@@ -111,6 +130,5 @@ plot_pltree <- function(tree) {
                    axis.text.y = ggplot2::element_text(size = 8)) +
     ggplot2::labs(x = "Worth Parameter")
   
-  # Combine ------------------------------------------------------------------
   tree_plot / dotplot + patchwork::plot_layout(heights = c(1, 3))
 }
