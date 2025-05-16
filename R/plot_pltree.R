@@ -15,7 +15,10 @@ plot_pltree <- function(tree) {
     label <- if (!is_terminal) {
       split <- partykit::split_node(node)
       var_name <- names(attr(tree, "data"))[split$varid]
-      paste0(var_name, "\np = ", formatC(partykit::info_node(node)$p.value, format = "e", digits = 2))
+      paste0(var_name, "\np = ",
+             formatC(partykit::info_node(node)$p.value,
+                     format = "e",
+                     digits = 2))
     } else {
       paste("Node", this_id)
     }
@@ -52,7 +55,9 @@ plot_pltree <- function(tree) {
   edges <- ggraph::get_edges(layout)
   
   # Worth data ---------------------------------------------------------------
-  terminal_ids <- layout %>% filter(terminal) %>% pull(id)
+  terminal_ids <- layout %>%
+    dplyr::filter(terminal) %>%
+    dplyr::pull(id)
   
   find_node_by_id <- function(node, id) {
     if (partykit::id_node(node) == id) return(node)
@@ -79,7 +84,7 @@ plot_pltree <- function(tree) {
       n = n
     )
   }) %>%
-    dplyr::mutate(item = factor(item, levels = rev(unique(item))),
+    dplyr::mutate(item = factor(item,levels = rev(unique(item))),
                   node_label = paste0(node, " (n = ", n, ")"))
   
   # Tree plot ----------------------------------------------------------------
