@@ -57,7 +57,7 @@ plot_pltree <- function(tree) {
         label_x = (x + x_positions[i]) / 2,
         label_y = -(depth + 0.5)
       )
-      list(layout = kid_result$layout, edges = bind_rows(kid_result$edges, edge))
+      list(layout = kid_result$layout, edges = dplyr::bind_rows(kid_result$edges, edge))
     })
     
     child_layouts <- dplyr::bind_rows(purrr::map(results, "layout"))
