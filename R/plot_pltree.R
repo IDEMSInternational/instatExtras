@@ -52,7 +52,7 @@ plot_pltree <- function(tree) {
   root_node <- partykit::node_party(tree)
   layout <- layout_tree(root_node)
   
-  edges <- ggraph::get_edges(layout)
+  edges <- get_edges(layout)
   
   # Worth data ---------------------------------------------------------------
   terminal_ids <- layout %>%
