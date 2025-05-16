@@ -31,13 +31,13 @@
 #' 
 #' @export
 plot_pltree <- function (tree){
-  library(PlackettLuce)
-  library(partykit)
-  library(ggplot2)
-  library(dplyr)
-  library(tibble)
-  library(purrr)
-  library(patchwork)
+  requireNamespace(PlackettLuce)
+  requireNamespace(partykit)
+  requireNamespace(ggplot2)
+  requireNamespace(dplyr)
+  requireNamespace(tibble)
+  requireNamespace(purrr)
+  requireNamespace(patchwork)
   terminal_ids <- nodeids(tree, terminal = TRUE)
   find_node_by_id <- function(node, id) {
     if (id_node(node) == id) 
