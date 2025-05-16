@@ -251,3 +251,32 @@ test_that("check_data_levels summarises normally when valid", {
   
   expect_equal(check_data_levels(levels_good), "data1 level: id")
 })
+
+# test-count_differences.R
+testthat::test_that("Identical vectors give 0", {
+  expect_equal(count_differences(c(1, 2, 3), c(1, 2, 3)), 0)
+})
+
+testthat::test_that("Different values are counted", {
+  expect_equal(count_differences(c(1, 2, 3), c(1, 4, 3)), 1)
+})
+
+testthat::test_that("NA vs value is counted as difference", {
+  expect_equal(count_differences(c(1, NA, 3), c(1, 2, 3)), 1)
+})
+
+testthat::test_that("NA vs NA is not a difference", {
+  expect_equal(count_differences(c(1, NA, 3), c(1, NA, 3)), 0)
+})
+
+testthat::test_that("Different types return NA", {
+  expect_true(is.na(count_differences(c(1, 2, 3), c("1", "2", "3"))))
+})
+
+testthat::test_that("Length mismatch throws error", {
+  expect_error(count_differences(c(1, 2), c(1, 2, 3)), "Vectors must be the same length")
+})
+
+testthat::test_that("Logical values are correctly compared", {
+  expect_equal(count_differences(c(TRUE, FALSE, NA), c(TRUE, TRUE, NA)), 1)
+})
