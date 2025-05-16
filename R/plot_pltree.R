@@ -8,6 +8,12 @@
 #' @return A ggplot2 object showing the tree and corresponding worth dotplots.
 #' @export
 plot_pltree <- function(tree) {
+  # Attach temporarily
+  patchwork_loaded <- "package:patchwork" %in% search()
+  if (!patchwork_loaded) {
+    suppressMessages(library(patchwork))
+    on.exit(detach("package:patchwork", unload = TRUE), add = TRUE)
+  }
   # Recursive tree layout ----------------------------------------------------
   tree_data <- model.frame(tree)
   
