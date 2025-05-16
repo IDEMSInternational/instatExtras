@@ -108,7 +108,7 @@ plot_pltree <- function (tree){
                           fill = "white", inherit.aes = FALSE) + 
       ggplot2::geom_text(data = edges, ggplot2::aes(x = label_x, y = label_y,  label = label), size = 3.5) +
       ggplot2::theme_void()
-    dotplot <- ggplot(worth_data, ggplot2::aes(x = worth, y = item)) + 
+    dotplot <- ggplot2::ggplot(worth_data, ggplot2::aes(x = worth, y = item)) + 
       ggplot2::geom_point(size = 2) +
       ggplot2::geom_text(ggplot2::aes(label = round(worth, 2)), hjust = -0.3, size = 3)
     #ggplot2::facet_wrap(~node_label, nrow = 1) +
