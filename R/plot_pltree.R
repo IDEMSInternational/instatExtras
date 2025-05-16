@@ -71,7 +71,9 @@ plot_pltree <- function(tree) {
   layout <- layout_result$layout
   edges <- layout_result$edges
   
-  terminal_ids <- layout %>% filter(terminal) %>% pull(id)
+  terminal_ids <- layout %>%
+    dplyr::filter(terminal) %>%
+    dplyr::pull(id)
   
   find_node_by_id <- function(node, id) {
     if (partykit::id_node(node) == id) return(node)
