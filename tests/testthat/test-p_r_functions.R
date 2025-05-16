@@ -219,7 +219,7 @@ test_that("plot_pltree runs and returns a ggplot object", {
   
   p <- plot_pltree(tm_tree)
   
-  expect_s3_class(p, "ggplot")  # patchwork returns a ggplot subclass
+  expect_true("ggplot" %in% class(p))  # patchwork returns a ggplot subclass
 })
 
 test_that("plot_pltree gives informative error on invalid input", {
