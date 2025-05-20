@@ -1,23 +1,34 @@
-#' Count Differences Between Two Vectors
+#' Count Number of Rows with Differences Across Multiple Vectors
 #'
-#' Compares two vectors element-wise and returns the number of differing elements.
-#' Treats \code{NA != value} as a difference and considers \code{NA == NA} as equal.
+#' Compares multiple vectors row-wise and returns the number of rows
+#' where not all values are equal (treating NA != value).
 #'
-#' @param x A vector.
-#' @param y A vector of the same length and type as \code{x}.
+#' @param ... Any number of vectors of equal length.
 #'
-#' @return An integer: the number of differing values between \code{x} and \code{y}.
-#' Returns \code{NA_integer_} if \code{x} and \code{y} have different types.
-#' 
+#' @return An integer: number of rows where not all values are equal.
+#'
 #' @examples
-#' count_differences(c(1, 2, NA), c(1, 3, NA))     # 1 difference (2 vs 3)
-#' count_differences(c("a", "b"), c("a", "c"))     # 1 difference
-#' count_differences(c("a", "b"), c(1, 2))     # NA because different type
-#' count_differences(c(TRUE, NA), c(TRUE, FALSE)) # 1 difference (NA vs FALSE)
-#'
-#' @export
-count_differences <- function(x, y) {
-  if (length(x) != length(y)) stop("Vectors must be the same length.")
-  if (typeof(x) != typeof(y)) return(NA_integer_)
-  sum(!(is.na(x) & is.na(y)) & (is.na(x) != is.na(y) | x != y), na.rm = TRUE)
+#' count_differences(c(1, 2, NA), c(1, 3, NA), c(1, 2, NA))
+#' count_differences(c("a", "b"), c("a", "b"), c("a", "c"))
+#' count_differences(c(1, 7), c(1, 3), c(1, 2))
+#' count_differences(c("a", "b"), c(1, 3), c(1, 2)) 
+count_differences <- function(...) {
+  cols <- list(...)
+  
+  if (length(cols) < 2) stop("Need at least two vectors.")
+  lengths <- vapply(cols, length, integer(1))
+  if (length(unique(lengths)) != 1) stop("All vectors must be same length.")
+  
+  types <- vapply(cols, typeof, character(1))
+  if (length(unique(types)) != 1) return(NA_integer_)
+  
+  mat <- do.call(cbind, cols)
+  
+  sum(apply(mat, 1, function(row) {
+    # If all NA, consider equal
+    if (all(is.na(row))) return(FALSE)
+    # Remove NAs and check if all remaining values are identical
+    vals <- row[!is.na(row)]
+    length(unique(vals)) > 1 || any(is.na(row) & !all(is.na(row)))
+  }))
 }

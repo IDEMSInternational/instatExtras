@@ -274,9 +274,14 @@ testthat::test_that("Different types return NA", {
 })
 
 testthat::test_that("Length mismatch throws error", {
-  expect_error(count_differences(c(1, 2), c(1, 2, 3)), "Vectors must be the same length")
+  expect_error(count_differences(c(1, 2), c(1, 2, 3)), "All vectors must be same length.")
+})
+
+testthat::test_that("Arguments mismatch throws error", {
+  expect_error(count_differences(c(1, 2)), "Need at least two vectors.")
 })
 
 testthat::test_that("Logical values are correctly compared", {
   expect_equal(count_differences(c(TRUE, FALSE, NA), c(TRUE, TRUE, NA)), 1)
 })
+
