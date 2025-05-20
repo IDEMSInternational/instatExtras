@@ -9,7 +9,7 @@
 #'
 #' @examples 
 #' dekade(as.Date("2020/12/25"))
-#' dekade(as.Date("1999/01/01"))
+#' dekade(as.Date("1997/07/21"))
 dekade <- function(date) {
   d <- 3 * (lubridate::month(date)) - 2 +
     (lubridate::mday(date) > 10) +
