@@ -7,6 +7,8 @@
 #'
 #' @return An integer: number of rows where not all values are equal.
 #'
+#' @export
+#' 
 #' @examples
 #' count_differences(c(1, 2, NA), c(1, 3, NA), c(1, 2, NA))
 #' count_differences(c("a", "b"), c("a", "b"), c("a", "c"))
