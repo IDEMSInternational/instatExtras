@@ -37,7 +37,8 @@ is.logical.like <- function(x) {
   } else if (is.character(x)) {
     return(all(x_no_na %in% c("0", "1", "TRUE", "FALSE")))
   } else if (is.factor(x)) {
-    return(all(levels(x) %in% c("0", "1", "TRUE", "FALSE")))
+    levs <- levels(x)
+    return(identical(sort(levs), c("0", "1")) || identical(sort(levs), c("FALSE", "TRUE")))
   } else {
     return(FALSE)
   }
