@@ -263,8 +263,41 @@ test_that("is.logical.like correctly identifies logical-like objects", {
   expect_true(is.logical.like(c(TRUE, FALSE)))
   expect_true(is.logical.like(1))
   expect_true(is.logical.like(c(0, 1)))
-  expect_false(is.logical.like("TRUE"))
+  expect_true(is.logical.like("TRUE"))
   expect_false(is.logical.like(NULL))
+})
+
+test_that("is.logical.like() identifies logical vectors", {
+  expect_true(is.logical.like(c(TRUE, FALSE, TRUE)))
+  expect_true(is.logical.like(logical(0)))  # empty logical
+})
+
+test_that("is.logical.like() identifies numeric 0/1 vectors", {
+  expect_true(is.logical.like(c(0, 1, 1, 0)))
+  expect_true(is.logical.like(c(0, 0, NA, 1)))  # handles NA
+  expect_false(is.logical.like(c(1, 2, 0)))     # 2 is not valid
+  expect_false(is.logical.like(c(1.0, 0.0, 1.5)))  # 1.5 invalid
+})
+
+test_that("is.logical.like() identifies character '0'/'1'/'TRUE'/'FALSE'", {
+  expect_true(is.logical.like(c("0", "1", "1")))
+  expect_true(is.logical.like(c("TRUE", "FALSE", "TRUE")))
+  expect_true(is.logical.like(c("0", "1", NA)))
+  expect_false(is.logical.like(c("yes", "no")))
+  expect_false(is.logical.like(c("0", "1", "2")))
+})
+
+test_that("is.logical.like() identifies factor with valid levels", {
+  expect_true(is.logical.like(factor(c("TRUE", "FALSE"))))
+  expect_true(is.logical.like(factor(c("0", "1", "0"))))
+  expect_false(is.logical.like(factor(c("0", "2"))))
+  expect_false(is.logical.like(factor(c("yes", "no"))))
+})
+
+test_that("is.logical.like() returns FALSE for other types", {
+  expect_false(is.logical.like(as.Date("2020-01-01") + 0:1))
+  expect_false(is.logical.like(list(TRUE, FALSE)))
+  expect_true(is.logical.like(matrix(c(0, 1, 1), ncol = 1)))
 })
 
 test_that("is.NAvariable correctly identifies NA and NULL vectors", {

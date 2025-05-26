@@ -22,16 +22,22 @@
 #' # Output: TRUE
 #' 
 #' is.logical.like("TRUE") 
-#' # Output: FALSE
+#' # Output: TRUE
 #' 
 #' is.logical.like(NULL) 
 #' # Output: FALSE
 
 is.logical.like <- function(x) {
-  if(is.logical(x)){
+  x_no_na <- stats::na.omit(x)
+  
+  if (is.logical(x)) {
     return(TRUE)
-  } else if(is.numeric(x)) {
-    return(all(stats::na.omit(x) %in% c(1,0)))
+  } else if (is.numeric(x)) {
+    return(all(x_no_na %in% c(0, 1)))
+  } else if (is.character(x)) {
+    return(all(x_no_na %in% c("0", "1", "TRUE", "FALSE")))
+  } else if (is.factor(x)) {
+    return(all(levels(x) %in% c("0", "1", "TRUE", "FALSE")))
   } else {
     return(FALSE)
   }

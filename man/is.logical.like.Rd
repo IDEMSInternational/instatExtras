@@ -29,7 +29,7 @@ is.logical.like(c(0, 1))
 # Output: TRUE
 
 is.logical.like("TRUE") 
-# Output: FALSE
+# Output: TRUE
 
 is.logical.like(NULL) 
 # Output: FALSE
