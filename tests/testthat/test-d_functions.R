@@ -53,13 +53,14 @@ test_that("detect_tricot_structure finds option, trait, and rank structure", {
     id = 1:3,
     option_a = c("x", "y", "z"),
     option_b = c("x", "y", "z"),
+    option_c = c("y", "x", "z"),
     colour_pos = c("A", "B", "C"),
     taste_neg = c("C", "B", "Not observed")
   )
   
   res <- detect_tricot_structure(df)
   
-  expect_equal(res$option_cols, c("option_a", "option_b"))
+  expect_equal(res$option_cols, c("option_a", "option_b", "option_c"))
   expect_true("_pos" %in% res$trait_good_cols)
   expect_true("_neg" %in% res$trait_bad_cols)
   expect_equal(sort(res$ranks), c("A", "B", "C"))

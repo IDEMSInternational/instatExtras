@@ -6,6 +6,7 @@
 \usage{
 detect_tricot_structure(
   data,
+  prefix = NULL,
   good_suffixes = c("_pos", "_best"),
   bad_suffixes = c("_neg", "_worst"),
   na_candidates = c("Not observed", "Not scored", NA_character_)
@@ -13,6 +14,8 @@ detect_tricot_structure(
 }
 \arguments{
 \item{data}{A data frame that may contain tricot trial data.}
+
+\item{prefix}{Character vector of suffixes that indicate trait-data (default \code{NULL})}
 
 \item{good_suffixes}{Character vector of suffixes that indicate positively ranked traits (default: \code{"_pos"}, \code{"_best"}).}
 

@@ -182,6 +182,27 @@ test_that("error if no columns ending with trait_good or trait_bad found in data
   )
 })
 
+test_that("beans data with no trait columns works", {
+  library(PlackettLuce)
+  data(beans)
+  beans$id <- 1:nrow(beans)
+  
+  tricot_structure <- detect_tricot_structure(beans, 
+                                              good_suffixes = "best", bad_suffixes = "worst", 
+                                              na_candidates = "na_candidates")
+  expect_equal(tricot_structure$option_cols, c("variety_a", "variety_b", "variety_c"))
+  expect_equal(tricot_structure$ranks, c("A", "B", "C"))
+  
+  pivot_data <- pivot_tricot(data = beans, 
+               data_id_col = "id", option_cols = tricot_structure$option_cols, 
+               possible_ranks = tricot_structure$ranks, trait_good = tricot_structure$trait_good_cols, 
+               trait_bad = tricot_structure$trait_bad_cols, 
+               na_value = tricot_structure$na_candidates)
+  expect_true(ncol(pivot_data) == 3)
+  expect_equal(names(pivot_data), c("id", "variety", "trait"))
+})
+
+
 test_that("plot_pltree runs and returns a ggplot object", {
   library(psychotree)
   library(PlackettLuce)

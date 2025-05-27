@@ -103,7 +103,6 @@ pivot_tricot <- function(data = NULL, data_id_col = "id", data_plot_trait = NULL
     matching_cols <- data %>% dplyr::select(dplyr::ends_with(trait_good), dplyr::ends_with(trait_bad))
     
     label_map <- stats::setNames(option_cols, possible_ranks)
-    
     data_options <- data %>%
       dplyr::mutate(id = data[[data_id_col]]) %>% 
       tidyr::pivot_longer(cols = dplyr::all_of(option_cols), names_to = "Label", values_to = "variable") %>% 
@@ -121,31 +120,45 @@ pivot_tricot <- function(data = NULL, data_id_col = "id", data_plot_trait = NULL
                             names_to = "trait", values_to = "variety") %>%
         dplyr::select(c(id, trait, variety)) %>%
         dplyr::mutate(rank = ifelse(grepl(trait_good, trait), 1, 3)) %>%
-        dplyr::mutate(trait = sub("(_[^_]*)$", "", trait)) %>%
-        dplyr::filter(!is.na(variety)) %>%
-        dplyr::group_by(id, trait) %>%
-        dplyr::mutate(variety = if (dplyr::n_distinct(variety) == 1) NA else variety) %>%
-        dplyr::filter(!is.na(variety)) %>%
-        dplyr::ungroup() %>%
-        unique()
+        dplyr::mutate(trait = sub("(_[^_]*)$", "", trait))
       
-      rank_2 <- data_options %>%
-        dplyr::group_by(id, trait) %>%
-        dplyr::filter(variety != na_value) %>%
-        dplyr::count() %>%
-        dplyr::mutate(rank = 2) %>%
-        dplyr::filter(n == 2)
-      
-      data_options_b <- data_options %>%
-        dplyr::full_join(rank_2) %>%
-        dplyr::group_by(id, trait) %>%
-        dplyr::mutate(variety = ifelse(is.na(variety), setdiff(possible_ranks, variety)[1], variety)) %>%
-        dplyr::ungroup() %>%
-        dplyr::arrange(id, trait) %>%
-        dplyr::full_join(data_options_id) %>%
-        dplyr::select(c(id, trait, rank, dummy_variety = variety, variety = variable)) %>%
-        tidyr::pivot_wider(names_from = trait, values_from = rank) %>%
-        dplyr::filter(!is.na(variety))
+      if (ncol(matching_cols) == 2){ # here, we have just "best" and "worst"
+        data_options_b <- data_options %>%
+          dplyr::group_by(id) %>%
+          dplyr::summarise(missing_var = setdiff(possible_ranks, variety), .groups = "drop") %>%
+          dplyr::mutate(trait = "middle", rank = 2) %>%
+          dplyr::rename(variety = missing_var) %>%
+          dplyr::bind_rows(data_options) %>%
+          dplyr::arrange(id, rank) %>%
+          dplyr::mutate(trait = rank) %>% # only have one trait.
+          dplyr::select(-c("rank"))
+      } else {
+        data_options <- data_options %>%
+          dplyr::filter(!is.na(variety)) %>%
+          dplyr::group_by(id, trait) %>%
+          dplyr::mutate(variety = if (dplyr::n_distinct(variety) == 1) NA else variety) %>%
+          dplyr::filter(!is.na(variety)) %>%
+          dplyr::ungroup() %>%
+          unique()
+        
+        rank_2 <- data_options %>%
+          dplyr::group_by(id, trait) %>%
+          dplyr::filter(variety != na_value) %>%
+          dplyr::count() %>%
+          dplyr::mutate(rank = 2) %>%
+          dplyr::filter(n == 2)
+        
+        data_options_b <- data_options %>%
+          dplyr::full_join(rank_2) %>%
+          dplyr::group_by(id, trait) %>%
+          dplyr::mutate(variety = ifelse(is.na(variety), setdiff(possible_ranks, variety)[1], variety)) %>%
+          dplyr::ungroup() %>%
+          dplyr::arrange(id, trait) %>%
+          dplyr::full_join(data_options_id) %>%
+          dplyr::select(c(id, trait, rank, dummy_variety = variety, variety = variable)) %>%
+          tidyr::pivot_wider(names_from = trait, values_from = rank) %>%
+          dplyr::filter(!is.na(variety))
+      }
     } else {
       if (!is.null(data_plot_trait)){
         data_options_id <- data_options_id %>%
