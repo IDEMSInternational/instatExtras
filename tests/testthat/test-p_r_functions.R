@@ -183,7 +183,7 @@ test_that("error if no columns ending with trait_good or trait_bad found in data
 })
 
 test_that("beans data with no trait columns works", {
-  library(gosset)
+  library(PlackettLuce)
   data(beans)
   beans$id <- 1:nrow(beans)
   
