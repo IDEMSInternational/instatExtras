@@ -99,7 +99,7 @@ detect_tricot_structure <- function(data,
   suffix_order <- sub(".*_", "", option_cols)
   
   # Reorder ranks based on matching lowercase suffixes
-  rank_values <- rank_values[match(suffix_order, tolower(rank_values))]
+  rank_values <- rank_values[match(toupper(suffix_order), rank_values)]
   
   list(
     option_cols = option_cols,
