@@ -39,11 +39,12 @@ summarise_data_levels <- function(data_list, id_cols = c("id", "participant_id",
     dplyr::tibble(
       dataset = name,
       level = res$level,
-      id_col = res$id_col %||% NA,
-      variety_col = res$variety_col %||% NA,
-      trait_col = res$trait_col %||% NA,
+      id_col = if (length(res$id_col) == 0) NA else res$id_col,
+      variety_col = if (length(res$variety_col) == 0) NA else res$variety_col,
+      trait_col = if (length(res$trait_col) == 0) NA else res$trait_col
     )
   })
+  
   if (all(output_data_levels$level == "No marker columns found.")){
     output_data_levels$print <- "Tricot Data not found."
   } else {
