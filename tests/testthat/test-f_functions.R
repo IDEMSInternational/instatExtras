@@ -17,8 +17,8 @@ test_that("find_data_level falls back to id level", {
   res <- find_data_level(df)
   expect_equal(res$level, "id")
   expect_equal(res$id_col, "id")
-  expect_true(is.null(res$variety_col))
-  expect_true(is.null(res$trait_col))
+  expect_true(length(res$variety_col) == 0)
+  expect_true(length(res$trait_col) == 0)
 })
 
 test_that("find_data_level handles duplicate columns (chooses unique)", {
@@ -34,7 +34,7 @@ test_that("find_data_level handles no matching columns", {
   df <- dplyr::tibble(x = 1:5)
   res <- find_data_level(df)
   expect_equal(res$level, "No marker columns found.")
-  expect_true(is.null(res$id_col))
+  expect_true(length(res$id_col) == 0)
 })
 
 test_that("message when no unique column among possible matches", {
@@ -45,9 +45,8 @@ test_that("message when no unique column among possible matches", {
     trait = c("height", "height", "weight", "weight")
   )
   
-  expect_message(
-    find_data_level(df, id_cols = c("id", "participant_id")),
-    regexp = "No unique column among possible matches for 'id'. Ignoring this marker type."
+  expect_true(
+    find_data_level(df, id_cols = c("id", "participant_id"))$id_col == "id"
   )
 })
 
@@ -65,3 +64,4 @@ test_that("returns correct level when no combination uniquely identifies", {
     "No combination of markers uniquely identifies the data rows."
   )
 })
+

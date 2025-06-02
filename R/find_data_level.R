@@ -79,7 +79,7 @@ find_data_level <- function(data,
     best <- result_df %>%
       dplyr::filter(is_unique) %>%
       dplyr::arrange(lengths(strsplit(level, "-"))) %>%
-      dplyr::slice(1)
+      dplyr::slice_tail(n = 1)
     level_raw <- best$level
     
     # Rename specific levels
