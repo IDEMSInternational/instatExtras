@@ -45,8 +45,4 @@ levels_no_marker <- summarise_data_levels(list(data1 = data_empty))
 levels_no_marker$level <- "No marker columns found." # simulate no markers found
 check_data_levels(levels_no_marker)
 
-# Example 4: Normal case, prints dataset and level
-data_good <- data.frame(id = 1:3, variety = c("A", "B", "C"))
-levels_good <- summarise_data_levels(list(data1 = data_good))
-check_data_levels(levels_good)
 }
