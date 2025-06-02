@@ -32,22 +32,13 @@ find_data_level <- function(data,
   
   rename_to_standard <- function(df, possible_names, standard_name) {
     found <- intersect(possible_names, names(df))
-    
-    if (length(found) == 1) {
-      selected_cols[[standard_name]] <<- found
-      df <- df %>% dplyr::rename(!!standard_name := dplyr::all_of(found))
-      
-    } else if (length(found) > 1) {
-      unique_candidates <- found[sapply(found, function(col) anyDuplicated(df[[col]]) == 0)]
-      
-      if (length(unique_candidates) >= 1) {
-        chosen <- unique_candidates[1]
-        selected_cols[[standard_name]] <<- chosen
-        df <- df %>% dplyr::rename(!!standard_name := dplyr::all_of(chosen))
-      } else {
-        message(paste0("No unique column among possible matches for '", standard_name, "'. Ignoring this marker type."))
-      }
+    if (length(found) > 1) {
+      found <- found[1]
+      message(paste0("Multiple matching variables for '", standard_name, "'. Taking ", found, "."))
     }
+    
+    selected_cols[[standard_name]] <<- found
+    df <- df %>% dplyr::rename(!!standard_name := dplyr::all_of(found))
     return(df)
   }
   
