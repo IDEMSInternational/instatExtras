@@ -98,4 +98,14 @@ nicabean_by_plot_2 <- pivot_tricot(data = nicabean_by_id,
                                          variety_col = "item",
                                          trait_col = "trait",
                                          rank_col = "rank")
+                                         
+
+# Example with beans data
+library(PlackettLuce)
+data(beans)
+beans$ID <- 1:nrow(beans)
+beans_by_plot <- pivot_tricot(data = beans,
+                                         data_id_col = "ID",
+                                         option_cols = c("variety_a", "variety_b", "variety_c"),
+                                         trait_bad = "worst", trait_good = "best")
 }
