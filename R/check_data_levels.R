@@ -40,12 +40,17 @@
 check_data_levels <- function(x) {
   output_data_levels_check <- x %>% dplyr::filter(level != "No marker columns found.")
   if (all(x$level == "No marker columns found.")) {
-    return("2") # Tricot Data not found.
+    return("2") # Tricot Data not found. / ID level data not found.
   } else if (!"id" %in% x$level) {
     return("0") # Need ID level data to proceed.
   } else if (length(unique(output_data_levels_check$level)) != length(output_data_levels_check$level)) {
     return("1") # Multiple data frames given at ID level. Should only have one data frame at each level.
   } else {
-    return(paste0(x$dataset, " level: ", x$level, collapse = "; "))
+    if (any(output_data_levels_check$varieties_cols == 0, na.rm = TRUE)) {
+      return("4")
+    } else {
+      # Otherwise it is all ok.
+      return(paste0(x$dataset, " level: ", x$level, collapse = "; ")) 
     }
+  }
 }

@@ -29,8 +29,8 @@
 #' @export
 detect_tricot_structure <- function(data,
                                     prefix = NULL,
-                                    good_suffixes = c("_pos", "_best"),
-                                    bad_suffixes = c("_neg", "_worst"),
+                                    good_suffixes = c("_pos", "_best", "best"),
+                                    bad_suffixes = c("_neg", "_worst", "worst"),
                                     na_candidates = c("Not observed", "Not scored", NA_character_)) {
   
   # 1. Option columns (ending in _a/_b/_c or similar)

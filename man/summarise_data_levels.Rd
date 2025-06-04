@@ -8,7 +8,9 @@ summarise_data_levels(
   data_list,
   id_cols = c("id", "participant_id", "participant_name", "ID"),
   variety_cols = c("variety", "varieties", "item", "items", "Genotype", "genotype"),
-  trait_cols = c("trait", "traits")
+  trait_cols = c("trait", "traits"),
+  positive_trait_suffixes = c("_pos", "_best"),
+  negative_trait_suffixes = c("_neg", "_worst")
 )
 }
 \arguments{
@@ -19,6 +21,10 @@ summarise_data_levels(
 \item{variety_cols}{Character vector of possible names for variety columns.}
 
 \item{trait_cols}{Character vector of possible names for trait columns.}
+
+\item{positive_trait_suffixes}{Character vector of suffixes used for positive trait rankings (e.g., \code{"_pos"}, \code{"_best"}) for ID-level data only.}
+
+\item{negative_trait_suffixes}{Character vector of suffixes used for negative trait rankings (e.g., \code{"_neg"}, \code{"_worst"}) for ID-level data only.}
 }
 \value{
 A tibble summarising the data level structure of each dataset. Columns include:

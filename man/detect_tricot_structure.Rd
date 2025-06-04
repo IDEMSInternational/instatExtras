@@ -7,8 +7,8 @@
 detect_tricot_structure(
   data,
   prefix = NULL,
-  good_suffixes = c("_pos", "_best"),
-  bad_suffixes = c("_neg", "_worst"),
+  good_suffixes = c("_pos", "_best", "best"),
+  bad_suffixes = c("_neg", "_worst", "worst"),
   na_candidates = c("Not observed", "Not scored", NA_character_)
 )
 }

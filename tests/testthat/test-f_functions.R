@@ -65,3 +65,11 @@ test_that("returns correct level when no combination uniquely identifies", {
   )
 })
 
+test_that("No suffix-based varieties found when only ID is present", {
+  df <- data.frame(id = 1:3, height = c(1.2, 2.3, 1.8), taste = c(3, 2, 4))
+  
+  result <- find_data_level(df)
+  
+  expect_equal(result$level, "id")
+  expect_equal(result$varieties_cols, 0)
+})
