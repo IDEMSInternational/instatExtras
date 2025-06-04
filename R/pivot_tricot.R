@@ -64,6 +64,16 @@
 #'                                          variety_col = "item",
 #'                                          trait_col = "trait",
 #'                                          rank_col = "rank")
+#'                                          
+#' 
+#' # Example with beans data
+#' library(PlackettLuce)
+#' data(beans)
+#' beans$ID <- 1:nrow(beans)
+#' beans_by_plot <- pivot_tricot(data = beans,
+#'                                          data_id_col = "ID",
+#'                                          option_cols = c("variety_a", "variety_b", "variety_c"),
+#'                                          trait_bad = "worst", trait_good = "best")
 pivot_tricot <- function(data = NULL, data_id_col = "id", data_plot_trait = NULL,
                          data_plot_trait_id_col = "id",
                          variety_col = NULL,
@@ -89,7 +99,7 @@ pivot_tricot <- function(data = NULL, data_id_col = "id", data_plot_trait = NULL
   
   # Handle data_plot_trait if relevant columns are given
   if (!is.null(variety_col) & !is.null(trait_col) & !is.null(rank_col)) {
-
+    
     data_options_a <- data_plot_trait %>%
       tidyr::pivot_wider(names_from = dplyr::all_of(trait_col),
                          values_from = dplyr::all_of(rank_col))
@@ -109,29 +119,31 @@ pivot_tricot <- function(data = NULL, data_id_col = "id", data_plot_trait = NULL
       dplyr::mutate(Label = forcats::fct_recode(Label, !!!label_map))
     
     data_options_id <- data_options %>%
-      dplyr::select(c(id, variety = Label, variable)) %>%
+      dplyr::select(c(id,
+                      variety = variable,
+                      dummy_variety = Label)) %>%
       unique()
     
     if (ncol(matching_cols) > 0) {
-      data_options <- data %>%
-        dplyr::mutate(id = data[[data_id_col]]) %>%
+      data_options <- data %>% dplyr::mutate(id = data[[data_id_col]]) %>% 
         tidyr::pivot_longer(cols = dplyr::all_of(c(dplyr::ends_with(trait_good), 
-                                                   dplyr::ends_with(trait_bad))),
-                            names_to = "trait", values_to = "variety") %>%
+                                                   dplyr::ends_with(trait_bad))), names_to = "trait", 
+                            values_to = "variety") %>%
         dplyr::select(c(id, trait, variety)) %>%
         dplyr::mutate(rank = ifelse(grepl(trait_good, trait), 1, 3)) %>%
         dplyr::mutate(trait = sub("(_[^_]*)$", "", trait))
-      
-      if (ncol(matching_cols) == 2){ # here, we have just "best" and "worst"
-        data_options_b <- data_options %>%
-          dplyr::group_by(id) %>%
-          dplyr::summarise(missing_var = setdiff(possible_ranks, variety), .groups = "drop") %>%
+      if (ncol(matching_cols) == 2) {
+        data_options_b <- data_options %>% dplyr::group_by(id) %>% 
+          dplyr::summarise(missing_var = setdiff(possible_ranks, 
+                                                 variety), .groups = "drop") %>%
           dplyr::mutate(trait = "middle", rank = 2) %>%
-          dplyr::rename(variety = missing_var) %>%
+          dplyr::rename(variety = missing_var) %>% 
           dplyr::bind_rows(data_options) %>%
           dplyr::arrange(id, rank) %>%
-          dplyr::mutate(trait = rank) %>% # only have one trait.
-          dplyr::select(-c("rank"))
+          dplyr::mutate(trait = rank) %>% 
+          dplyr::select(-c("rank")) %>%
+          dplyr::rename(dummy_variety = "variety")
+        data_options_b <- dplyr::full_join(data_options_id, data_options_b)
       } else {
         data_options <- data_options %>%
           dplyr::filter(!is.na(variety)) %>%
@@ -154,16 +166,15 @@ pivot_tricot <- function(data = NULL, data_id_col = "id", data_plot_trait = NULL
           dplyr::mutate(variety = ifelse(is.na(variety), setdiff(possible_ranks, variety)[1], variety)) %>%
           dplyr::ungroup() %>%
           dplyr::arrange(id, trait) %>%
+          dplyr::rename(dummy_variety = variety) %>%
           dplyr::full_join(data_options_id) %>%
-          dplyr::select(c(id, trait, rank, dummy_variety = variety, variety = variable)) %>%
+          dplyr::select(c(id, trait, rank, variety, dummy_variety)) %>%
           tidyr::pivot_wider(names_from = trait, values_from = rank) %>%
           dplyr::filter(!is.na(variety))
       }
     } else {
       if (!is.null(data_plot_trait)){
-        data_options_id <- data_options_id %>%
-          dplyr::select(c(id, dummy_variety = variety, variable))
-        data_options_a <- dplyr::full_join(data_options_a, data_options_id, by = c("id" = "id", "variety" = "variable"))
+        data_options_a <- dplyr::full_join(data_options_a, data_options_id)
       } else {
         stop(paste0("No columns ending with ", trait_good, " or ", trait_bad, " found in `data`."))
       }

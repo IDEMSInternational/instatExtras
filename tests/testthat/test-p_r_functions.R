@@ -115,14 +115,6 @@ test_that("pivot_tricot works as expected", {
   
   nicabean_by_id$Vigor_pos = "A"
   nicabean_by_id$Vigor_neg = "C"
-  expect_warning(pivot_tricot(data = nicabean_by_id,
-                              data_id_col = "id",
-                              option_cols = c("variety_a", "variety_b", "variety_c"),
-                              data_plot_trait = nicabean_by_id_item_trait,
-                              data_plot_trait_id_col = "id",
-                              variety_col = "item",
-                              trait_col = "trait",
-                              rank_col = "rank"))
   
   expect_error(pivot_tricot(data = nicabean_by_id_item_trait,
                             data_plot_trait_id_col = "id",
@@ -198,8 +190,8 @@ test_that("beans data with no trait columns works", {
                possible_ranks = tricot_structure$ranks, trait_good = tricot_structure$trait_good_cols, 
                trait_bad = tricot_structure$trait_bad_cols, 
                na_value = tricot_structure$na_candidates)
-  expect_true(ncol(pivot_data) == 3)
-  expect_equal(names(pivot_data), c("id", "variety", "trait"))
+  expect_true(ncol(pivot_data) == 4)
+  expect_equal(names(pivot_data), c("id", "variety", "dummy_variety", "trait"))
 })
 
 
@@ -212,18 +204,11 @@ test_that("plot_pltree runs and returns a ggplot object", {
   data("Topmodel2007", package = "psychotree")
   ## convert paircomp object to grouped rankings
   R <- as.grouped_rankings(Topmodel2007$preference)
-  ## rankings are grouped by judge
-  print(R[1:2,], max = 4)
-  ## Topmodel2007[, -1] gives covariate values for each judge
-  print(Topmodel2007[1:2, -1])
   
   ## fit partition model based on all variables except preference
   ## set npseudo = 0 as all judges rank all models
   tm_tree <- pltree(R ~ ., data = Topmodel2007[, -1], minsize = 5,
                     npseudo = 0)
-  
-  ## log-abilities, zero sum contrast
-  itempar(tm_tree, log = TRUE)
   
   # Simulate a small rankings dataset
   R <- matrix(c(1, 2, 3,
@@ -232,12 +217,6 @@ test_that("plot_pltree runs and returns a ggplot object", {
                 3, 1, 2,
                 2, 3, 1), byrow = TRUE, ncol = 3)
   
-  ## plot shows abilities constrained to sum to 1
-  plot(tm_tree, abbreviate = 1, yscale = c(0, 0.5))
-  ## instead show log-abilities with Anja as reference (need to used index)
-  plot(tm_tree, abbreviate = 1, worth = FALSE, ref = 6,
-       yscale = c(-1.5, 2.2))
-  
   p <- plot_pltree(tm_tree)
   
   expect_true("ggplot" %in% class(p))  # patchwork returns a ggplot subclass
@@ -245,5 +224,45 @@ test_that("plot_pltree runs and returns a ggplot object", {
 
 test_that("plot_pltree gives informative error on invalid input", {
   expect_error(plot_pltree())
+})
+
+
+test_that("pivot_tricot warns when data and data_plot_trait have conflicting trait info", {
+  # ID-Level data with trait_good and trait_bad
+  data <- data.frame(
+    id = c(1, 2),
+    variety_a = c("A", "A"),
+    variety_b = c("B", "B"),
+    variety_c = c("C", "C"),
+    Vigor_pos = c("A", "B"),
+    Vigor_neg = c("C", "C"),
+    Mould_pos = c("A", "B"),
+    Mould_neg = c("C", "C")
+  )
+  
+  data_pivot <- pivot_tricot(data, option_cols = c("variety_a", "variety_b", "variety_c"))
+  
+  # Plot-Trait Level data with the same IDs and varieties, but slightly conflicting ranks
+  data_plot_trait <- data.frame(
+    id = c(1, 1, 1, 2, 2, 2, 1, 1, 1, 2, 2, 2),
+    item = c("A", "B", "C", "A", "B", "C", "A", "B", "C", "A", "B", "C"),
+    trait = c(rep("Vigor", 6), rep("Mould", 6)),
+    rank = c(1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3)  # Will mismatch due to data indicating C as worst (not 3rd)
+  )
+  
+  expect_warning(
+    out <- pivot_tricot(
+      data = data,
+      data_plot_trait = data_plot_trait,
+      data_id_col = "id",
+      data_plot_trait_id_col = "id",
+      variety_col = "item",
+      trait_col = "trait",
+      rank_col = "rank",
+      option_cols = c("variety_a", "variety_b", "variety_c"),
+      trait_good = "_pos",
+      trait_bad = "_neg"
+    )
+  )
 })
 
