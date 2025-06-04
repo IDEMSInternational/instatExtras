@@ -226,3 +226,43 @@ test_that("plot_pltree gives informative error on invalid input", {
   expect_error(plot_pltree())
 })
 
+
+test_that("pivot_tricot warns when data and data_plot_trait have conflicting trait info", {
+  # ID-Level data with trait_good and trait_bad
+  data <- data.frame(
+    id = c(1, 2),
+    variety_a = c("A", "A"),
+    variety_b = c("B", "B"),
+    variety_c = c("C", "C"),
+    Vigor_pos = c("A", "B"),
+    Vigor_neg = c("C", "C"),
+    Mould_pos = c("A", "B"),
+    Mould_neg = c("C", "C")
+  )
+  
+  data_pivot <- pivot_tricot(data, option_cols = c("variety_a", "variety_b", "variety_c"))
+  
+  # Plot-Trait Level data with the same IDs and varieties, but slightly conflicting ranks
+  data_plot_trait <- data.frame(
+    id = c(1, 1, 1, 2, 2, 2, 1, 1, 1, 2, 2, 2),
+    item = c("A", "B", "C", "A", "B", "C", "A", "B", "C", "A", "B", "C"),
+    trait = c(rep("Vigor", 6), rep("Mould", 6)),
+    rank = c(1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3)  # Will mismatch due to data indicating C as worst (not 3rd)
+  )
+  
+  expect_warning(
+    out <- pivot_tricot(
+      data = data,
+      data_plot_trait = data_plot_trait,
+      data_id_col = "id",
+      data_plot_trait_id_col = "id",
+      variety_col = "item",
+      trait_col = "trait",
+      rank_col = "rank",
+      option_cols = c("variety_a", "variety_b", "variety_c"),
+      trait_good = "_pos",
+      trait_bad = "_neg"
+    )
+  )
+})
+
