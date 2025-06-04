@@ -46,8 +46,8 @@ check_data_levels <- function(x) {
   } else if (length(unique(output_data_levels_check$level)) != length(output_data_levels_check$level)) {
     return("1") # Multiple data frames given at ID level. Should only have one data frame at each level.
   } else {
-    if (any(output_data_levels_check$varieties_cols == 0, na.rm = TRUE)) {
-      return("4")
+    if (nrow(output_data_levels_check) == 1 && any(output_data_levels_check$varieties_cols == 0, na.rm = TRUE)) {
+      return("4") # ID variable data found, but no traits data
     } else {
       # Otherwise it is all ok.
       return(paste0(x$dataset, " level: ", x$level, collapse = "; ")) 
