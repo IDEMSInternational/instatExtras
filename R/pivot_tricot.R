@@ -174,9 +174,7 @@ pivot_tricot <- function(data = NULL, data_id_col = "id", data_plot_trait = NULL
       }
     } else {
       if (!is.null(data_plot_trait)){
-        data_options_id <- data_options_id %>%
-          dplyr::select(c(id, dummy_variety = variety, variable))
-        data_options_a <- dplyr::full_join(data_options_a, data_options_id, by = c("id" = "id", "variety" = "variable"))
+        data_options_a <- dplyr::full_join(data_options_a, data_options_id)
       } else {
         stop(paste0("No columns ending with ", trait_good, " or ", trait_bad, " found in `data`."))
       }
