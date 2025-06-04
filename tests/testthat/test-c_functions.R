@@ -285,3 +285,20 @@ testthat::test_that("Logical values are correctly compared", {
   expect_equal(count_differences(c(TRUE, FALSE, NA), c(TRUE, TRUE, NA)), 1)
 })
 
+test_that("Returns '4' when variety suffixes are found but no trait or variety column", {
+  df <- data.frame(id = 1:3, yield = c(10, 20, 15), taste = c(5, 4, 3))
+  result <- summarise_data_levels(list(one = df))
+  
+  # Should return "4" because suffixes were detected (varieties_cols == 1)
+  expect_equal(check_data_levels(result), "4")
+})
+
+test_that("Does not return '4' when varieties_cols is NA", {
+  df <- data.frame(id = 1:3)
+  result <- summarise_data_levels(list(one = df))
+  result$varieties_cols <- NA
+  
+  # Should not return "4", fall through to final return
+  expect_false(check_data_levels(result) == "4")
+})
+

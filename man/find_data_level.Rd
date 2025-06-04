@@ -8,7 +8,9 @@ find_data_level(
   data,
   id_cols = c("id", "participant_id", "participant_name", "ID"),
   variety_cols = c("variety", "varieties", "item", "items", "Genotype", "genotype"),
-  trait_cols = c("trait", "traits")
+  trait_cols = c("trait", "traits"),
+  positive_trait_suffixes = c("_pos", "_best"),
+  negative_trait_suffixes = c("_neg", "_worst")
 )
 }
 \arguments{
@@ -19,6 +21,10 @@ find_data_level(
 \item{variety_cols}{Character vector of possible names for variety columns.}
 
 \item{trait_cols}{Character vector of possible names for trait columns.}
+
+\item{positive_trait_suffixes}{Character vector of suffixes used for positive trait rankings (e.g., \code{"_pos"}, \code{"_best"}) for ID-level data only.}
+
+\item{negative_trait_suffixes}{Character vector of suffixes used for negative trait rankings (e.g., \code{"_neg"}, \code{"_worst"}) for ID-level data only.}
 }
 \value{
 A named list with the following elements:
@@ -27,6 +33,7 @@ A named list with the following elements:
 \item{id_col}{The name of the column identified as the ID column (if found).}
 \item{variety_col}{The name of the variety column (if found).}
 \item{trait_col}{The name of the trait column (if found).}
+\item{varieties_cols}{An integer (0 or 1) indicating whether any columns appear to be variety-specific based on suffixes, used only when the data has just an ID column.}
 }
 }
 \description{
@@ -39,4 +46,8 @@ find_data_level(df)
 
 df <- data.frame(ID = c(1:3, 1:3), variety = c(1,1,1,3,3,3))
 find_data_level(df)
+
+df <- data.frame(id = 1:3, yield_pos = c(1, 2, 3))  # variety inferred from suffix
+find_data_level(df)
+
 }

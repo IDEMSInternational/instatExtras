@@ -6,6 +6,8 @@
 #' @param id_cols Character vector of possible names for ID columns.
 #' @param variety_cols Character vector of possible names for variety columns.
 #' @param trait_cols Character vector of possible names for trait columns.
+#' @param positive_trait_suffixes Character vector of suffixes used for positive trait rankings (e.g., `"_pos"`, `"_best"`) for ID-level data only.
+#' @param negative_trait_suffixes Character vector of suffixes used for negative trait rankings (e.g., `"_neg"`, `"_worst"`) for ID-level data only.
 #'
 #' @return A tibble summarising the data level structure of each dataset. Columns include:
 #' \describe{
@@ -23,7 +25,9 @@
 #' @export
 summarise_data_levels <- function(data_list, id_cols = c("id", "participant_id", "participant_name", "ID"),
                                   variety_cols = c("variety", "varieties", "item", "items", "Genotype", "genotype"),
-                                  trait_cols = c("trait", "traits")) {
+                                  trait_cols = c("trait", "traits"),
+                                  positive_trait_suffixes = c("_pos", "_best"),
+                                  negative_trait_suffixes = c("_neg", "_worst")) {
   # If data_list is a character vector, get the datasets from the environment
   if (is.character(data_list)){
     if (exists("data_book", inherits = TRUE)) {
@@ -35,18 +39,19 @@ summarise_data_levels <- function(data_list, id_cols = c("id", "participant_id",
   }
   
   output_data_levels <- purrr::map_dfr(names(data_list), function(name) {
-    res <- find_data_level(data_list[[name]], id_cols = id_cols, variety_cols = variety_cols, trait_cols = trait_cols)
+    res <- find_data_level(data_list[[name]], id_cols = id_cols, variety_cols = variety_cols, trait_cols = trait_cols, positive_trait_suffixes = positive_trait_suffixes, negative_trait_suffixes = negative_trait_suffixes)
     dplyr::tibble(
       dataset = name,
       level = res$level,
       id_col = if (length(res$id_col) == 0) NA else res$id_col,
       variety_col = if (length(res$variety_col) == 0) NA else res$variety_col,
-      trait_col = if (length(res$trait_col) == 0) NA else res$trait_col
+      trait_col = if (length(res$trait_col) == 0) NA else res$trait_col,
+      varieties_cols = if (length(res$varieties_cols) && res$varieties_cols == 1) NA else 0
     )
   })
-  
+
   if (all(output_data_levels$level == "No marker columns found.")){
-    output_data_levels$print <- "Tricot Data not found."
+    output_data_levels$print <- "Tricot Data not found. Try adding ID variable."
   } else {
     output_data_levels$print <- paste0(output_data_levels$dataset, " level: ", output_data_levels$level, collapse = "; ")
   }
