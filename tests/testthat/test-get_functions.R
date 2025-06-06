@@ -527,3 +527,13 @@ test_that("Table title is empty if multiple summary and variable values", {
   expect_equal(gt_table$`_heading`$title, "")
 })
 
+test_that("Table returns gt object if there are two summary-variables given", {
+  df <- tibble::tibble(
+    `summary-variable` = c("Sum", "Mean", "SD"),
+    col1 = 1:3,
+    col2 = 4:6
+  )
+  
+  gt_table <- generate_summary_tables(df)
+  expect_true("gt_tbl" %in% class(gt_table))
+})
