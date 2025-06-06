@@ -16,6 +16,8 @@ generate_summary_tables <- function(table_data) {
         unique() %>%
         gsub("__", " ", .) 
       table_data <- dplyr::select(table_data, -`summary-variable`)
+    } else {
+      return(gt::gt(table_data))
     }
   } else {
     unique_summary <- unique(table_data$summary)
