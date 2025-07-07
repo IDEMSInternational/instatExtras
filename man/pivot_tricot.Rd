@@ -7,6 +7,8 @@
 pivot_tricot(
   data = NULL,
   data_id_col = "id",
+  data_trait_cols = NULL,
+  carry_cols = NULL,
   data_plot_trait = NULL,
   data_plot_trait_id_col = "id",
   variety_col = NULL,
@@ -20,92 +22,64 @@ pivot_tricot(
 )
 }
 \arguments{
-\item{data}{A data frame containing option columns and trait ranking indicators (e.g. columns ending in \verb{_pos} or \verb{_neg}).}
+\item{data}{A data frame containing ID-level Tricot data.  Must include an ID column
+(data_id_col) and three option columns (option_cols), plus trait indicator
+columns ending in trait_good or trait_bad, unless data_plot_trait is provided.}
 
-\item{data_id_col}{The name of the ID column in \code{data}. Default is \code{"id"}.}
+\item{data_id_col}{Character string naming the ID column in data.  Default is "id".}
 
-\item{data_plot_trait}{A data frame containing ID, variety, trait, and rank columns.}
+\item{data_trait_cols}{Optional character vector of specific trait-indicator columns
+in data to restrict scanning (overrides automatic selection by suffix).  Default NULL.}
 
-\item{data_plot_trait_id_col}{The name of the ID column in \code{data_plot_trait}. Default is \code{"id"}.}
+\item{carry_cols}{Optional character vector of column names in data to carry along
+into the output (e.g. blocking factors, metadata).  Default NULL.}
 
-\item{variety_col}{The name of the variety column in \code{data_plot_trait}.}
+\item{data_plot_trait}{A data frame in “plot–trait” format containing one row per
+(ID, variety, trait) with an associated rank_col.  Default NULL.}
 
-\item{trait_col}{The name of the trait column in \code{data_plot_trait}.}
+\item{data_plot_trait_id_col}{Character string naming the ID column in
+data_plot_trait.  Default is "id".}
 
-\item{rank_col}{The name of the rank column in \code{data_plot_trait}.}
+\item{variety_col}{Character string naming the variety column in data_plot_trait.}
 
-\item{option_cols}{A character vector of column names in \code{data} that store the option labels (e.g. \code{"option_a"}, \code{"option_b"}, \code{"option_c"}).}
+\item{trait_col}{Character string naming the trait column in data_plot_trait.}
 
-\item{possible_ranks}{A character vector mapping to \code{option_cols}, indicating rank labels (e.g. \code{"A"}, \code{"B"}, \code{"C"}).}
+\item{rank_col}{Character string naming the rank column in data_plot_trait.}
 
-\item{trait_good}{A suffix string (e.g. \code{"_pos"}) used to identify columns in \code{data} where a variety is "preferred" for a trait. Default is \code{"_pos"}.}
+\item{option_cols}{Character vector of length three naming the option columns in
+data (e.g. c("option_a", "option_b", "option_c")).  Default is
+c("option_a", "option_b", "option_c").}
 
-\item{trait_bad}{A suffix string (e.g. \code{"_neg"}) used to identify columns in \code{data} where a variety is "not preferred" for a trait. Default is \code{"_neg"}.}
+\item{possible_ranks}{Character vector of labels corresponding to option_cols
+(e.g. c("A", "B", "C")).  Default is c("A", "B", "C").}
 
-\item{na_value}{A value used to indicate when a trait was not observed or is missing. Default is \code{"Not observed"}.}
+\item{trait_good}{Suffix (or full name) identifying columns in data where a
+variety is positively ranked for a trait (e.g. "_pos" or "best").  Default "_pos".}
+
+\item{trait_bad}{Suffix (or full name) identifying columns in data where a
+variety is negatively ranked for a trait (e.g. "_neg" or "worst").  Default "_neg".}
+
+\item{na_value}{Value used in data to indicate a missing or unobserved trait.
+Default is "Not observed".}
 }
 \value{
-A tibble with the transformed Tricot data, containing columns:
-\itemize{
-\item \code{id}: Identifier for each observation.
-\item \code{dummy_variety}: (Optional). The dummy variable that variety is associated to.
-\item \code{rank}: The rank assigned to each variety.
-\item \code{variety}: The variety name.
-\item And a set of trait variables
+A tibble in tidy format with one row per (ID, trait, variety) combination,
+containing at least the following columns:
+\describe{
+\item{<data_id_col>}{Identifier for each trial or plot (column name retained).}
+\item{dummy_variety}{Factor-coded option label corresponding to the variety (e.g. "A", "B", "C").}
+\item{trait}{Name of the trait being ranked (when data input used).}
+\item{rank}{Numeric or character rank assigned to the variety.}
+\item{variety}{Name of the variety or option.}
+\item{<carry_cols>}{Any additional columns specified via carry_cols, carried through from data.}
 }
+Additional trait-specific columns will appear if both data and
+data_plot_trait are provided.
 }
 \description{
-This function transforms Tricot (Triadic Comparison of Technologies) data
-into a tidy format, assigning ranks based on trait evaluations.
-}
-\details{
-It supports input either as a single dataset (\code{data}) or as two datasets:
-one with trait-wise rankings (\code{data_plot_trait}) and one with option labels and traits.
-
-The function assumes a tricot setup where three options (e.g. crops, varieties) are ranked per trait.
-Rankings may be extracted from columns ending in a suffix such as \verb{_pos} or \verb{_neg}, or explicitly provided.
-}
-\examples{
-library(gosset)
-# Read in tricot data from the `gosset` library
-cassava_pivot <- pivot_tricot(cassava)
-
-# Example using nicabean data - if we have Plot-Trait Level data
-data(nicabean)
-nicabean_by_id_item_trait <- nicabean$trial
-nicabean_by_id <- nicabean$covar 
-nicabean_by_plot <- pivot_tricot(data_plot_trait = nicabean_by_id_item_trait, # B
-                                       data_plot_trait_id_col = "id",
-                                       variety_col = "item",
-                                       trait_col = "trait",
-                                       rank_col = "rank")
-
-# Example using breadwheat data - if we have just ID-Level data 
-data(breadwheat)
-breadwheat_by_plot <- pivot_tricot(data = breadwheat,
-                                         data_id_col = "participant_name",
-                                         option_cols = c("variety_a", "variety_b", "variety_c"),
-                                         trait_good = "best", trait_bad = "_worst")
-
-# Example using nicabean data - if we have both data and data_plot_trait data
-nicabean_by_id$Vigor_pos = "A"
-nicabean_by_id$Vigor_neg = "C"
-nicabean_by_plot_2 <- pivot_tricot(data = nicabean_by_id,
-                                         data_id_col = "id",
-                                         option_cols = c("variety_a", "variety_b", "variety_c"),
-                                         data_plot_trait = nicabean_by_id_item_trait,
-                                         data_plot_trait_id_col = "id",
-                                         variety_col = "item",
-                                         trait_col = "trait",
-                                         rank_col = "rank")
-                                         
-
-# Example with beans data
-library(PlackettLuce)
-data(beans)
-beans$ID <- 1:nrow(beans)
-beans_by_plot <- pivot_tricot(data = beans,
-                                         data_id_col = "ID",
-                                         option_cols = c("variety_a", "variety_b", "variety_c"),
-                                         trait_bad = "worst", trait_good = "best")
+Transforms Tricot (Triadic Comparison of Technologies) data into a tidy format,
+assigning ranks to varieties based on trait evaluations.  Supports input either
+as a single ID-level dataset (data) with option columns and trait indicators,
+or as a plot–trait–level dataset (data_plot_trait) with explicit variety,
+trait, and rank columns, or both.
 }
