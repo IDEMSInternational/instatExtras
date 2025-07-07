@@ -166,7 +166,10 @@ test_that("create_av_packs fetches available packages", {
 test_that("create_rankings_list returns correct structure", {
   library(gosset)
   data(cassava)
-  cassava_by_id_variety <- pivot_tricot(cassava)
+  cassava_by_id_variety <- pivot_tricot(cassava, data_id_col = "id",
+                                        option_cols = c("option_a", "option_b", "option_c"),
+                                        possible_ranks = c("A", "B", "C"),
+                                        trait_good = "_pos", trait_bad = "_neg")
   
   traits <- c("colour", "firmness", "odour", "overall", 
               "stretchability", "taste", "mouldability", "smoothness")
