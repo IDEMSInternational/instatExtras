@@ -147,7 +147,7 @@ pivot_tricot <- function(data = NULL,
         data_options_b <- data_options_b %>%
           dplyr::full_join(ranked) %>%
           dplyr::group_by(!!id_data_sym, trait) %>%
-          dplyr::mutate(variety = ifelse(is.na(variety), setdiff(possible_ranks, variety)[1], variety)) %>%
+          dplyr::mutate(variety = dplyr::if_else(is.na(variety), setdiff(possible_ranks, variety)[1], variety)) %>%
           dplyr::ungroup() %>%
           dplyr::arrange(!!id_data_sym, trait) %>% 
           dplyr::rename(dummy_variety = variety) %>%
