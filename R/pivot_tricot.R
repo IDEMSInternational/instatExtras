@@ -137,7 +137,7 @@ pivot_tricot <- function(data = NULL,
           dplyr::rename(dummy_variety = "variety")
         data_options_b <- dplyr::full_join(data_options_id, data_options_b)
       } else {
-        # General case for >=3 traits
+        # General case 
         ranked <- data_options_b %>%
           dplyr::filter(!is.na(variety) & variety != na_value) %>%
           dplyr::count(!!id_data_sym, trait) %>%
@@ -149,6 +149,7 @@ pivot_tricot <- function(data = NULL,
           dplyr::group_by(!!id_data_sym, trait) %>%
           dplyr::mutate(variety = ifelse(is.na(variety), setdiff(possible_ranks, variety)[1], variety)) %>%
           dplyr::ungroup() %>%
+          dplyr::arrange(!!id_data_sym, trait) %>% 
           dplyr::rename(dummy_variety = variety) %>%
           dplyr::full_join(data_options_id) %>%
           dplyr::select(dplyr::all_of(c(data_id_col, carry_cols)), trait, rank, variety, dummy_variety) %>%
