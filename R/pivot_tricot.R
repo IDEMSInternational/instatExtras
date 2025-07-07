@@ -130,11 +130,12 @@ pivot_tricot <- function(data = NULL,
           dplyr::summarise(missing_var = setdiff(possible_ranks, variety), .groups = "drop") %>%
           dplyr::mutate(trait = "middle", rank = 2) %>%
           dplyr::rename(variety = missing_var)
-        
         data_options_b <- dplyr::bind_rows(data_options_b, missing_mid) %>%
           dplyr::arrange(!!id_data_sym, rank) %>%
-          dplyr::rename(dummy_variety = variety) %>%
-          dplyr::full_join(data_options_id)
+          dplyr::mutate(trait = rank) %>% 
+          dplyr::select(-c("rank")) %>%
+          dplyr::rename(dummy_variety = "variety")
+        data_options_b <- dplyr::full_join(data_options_id, data_options_b)
       } else {
         # General case for >=3 traits
         ranked <- data_options_b %>%

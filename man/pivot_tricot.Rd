@@ -23,99 +23,63 @@ pivot_tricot(
 }
 \arguments{
 \item{data}{A data frame containing ID-level Tricot data.  Must include an ID column
-(\code{data_id_col}) and three option columns (\code{option_cols}), plus trait indicator
-columns ending in \code{trait_good} or \code{trait_bad}, unless \code{data_plot_trait} is provided.}
+(data_id_col) and three option columns (option_cols), plus trait indicator
+columns ending in trait_good or trait_bad, unless data_plot_trait is provided.}
 
-\item{data_id_col}{Character string naming the ID column in \code{data}.  Default is \code{"id"}.}
+\item{data_id_col}{Character string naming the ID column in data.  Default is "id".}
 
 \item{data_trait_cols}{Optional character vector of specific trait-indicator columns
-in \code{data} to restrict scanning (overrides automatic selection by suffix).  Default \code{NULL}.}
+in data to restrict scanning (overrides automatic selection by suffix).  Default NULL.}
 
-\item{carry_cols}{Optional character vector of column names in \code{data} to carry along
-into the output (e.g. blocking factors, metadata).  Default \code{NULL}.}
+\item{carry_cols}{Optional character vector of column names in data to carry along
+into the output (e.g. blocking factors, metadata).  Default NULL.}
 
 \item{data_plot_trait}{A data frame in “plot–trait” format containing one row per
-(ID, variety, trait) with an associated \code{rank_col}.  Default \code{NULL}.}
+(ID, variety, trait) with an associated rank_col.  Default NULL.}
 
 \item{data_plot_trait_id_col}{Character string naming the ID column in
-\code{data_plot_trait}.  Default is \code{"id"}.}
+data_plot_trait.  Default is "id".}
 
-\item{variety_col}{Character string naming the variety column in \code{data_plot_trait}.}
+\item{variety_col}{Character string naming the variety column in data_plot_trait.}
 
-\item{trait_col}{Character string naming the trait column in \code{data_plot_trait}.}
+\item{trait_col}{Character string naming the trait column in data_plot_trait.}
 
-\item{rank_col}{Character string naming the rank column in \code{data_plot_trait}.}
+\item{rank_col}{Character string naming the rank column in data_plot_trait.}
 
 \item{option_cols}{Character vector of length three naming the option columns in
-\code{data} (e.g. \code{c("option_a", "option_b", "option_c")}).  Default is
-\code{c("option_a", "option_b", "option_c")}.}
+data (e.g. c("option_a", "option_b", "option_c")).  Default is
+c("option_a", "option_b", "option_c").}
 
-\item{possible_ranks}{Character vector of labels corresponding to \code{option_cols}
-(e.g. \code{c("A", "B", "C")}).  Default is \code{c("A", "B", "C")}.}
+\item{possible_ranks}{Character vector of labels corresponding to option_cols
+(e.g. c("A", "B", "C")).  Default is c("A", "B", "C").}
 
-\item{trait_good}{Suffix (or full name) identifying columns in \code{data} where a
-variety is positively ranked for a trait (e.g. \code{"_pos"} or \code{"best"}).  Default \code{"_pos"}.}
+\item{trait_good}{Suffix (or full name) identifying columns in data where a
+variety is positively ranked for a trait (e.g. "_pos" or "best").  Default "_pos".}
 
-\item{trait_bad}{Suffix (or full name) identifying columns in \code{data} where a
-variety is negatively ranked for a trait (e.g. \code{"_neg"} or \code{"worst"}).  Default \code{"_neg"}.}
+\item{trait_bad}{Suffix (or full name) identifying columns in data where a
+variety is negatively ranked for a trait (e.g. "_neg" or "worst").  Default "_neg".}
 
-\item{na_value}{Value used in \code{data} to indicate a missing or unobserved trait.
-Default is \code{"Not observed"}.}
+\item{na_value}{Value used in data to indicate a missing or unobserved trait.
+Default is "Not observed".}
 }
 \value{
 A tibble in tidy format with one row per (ID, trait, variety) combination,
 containing at least the following columns:
 \describe{
-\item{id}{Identifier for each trial or plot.}
-\item{dummy_variety}{Factor-coded option label corresponding to the variety (e.g. \code{"A"}, \code{"B"}, \code{"C"}).}
-\item{trait}{Name of the trait being ranked (when \code{data} input used).}
+\item{<data_id_col>}{Identifier for each trial or plot (column name retained).}
+\item{dummy_variety}{Factor-coded option label corresponding to the variety (e.g. "A", "B", "C").}
+\item{trait}{Name of the trait being ranked (when data input used).}
 \item{rank}{Numeric or character rank assigned to the variety.}
 \item{variety}{Name of the variety or option.}
-\item{<carry_cols>}{Any additional columns specified via \code{carry_cols}, carried through from \code{data}.}
+\item{<carry_cols>}{Any additional columns specified via carry_cols, carried through from data.}
 }
-Additional trait-specific columns will appear if both \code{data} and
-\code{data_plot_trait} are provided.
+Additional trait-specific columns will appear if both data and
+data_plot_trait are provided.
 }
 \description{
 Transforms Tricot (Triadic Comparison of Technologies) data into a tidy format,
 assigning ranks to varieties based on trait evaluations.  Supports input either
-as a single ID-level dataset (\code{data}) with option columns and trait indicators,
-or as a plot–trait–level dataset (\code{data_plot_trait}) with explicit variety,
+as a single ID-level dataset (data) with option columns and trait indicators,
+or as a plot–trait–level dataset (data_plot_trait) with explicit variety,
 trait, and rank columns, or both.
-}
-\examples{
-# Using ID-level data only, carrying a blocking factor
-df <- data.frame(
-  id         = 1:3,
-  block      = rep(1:3),
-  option_a   = c("x", "y", "z"),
-  option_b   = c("u", "v", "w"),
-  option_c   = c("m", "n", "o"),
-  colour_pos = c("A", "B", "C"),
-  taste_neg  = c("C", "B", "Not observed")
-)
-pivot_tricot(
-  data         = df,
-  data_id_col  = "id",
-  carry_cols   = "block",
-  option_cols  = c("option_a", "option_b", "option_c"),
-  trait_good   = "_pos",
-  trait_bad    = "_neg"
-)
-
-# Using plot–trait–level data only
-df_trait <- data.frame(
-  id     = rep(1:2, each = 3),
-  item   = rep(c("x","y","z"), times = 2),
-  trait  = rep("colour", 6),
-  rank   = rep(1:3, times = 2)
-)
-pivot_tricot(
-  data_plot_trait       = df_trait,
-  data_plot_trait_id_col = "id",
-  variety_col            = "item",
-  trait_col              = "trait",
-  rank_col               = "rank"
-)
-
 }

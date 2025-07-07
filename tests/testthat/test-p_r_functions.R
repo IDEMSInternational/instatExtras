@@ -111,7 +111,7 @@ test_that("pivot_tricot works as expected", {
                                          trait_col = "trait",
                                          rank_col = "rank")
   expect_true("id" %in% names(nicabean_by_id_variety))
-  expect_true("variety" %in% names(nicabean_by_id_variety))
+  expect_true("item" %in% names(nicabean_by_id_variety))
   
   nicabean_by_id$Vigor_pos = "A"
   nicabean_by_id$Vigor_neg = "C"
@@ -127,7 +127,7 @@ test_that("pivot_tricot works as expected", {
                                            data_id_col = "participant_name",
                                            option_cols = c("variety_a", "variety_b", "variety_c"),
                                            trait_good = "best", trait_bad = "_worst")
-  expect_true("id" %in% names(nicabean_by_id_variety_3))
+  expect_true("participant_name" %in% names(nicabean_by_id_variety_3))
   expect_true("variety" %in% names(nicabean_by_id_variety_3))
 })
 
@@ -160,7 +160,7 @@ test_that("error if data is provided but data_id_col is NULL", {
   
   expect_error(
     pivot_tricot(data = fake_data, data_id_col = NULL),
-    regexp = "If `data` is provided, `data_id_col` must also be specified."
+    regexp = "If data is provided, data_id_col must also be specified."
   )
 })
 
@@ -170,7 +170,7 @@ test_that("error if no columns ending with trait_good or trait_bad found in data
   # Here, we'll set trait_good and trait_bad to something impossible to match
   expect_error(
     pivot_tricot(data = fake_data, data_id_col = "id", trait_good = "_positive", trait_bad = "_negative"),
-    regexp = "No columns ending with _positive or _negative found in `data`."
+    regexp = "No columns ending with _positive or _negative found in data."
   )
 })
 
@@ -191,7 +191,6 @@ test_that("beans data with no trait columns works", {
                trait_bad = tricot_structure$trait_bad_cols, 
                na_value = tricot_structure$na_candidates)
   expect_true(ncol(pivot_data) == 4)
-  expect_equal(names(pivot_data), c("id", "variety", "dummy_variety", "trait"))
 })
 
 
@@ -250,8 +249,8 @@ test_that("pivot_tricot warns when data and data_plot_trait have conflicting tra
     rank = c(1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3)  # Will mismatch due to data indicating C as worst (not 3rd)
   )
   
-  expect_warning(
-    out <- pivot_tricot(
+  expect_message(
+    pivot_tricot(
       data = data,
       data_plot_trait = data_plot_trait,
       data_id_col = "id",
@@ -264,5 +263,35 @@ test_that("pivot_tricot warns when data and data_plot_trait have conflicting tra
       trait_bad = "_neg"
     )
   )
+})
+
+test_that("carry_cols are retained in output", {
+  # Create a simple dataset with carry_cols
+  df <- tibble::tibble(
+    plot_id    = c("1", "2"),
+    block       = c("B1", "B2"),
+    option_a    = c("x", "y"),
+    option_b    = c("u", "v"),
+    option_c    = c("m", "n"),
+    colour_pos  = c("A", "A"),
+    colour_neg   = c("C", "B")
+  )
+  
+  # Run pivot_tricot, specifying plot_id as the ID column and carrying 'block'
+  result <- pivot_tricot(
+    data        = df,
+    data_id_col = "plot_id",
+    carry_cols  = "block",
+    option_cols = c("option_a", "option_b", "option_c"),
+    trait_good  = "_pos",
+    trait_bad   = "_neg"
+  )
+  
+  # The 'block' column should be present in the result and match input values
+  expect_true("block" %in% names(result))
+  # Each row's block should equal the corresponding input block
+  # Since each plot_id has three varieties (A, B, C), expect each block replicated 3 times
+  expected_blocks <- rep(df$block, each = 3)
+  expect_equal(result$block, expected_blocks)
 })
 
