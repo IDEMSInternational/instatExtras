@@ -6,6 +6,8 @@
 \usage{
 detect_tricot_structure(
   data,
+  variety_cols = NULL,
+  rank_values = c("A", "B", "C"),
   prefix = NULL,
   good_suffixes = c("_pos", "_best", "best"),
   bad_suffixes = c("_neg", "_worst", "worst"),
@@ -13,35 +15,39 @@ detect_tricot_structure(
 )
 }
 \arguments{
-\item{data}{A data frame that may contain tricot trial data.}
+\item{data}{A data frame containing tricot trial data.}
 
-\item{prefix}{Character vector of suffixes that indicate trait-data (default \code{NULL})}
+\item{variety_cols}{Optional character vector of column names for option sets (e.g., c("option_a", "option_b", "option_c")). Autodetected by suffix \verb{_a}, \verb{_b}, \verb{_c} if \code{NULL}.}
 
-\item{good_suffixes}{Character vector of suffixes that indicate positively ranked traits (default: \code{"_pos"}, \code{"_best"}).}
+\item{rank_values}{Character vector of possible rank values (e.g., \code{c("A", "B", "C")}). If \code{NULL}, inferred from observed trait values.}
 
-\item{bad_suffixes}{Character vector of suffixes that indicate negatively ranked traits (default: \code{"_neg"}, \code{"_worst"}).}
+\item{prefix}{Optional character string used to filter option columns by a common prefix before \verb{_a}, \verb{_b}, \verb{_c} when autodetecting.}
 
-\item{na_candidates}{Character vector of values to treat as missing (default includes \code{"Not observed"}).}
+\item{good_suffixes}{Character vector of suffixes indicating positively ranked traits (default: \code{c("_pos", "_best", "best")}).}
+
+\item{bad_suffixes}{Character vector of suffixes indicating negatively ranked traits (default: \code{c("_neg", "_worst", "worst")}).}
+
+\item{na_candidates}{Character vector of values to treat as missing (default: \code{c("Not observed", "Not scored", NA_character_)}).}
 }
 \value{
-A list with the following elements:
+A list with the following components:
 \describe{
-\item{option_cols}{Vector of column names matching \verb{_a}, \verb{_b}, or \verb{_c} pattern for options.}
-\item{ranks}{Unique ranking values detected (excluding \code{na_candidates}).}
-\item{trait_good_cols}{Suffixes of columns identified as good trait responses.}
-\item{trait_bad_cols}{Suffixes of columns identified as bad trait responses.}
-\item{na_candidates}{The \code{na_candidates} input, for reference.}
+\item{option_cols}{Character vector of detected or specified option columns.}
+\item{ranks}{Character vector of rank values used to order options.}
+\item{trait_good_cols}{Character vector of detected suffixes for good traits.}
+\item{trait_bad_cols}{Character vector of detected suffixes for bad traits.}
+\item{na_candidates}{The original \code{na_candidates} vector, for reference.}
 }
 }
 \description{
-Identifies option columns, good/bad trait columns, and rank values within a tricot dataset based on naming conventions.
+Identifies option columns, trait columns (good/bad), and rank values in a tricot dataset based on naming conventions.
 }
 \examples{
 df <- data.frame(
   id = 1:3,
-  option_a = c("x", "y", "z"),
+  option_a   = c("x", "y", "z"),
   colour_pos = c("A", "B", "C"),
-  taste_neg = c("C", "B", "Not observed")
+  taste_neg  = c("C", "B", "Not observed")
 )
 detect_tricot_structure(df)
 

@@ -1,81 +1,90 @@
 #' Pivot Tricot Data
 #'
-#' This function transforms Tricot (Triadic Comparison of Technologies) data 
-#' into a tidy format, assigning ranks based on trait evaluations.
+#' Transforms Tricot (Triadic Comparison of Technologies) data into a tidy format,
+#' assigning ranks to varieties based on trait evaluations.  Supports input either
+#' as a single ID-level dataset (`data`) with option columns and trait indicators,
+#' or as a plot–trait–level dataset (`data_plot_trait`) with explicit variety,
+#' trait, and rank columns, or both.
 #'
-#' It supports input either as a single dataset (`data`) or as two datasets:
-#' one with trait-wise rankings (`data_plot_trait`) and one with option labels and traits.
+#' @param data A data frame containing ID-level Tricot data.  Must include an ID column
+#'   (`data_id_col`) and three option columns (`option_cols`), plus trait indicator
+#'   columns ending in `trait_good` or `trait_bad`, unless `data_plot_trait` is provided.
+#' @param data_id_col Character string naming the ID column in `data`.  Default is `"id"`.
+#' @param data_trait_cols Optional character vector of specific trait-indicator columns
+#'   in `data` to restrict scanning (overrides automatic selection by suffix).  Default `NULL`.
+#' @param carry_cols Optional character vector of column names in `data` to carry along
+#'   into the output (e.g. blocking factors, metadata).  Default `NULL`.
+#' @param data_plot_trait A data frame in “plot–trait” format containing one row per
+#'   (ID, variety, trait) with an associated `rank_col`.  Default `NULL`.
+#' @param data_plot_trait_id_col Character string naming the ID column in
+#'   `data_plot_trait`.  Default is `"id"`.
+#' @param variety_col Character string naming the variety column in `data_plot_trait`.
+#' @param trait_col Character string naming the trait column in `data_plot_trait`.
+#' @param rank_col Character string naming the rank column in `data_plot_trait`.
+#' @param option_cols Character vector of length three naming the option columns in
+#'   `data` (e.g. `c("option_a", "option_b", "option_c")`).  Default is
+#'   `c("option_a", "option_b", "option_c")`.
+#' @param possible_ranks Character vector of labels corresponding to `option_cols`
+#'   (e.g. `c("A", "B", "C")`).  Default is `c("A", "B", "C")`.
+#' @param trait_good Suffix (or full name) identifying columns in `data` where a
+#'   variety is positively ranked for a trait (e.g. `"_pos"` or `"best"`).  Default `"_pos"`.
+#' @param trait_bad Suffix (or full name) identifying columns in `data` where a
+#'   variety is negatively ranked for a trait (e.g. `"_neg"` or `"worst"`).  Default `"_neg"`.
+#' @param na_value Value used in `data` to indicate a missing or unobserved trait.
+#'   Default is `"Not observed"`.
 #'
-#' The function assumes a tricot setup where three options (e.g. crops, varieties) are ranked per trait.
-#' Rankings may be extracted from columns ending in a suffix such as `_pos` or `_neg`, or explicitly provided.
-#'
-#' @param data A data frame containing option columns and trait ranking indicators (e.g. columns ending in `_pos` or `_neg`).
-#' @param data_id_col The name of the ID column in `data`. Default is `"id"`.
-#' @param data_plot_trait A data frame containing ID, variety, trait, and rank columns.
-#' @param data_plot_trait_id_col The name of the ID column in `data_plot_trait`. Default is `"id"`.
-#' @param variety_col The name of the variety column in `data_plot_trait`.
-#' @param trait_col The name of the trait column in `data_plot_trait`.
-#' @param rank_col The name of the rank column in `data_plot_trait`.
-#' @param option_cols A character vector of column names in `data` that store the option labels (e.g. `"option_a"`, `"option_b"`, `"option_c"`).
-#' @param possible_ranks A character vector mapping to `option_cols`, indicating rank labels (e.g. `"A"`, `"B"`, `"C"`).
-#' @param trait_good A suffix string (e.g. `"_pos"`) used to identify columns in `data` where a variety is "preferred" for a trait. Default is `"_pos"`.
-#' @param trait_bad A suffix string (e.g. `"_neg"`) used to identify columns in `data` where a variety is "not preferred" for a trait. Default is `"_neg"`.
-#' @param na_value A value used to indicate when a trait was not observed or is missing. Default is `"Not observed"`.
-#'
-#' @return A tibble with the transformed Tricot data, containing columns:
-#'   - `id`: Identifier for each observation.
-#'   - `dummy_variety`: (Optional). The dummy variable that variety is associated to.
-#'   - `rank`: The rank assigned to each variety.
-#'   - `variety`: The variety name.
-#'   - And a set of trait variables
-#'
-#' @export
+#' @return A tibble in tidy format with one row per (ID, trait, variety) combination,
+#'   containing at least the following columns:
+#'   \describe{
+#'     \item{id}{Identifier for each trial or plot.}
+#'     \item{dummy_variety}{Factor-coded option label corresponding to the variety (e.g. `"A"`, `"B"`, `"C"`).}
+#'     \item{trait}{Name of the trait being ranked (when `data` input used).}
+#'     \item{rank}{Numeric or character rank assigned to the variety.}
+#'     \item{variety}{Name of the variety or option.}
+#'     \item{<carry_cols>}{Any additional columns specified via `carry_cols`, carried through from `data`.}
+#'   }
+#'   Additional trait-specific columns will appear if both `data` and
+#'   `data_plot_trait` are provided.
 #'
 #' @examples
-#' library(gosset)
-#' # Read in tricot data from the `gosset` library
-#' cassava_pivot <- pivot_tricot(cassava)
-#' 
-#' # Example using nicabean data - if we have Plot-Trait Level data
-#' data(nicabean)
-#' nicabean_by_id_item_trait <- nicabean$trial
-#' nicabean_by_id <- nicabean$covar 
-#' nicabean_by_plot <- pivot_tricot(data_plot_trait = nicabean_by_id_item_trait, # B
-#'                                        data_plot_trait_id_col = "id",
-#'                                        variety_col = "item",
-#'                                        trait_col = "trait",
-#'                                        rank_col = "rank")
-#' 
-#' # Example using breadwheat data - if we have just ID-Level data 
-#' data(breadwheat)
-#' breadwheat_by_plot <- pivot_tricot(data = breadwheat,
-#'                                          data_id_col = "participant_name",
-#'                                          option_cols = c("variety_a", "variety_b", "variety_c"),
-#'                                          trait_good = "best", trait_bad = "_worst")
-#' 
-#' # Example using nicabean data - if we have both data and data_plot_trait data
-#' nicabean_by_id$Vigor_pos = "A"
-#' nicabean_by_id$Vigor_neg = "C"
-#' nicabean_by_plot_2 <- pivot_tricot(data = nicabean_by_id,
-#'                                          data_id_col = "id",
-#'                                          option_cols = c("variety_a", "variety_b", "variety_c"),
-#'                                          data_plot_trait = nicabean_by_id_item_trait,
-#'                                          data_plot_trait_id_col = "id",
-#'                                          variety_col = "item",
-#'                                          trait_col = "trait",
-#'                                          rank_col = "rank")
-#'                                          
-#' 
-#' # Example with beans data
-#' library(PlackettLuce)
-#' data(beans)
-#' beans$ID <- 1:nrow(beans)
-#' beans_by_plot <- pivot_tricot(data = beans,
-#'                                          data_id_col = "ID",
-#'                                          option_cols = c("variety_a", "variety_b", "variety_c"),
-#'                                          trait_bad = "worst", trait_good = "best")
-pivot_tricot <- function(data = NULL, data_id_col = "id", data_plot_trait = NULL,
-                         data_plot_trait_id_col = "id",
+#' # Using ID-level data only, carrying a blocking factor
+#' df <- data.frame(
+#'   id         = 1:3,
+#'   block      = rep(1:3),
+#'   option_a   = c("x", "y", "z"),
+#'   option_b   = c("u", "v", "w"),
+#'   option_c   = c("m", "n", "o"),
+#'   colour_pos = c("A", "B", "C"),
+#'   taste_neg  = c("C", "B", "Not observed")
+#' )
+#' pivot_tricot(
+#'   data         = df,
+#'   data_id_col  = "id",
+#'   carry_cols   = "block",
+#'   option_cols  = c("option_a", "option_b", "option_c"),
+#'   trait_good   = "_pos",
+#'   trait_bad    = "_neg"
+#' )
+#'
+#' # Using plot–trait–level data only
+#' df_trait <- data.frame(
+#'   id     = rep(1:2, each = 3),
+#'   item   = rep(c("x","y","z"), times = 2),
+#'   trait  = rep("colour", 6),
+#'   rank   = rep(1:3, times = 2)
+#' )
+#' pivot_tricot(
+#'   data_plot_trait       = df_trait,
+#'   data_plot_trait_id_col = "id",
+#'   variety_col            = "item",
+#'   trait_col              = "trait",
+#'   rank_col               = "rank"
+#' )
+#'
+#' @export
+pivot_tricot <- function(data = NULL, data_id_col = "id", data_trait_cols = NULL,
+                         carry_cols = NULL,
+                         data_plot_trait = NULL, data_plot_trait_id_col = "id",
                          variety_col = NULL,
                          trait_col = NULL, rank_col = NULL,
                          option_cols = c("option_a", "option_b", "option_c"),
@@ -110,7 +119,13 @@ pivot_tricot <- function(data = NULL, data_id_col = "id", data_plot_trait = NULL
   
   # Handle data
   if (!is.null(data)) {
-    matching_cols <- data %>% dplyr::select(dplyr::ends_with(trait_good), dplyr::ends_with(trait_bad))
+    
+    # if they specify which traits, then run this
+    if (!is.null(data_trait_cols)){
+      matching_cols <- data %>% dplyr::select(dplyr::all_of(data_trait_cols))
+    } else {
+      matching_cols <- data %>% dplyr::select(dplyr::ends_with(trait_good), dplyr::ends_with(trait_bad))
+    }
     
     label_map <- stats::setNames(option_cols, possible_ranks)
     data_options <- data %>%
@@ -120,14 +135,14 @@ pivot_tricot <- function(data = NULL, data_id_col = "id", data_plot_trait = NULL
     
     data_options_id <- data_options %>%
       dplyr::select(c(id,
+                      dplyr::all_of(carry_cols),
                       variety = variable,
                       dummy_variety = Label)) %>%
       unique()
     
     if (ncol(matching_cols) > 0) {
       data_options <- data %>% dplyr::mutate(id = data[[data_id_col]]) %>% 
-        tidyr::pivot_longer(cols = dplyr::all_of(c(dplyr::ends_with(trait_good), 
-                                                   dplyr::ends_with(trait_bad))), names_to = "trait", 
+        tidyr::pivot_longer(cols = dplyr::all_of(names(matching_cols)), names_to = "trait", 
                             values_to = "variety") %>%
         dplyr::select(c(id, trait, variety)) %>%
         dplyr::mutate(rank = ifelse(grepl(trait_good, trait), 1, 3)) %>%
@@ -168,7 +183,7 @@ pivot_tricot <- function(data = NULL, data_id_col = "id", data_plot_trait = NULL
           dplyr::arrange(id, trait) %>%
           dplyr::rename(dummy_variety = variety) %>%
           dplyr::full_join(data_options_id) %>%
-          dplyr::select(c(id, trait, rank, variety, dummy_variety)) %>%
+          dplyr::select(c(id, trait, rank, variety, dplyr::all_of(carry_cols), dummy_variety)) %>%
           tidyr::pivot_wider(names_from = trait, values_from = rank) %>%
           dplyr::filter(!is.na(variety))
       }
