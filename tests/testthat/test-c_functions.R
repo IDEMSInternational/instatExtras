@@ -305,3 +305,39 @@ test_that("Does not return '4' when varieties_cols is NA", {
   expect_false(check_data_levels(result) == "4")
 })
 
+test_that("strongly connected network prints correct message", {
+  # Complete cycle over 4 items a–d
+  mat <- matrix(c(
+    1,2,3,4,
+    2,3,4,1,
+    3,4,1,2,
+    4,1,2,3
+  ), ncol = 4, byrow = TRUE)
+  colnames(mat) <- letters[1:4]
+  X <- PlackettLuce::as.rankings(mat)
+  
+  out <- capture_output(res <- connectivity_check(X))
+  expect_match(out, "Network is strongly connected\\.")
+  expect_match(out, "There is 1 cluster")
+})
+
+test_that("disconnected network prints cluster report", {
+  # Items a,b isolated; c,d form a pair
+  mat2 <- matrix(c(
+    1,0,0,0,
+    0,2,0,0,
+    0,0,3,4,
+    0,0,4,3
+  ), ncol = 4, byrow = TRUE)
+  colnames(mat2) <- letters[1:4]
+  X2 <- PlackettLuce::as.rankings(mat2)
+  
+  out <- capture_output(res2 <- connectivity_check(X2))
+  expect_match(out, "The network has multiple disconnected clusters:")
+  expect_match(out, "Clusters found: 3")
+  expect_match(out, "Cluster sizes: 2, 1, 1")
+  # cluster 1: a, cluster 2: b? Actually as.vector membership:
+  expect_match(out, "Cluster 1 \\(2 items\\): c, d")
+  expect_match(out, "Cluster 2 \\(1 items\\): b")
+  expect_match(out, "Cluster 3 \\(1 items\\): a")
+})
