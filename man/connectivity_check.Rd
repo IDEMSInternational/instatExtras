@@ -35,7 +35,7 @@ mat <- matrix(c(
   4,1,2,3
 ), ncol = 4, byrow = TRUE)
 colnames(mat) <- letters[1:4]
-X <- as.rankings(mat)
+X <- PlackettLuce::as.rankings(mat)
 connectivity_check(X)
 
 # Disconnected example
@@ -46,6 +46,6 @@ mat2 <- matrix(c(
   0,0,4,3
 ), ncol = 4, byrow = TRUE)
 colnames(mat2) <- letters[1:4]
-X2 <- as.rankings(mat2)
+X2 <- PlackettLuce::as.rankings(mat2)
 connectivity_check(X2)
 }

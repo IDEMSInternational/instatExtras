@@ -24,7 +24,7 @@
 #'   4,1,2,3
 #' ), ncol = 4, byrow = TRUE)
 #' colnames(mat) <- letters[1:4]
-#' X <- as.rankings(mat)
+#' X <- PlackettLuce::as.rankings(mat)
 #' connectivity_check(X)
 #'
 #' # Disconnected example
@@ -35,7 +35,7 @@
 #'   0,0,4,3
 #' ), ncol = 4, byrow = TRUE)
 #' colnames(mat2) <- letters[1:4]
-#' X2 <- as.rankings(mat2)
+#' X2 <- PlackettLuce::as.rankings(mat2)
 #' connectivity_check(X2)
 #' @export
 connectivity_check <- function(X = rankings_object[[1]]) {
@@ -48,8 +48,8 @@ connectivity_check <- function(X = rankings_object[[1]]) {
   if (length(msgs) > 0) {
     # Disconnected
     cat("WARNING: Network is not strongly connected.\n\n")
-    cat(sprintf("  • Clusters found: %d  (need 1 for strong connectivity)\n", res$no))
-    cat(sprintf("  • Cluster sizes: %s\n\n", paste(res$csize, collapse = ", ")))
+    cat(sprintf("  Clusters found: %d  (need 1 for strong connectivity)\n", res$no))
+    cat(sprintf("  Cluster sizes: %s\n\n", paste(res$csize, collapse = ", ")))
     cat("  Cluster membership:\n")
     for (i in seq_len(res$no)) {
       members <- names(res$membership)[res$membership == i]
