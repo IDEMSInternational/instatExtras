@@ -9,9 +9,9 @@
 #' @return Invisibly returns the result of
 #'   \code{PlackettLuce::connectivity(X)}, while printing either:
 #'   \itemize{
-#'     \item A “strongly connected” message if there is a single
+#'     \item A "strongly connected" message if there is a single
 #'           cluster, or
-#'     \item A “not strongly connected” report showing
+#'     \item A "not strongly connected" report showing
 #'           the number of clusters, their sizes, and the
 #'           membership vector otherwise.
 #'   }
@@ -53,7 +53,7 @@ connectivity_check <- function(X = rankings_object[[1]]) {
     cat("  Cluster membership:\n")
     for (i in seq_len(res$no)) {
       members <- names(res$membership)[res$membership == i]
-      cat(sprintf("    – Cluster %d (%d items): %s\n",
+      cat(sprintf("    - Cluster %d (%d items): %s\n",
                   i, length(members), paste(members, collapse = ", ")))
     }
   } else {

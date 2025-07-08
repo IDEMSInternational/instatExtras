@@ -14,9 +14,9 @@ Default is the first element of \code{rankings_object}.}
 Invisibly returns the result of
 \code{PlackettLuce::connectivity(X)}, while printing either:
 \itemize{
-\item A “strongly connected” message if there is a single
+\item A "strongly connected" message if there is a single
 cluster, or
-\item A “not strongly connected” report showing
+\item A "not strongly connected" report showing
 the number of clusters, their sizes, and the
 membership vector otherwise.
 }
