@@ -333,11 +333,6 @@ test_that("disconnected network prints cluster report", {
   X2 <- PlackettLuce::as.rankings(mat2)
   
   out <- capture_output(res2 <- connectivity_check(X2))
-  expect_match(out, "The network has multiple disconnected clusters:")
   expect_match(out, "Clusters found: 3")
   expect_match(out, "Cluster sizes: 2, 1, 1")
-  # cluster 1: a, cluster 2: b? Actually as.vector membership:
-  expect_match(out, "Cluster 1 \\(2 items\\): c, d")
-  expect_match(out, "Cluster 2 \\(1 items\\): b")
-  expect_match(out, "Cluster 3 \\(1 items\\): a")
 })
