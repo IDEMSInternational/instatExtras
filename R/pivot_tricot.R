@@ -92,6 +92,16 @@ pivot_tricot <- function(data = NULL, data_id_col = "id", data_trait_cols = NULL
       matching_cols <- data %>% dplyr::select(dplyr::ends_with(trait_good), dplyr::ends_with(trait_bad))
     }
     
+    if (length(option_cols) != length(possible_ranks)){
+      msg <- paste0(
+        "Need the number of variety variables to equal the number of given ranks.\n",
+        "Found ", length(option_cols), " variety variables and ", length(possible_ranks), " ranks.\n",
+        "Variety variables: ", paste(option_cols, collapse = ", "), "\n",
+        "Ranks: ",             paste(possible_ranks, collapse = ", "), "\n\n",
+        "Specify this using the option_cols and possible_ranks arguments."
+      )
+      stop(msg, call. = FALSE)
+    }
     label_map <- stats::setNames(option_cols, possible_ranks)
     data_options <- data %>%
       dplyr::mutate(!!id_data_sym := data[[data_id_col]]) %>% 
