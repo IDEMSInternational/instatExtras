@@ -295,3 +295,27 @@ test_that("carry_cols are retained in output", {
   expect_equal(result$block, expected_blocks)
 })
 
+test_that("error is run if number of option cols != number of ranks", {
+  # Create a simple dataset with carry_cols
+  df <- tibble::tibble(
+    plot_id    = c("1", "2"),
+    block       = c("B1", "B2"),
+    option_a    = c("x", "y"),
+    option_b    = c("u", "v"),
+    option_c    = c("m", "n"),
+    colour_pos  = c("A", "A"),
+    colour_neg   = c("C", "B")
+  )
+  
+  # Run pivot_tricot, specifying plot_id as the ID column and carrying 'block'
+  expect_error(pivot_tricot(
+    data        = df,
+    data_id_col = "plot_id",
+    carry_cols  = "block",
+    option_cols = c("option_a", "option_b"),
+    trait_good  = "_pos",
+    trait_bad   = "_neg",
+    possible_ranks = c("A", "B", "C")
+  ))
+  
+})
