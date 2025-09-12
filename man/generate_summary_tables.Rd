@@ -4,10 +4,12 @@
 \alias{generate_summary_tables}
 \title{Generate Summary Tables}
 \usage{
-generate_summary_tables(table_data)
+generate_summary_tables(table_data, ...)
 }
 \arguments{
 \item{table_data}{A data frame containing the summary data, including a \code{summary-variable} column.}
+
+\item{...}{Additional options to read into gt()}
 }
 \value{
 A \code{gt} table with formatted styling and an automatically generated title.

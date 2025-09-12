@@ -5,10 +5,11 @@
 #' to display summarized data while dropping the `summary-variable` column.
 #'
 #' @param table_data A data frame containing the summary data, including a `summary-variable` column.
-#'
+#' @param ... Additional options to read into gt()
+
 #' @return A `gt` table with formatted styling and an automatically generated title.
 #' @export
-generate_summary_tables <- function(table_data) {
+generate_summary_tables <- function(table_data, ...) {
   if ("summary-variable" %in% names(table_data)) {
     unique_summary <- unique(table_data$`summary-variable`)
     if (length(unique_summary) == 1){
@@ -36,7 +37,7 @@ generate_summary_tables <- function(table_data) {
       summary_title <- ""
     }
   }
-  gt_table <- gt::gt(table_data)
+  gt_table <- gt::gt(table_data, ...)
   gt_table <- gt::tab_header(gt_table, title = summary_title)
   return(gt_table)
 }
