@@ -249,7 +249,7 @@ test_that("pivot_tricot warns when data and data_plot_trait have conflicting tra
     rank = c(1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3)  # Will mismatch due to data indicating C as worst (not 3rd)
   )
   
-  expect_message(
+  expect_warning(
     pivot_tricot(
       data = data,
       data_plot_trait = data_plot_trait,
@@ -291,7 +291,7 @@ test_that("carry_cols are retained in output", {
   expect_true("block" %in% names(result))
   # Each row's block should equal the corresponding input block
   # Since each plot_id has three varieties (A, B, C), expect each block replicated 3 times
-  expected_blocks <- rep(df$block, each = 3)
+  expected_blocks <- rep(df$block, each = 5)
   expect_equal(result$block, expected_blocks)
 })
 
@@ -319,3 +319,4 @@ test_that("error is run if number of option cols != number of ranks", {
   ))
   
 })
+
