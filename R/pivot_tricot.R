@@ -103,6 +103,7 @@ pivot_tricot <- function(data = NULL, data_id_col = "id", data_trait_cols = NULL
       stop(msg, call. = FALSE)
     }
     label_map <- stats::setNames(option_cols, possible_ranks)
+    if (is.null(variety_col)) variety_col <- "variety"; x <- 1
     data_options <- data %>%
       dplyr::mutate(!!id_data_sym := data[[data_id_col]]) %>% 
       tidyr::pivot_longer(cols = dplyr::all_of(option_cols), names_to = "Label", values_to = variety_col) %>% 
@@ -117,15 +118,15 @@ pivot_tricot <- function(data = NULL, data_id_col = "id", data_trait_cols = NULL
       data_options <- data %>% 
         dplyr::mutate(!!id_data_sym := .data[[data_id_col]]) %>%
         tidyr::pivot_longer(cols = dplyr::all_of(names(matching_cols)), names_to = "trait", 
-                            values_to = "variety") %>%
-        dplyr::select(!!id_data_sym, trait, variety) %>%
+                            values_to = variety_col) %>%
+        dplyr::select(!!id_data_sym, trait, dplyr::all_of(variety_col)) %>%
         dplyr::mutate(rank = ifelse(grepl(trait_good, trait), 1, 3)) %>%
         dplyr::mutate(trait = sub("(_[^_]*)$", "", trait))
       if (ncol(matching_cols) == 2) {
         data_options_b <- data_options %>% 
           dplyr::group_by(!!id_data_sym) %>%
           dplyr::summarise(missing_var = setdiff(possible_ranks, 
-                                                 variety), .groups = "drop") %>%
+                                                 dplyr::all_of(variety_col)), .groups = "drop") %>%
           dplyr::mutate(trait = "middle", rank = 2) %>%
           dplyr::rename(variety = missing_var) %>% 
           dplyr::bind_rows(data_options) %>%
@@ -135,17 +136,21 @@ pivot_tricot <- function(data = NULL, data_id_col = "id", data_trait_cols = NULL
           dplyr::rename(dummy_variety = "variety")
         data_options_b <- dplyr::full_join(data_options_id, data_options_b)
       } else {
+        variety_sym <- rlang::sym(variety_col)
+        
         data_options <- data_options %>%
-          dplyr::filter(!is.na(variety)) %>%
+          dplyr::filter(!is.na(!!variety_sym)) %>%
           dplyr::group_by(!!id_data_sym, trait) %>%
-          dplyr::mutate(variety = if (dplyr::n_distinct(variety) == 1) NA else variety) %>%
-          dplyr::filter(!is.na(variety)) %>%
+          dplyr::mutate(
+            !!variety_sym := if (dplyr::n_distinct(!!variety_sym) == 1) NA else !!variety_sym
+          ) %>%
+          dplyr::filter(!is.na(!!variety_sym)) %>%
           dplyr::ungroup() %>%
           unique()
         
         rank_2 <- data_options %>%
           dplyr::group_by(!!id_data_sym, trait) %>%
-          dplyr::filter(variety != na_value) %>%
+          dplyr::filter(!!variety_sym != na_value) %>%
           dplyr::count() %>%
           dplyr::mutate(rank = 2) %>%
           dplyr::filter(n == 2)
@@ -153,15 +158,21 @@ pivot_tricot <- function(data = NULL, data_id_col = "id", data_trait_cols = NULL
         data_options_b <- data_options %>%
           dplyr::full_join(rank_2) %>%
           dplyr::group_by(!!id_data_sym, trait) %>%
-          dplyr::mutate(variety = dplyr::if_else(is.na(variety), setdiff(possible_ranks, variety)[1], variety)) %>%
+          dplyr::mutate(
+            !!variety_sym := dplyr::if_else(
+              is.na(!!variety_sym),
+              setdiff(possible_ranks, !!variety_sym)[1],
+              !!variety_sym
+            )
+          ) %>%
           dplyr::ungroup() %>%
           dplyr::arrange(!!id_data_sym, trait) %>%
-          dplyr::rename(dummy_variety = variety) %>%
+          dplyr::rename(dummy_variety = !!variety_sym) %>%
           dplyr::full_join(data_options_id) %>%
-          dplyr::select(dplyr::all_of(c(data_id_col, carry_cols)), trait, rank, variety, dummy_variety) %>%
+          dplyr::select(dplyr::all_of(c(data_id_col, carry_cols)), trait, rank, !!variety_sym, dummy_variety) %>%
           tidyr::pivot_wider(names_from = trait, values_from = rank) %>%
-          dplyr::filter(!is.na(variety))
-      }
+          dplyr::filter(!is.na(!!variety_sym))
+        }
     } else {
       if (!is.null(data_plot_trait)){
         data_options_a <- dplyr::full_join(data_options_a, data_options_id)
