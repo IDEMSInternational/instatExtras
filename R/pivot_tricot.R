@@ -103,6 +103,7 @@ pivot_tricot <- function(data = NULL, data_id_col = "id", data_trait_cols = NULL
       stop(msg, call. = FALSE)
     }
     label_map <- stats::setNames(option_cols, possible_ranks)
+    if (is.null(variety_col)) variety_col <- "variety"; x <- 1
     data_options <- data %>%
       dplyr::mutate(!!id_data_sym := data[[data_id_col]]) %>% 
       tidyr::pivot_longer(cols = dplyr::all_of(option_cols), names_to = "Label", values_to = variety_col) %>% 
@@ -118,14 +119,14 @@ pivot_tricot <- function(data = NULL, data_id_col = "id", data_trait_cols = NULL
         dplyr::mutate(!!id_data_sym := .data[[data_id_col]]) %>%
         tidyr::pivot_longer(cols = dplyr::all_of(names(matching_cols)), names_to = "trait", 
                             values_to = "variety") %>%
-        dplyr::select(!!id_data_sym, trait, variety) %>%
+        dplyr::select(!!id_data_sym, trait, dplyr::all_of(variety_col)) %>%
         dplyr::mutate(rank = ifelse(grepl(trait_good, trait), 1, 3)) %>%
         dplyr::mutate(trait = sub("(_[^_]*)$", "", trait))
       if (ncol(matching_cols) == 2) {
         data_options_b <- data_options %>% 
           dplyr::group_by(!!id_data_sym) %>%
           dplyr::summarise(missing_var = setdiff(possible_ranks, 
-                                                 variety), .groups = "drop") %>%
+                                                 dplyr::all_of(variety)), .groups = "drop") %>%
           dplyr::mutate(trait = "middle", rank = 2) %>%
           dplyr::rename(variety = missing_var) %>% 
           dplyr::bind_rows(data_options) %>%
