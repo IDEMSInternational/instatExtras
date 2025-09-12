@@ -105,12 +105,11 @@ pivot_tricot <- function(data = NULL, data_id_col = "id", data_trait_cols = NULL
     label_map <- stats::setNames(option_cols, possible_ranks)
     data_options <- data %>%
       dplyr::mutate(!!id_data_sym := data[[data_id_col]]) %>% 
-      tidyr::pivot_longer(cols = dplyr::all_of(option_cols), names_to = "Label", values_to = "variable") %>% 
+      tidyr::pivot_longer(cols = dplyr::all_of(option_cols), names_to = "Label", values_to = variety_col) %>% 
       dplyr::mutate(Label = forcats::fct_recode(Label, !!!label_map))
     
     data_options_id <- data_options %>%
-      dplyr::select(c(dplyr::all_of(c(data_id_col, carry_cols)),
-                      variety = variable,
+      dplyr::select(c(dplyr::all_of(c(data_id_col, carry_cols, variety_col)),
                       dummy_variety = Label)) %>%
       unique()
     
