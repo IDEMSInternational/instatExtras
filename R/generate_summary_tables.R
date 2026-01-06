@@ -5,17 +5,21 @@
 #' to display summarized data while dropping the `summary-variable` column.
 #'
 #' @param table_data A data frame containing the summary data, including a `summary-variable` column.
+#' @param rm_summary_title Optional boolean to remove the summary label from the title. Only if there is one summary given, and it is a `summary-variable` type. Default `FALSE`.
 #' @param ... Additional options to read into gt()
 
 #' @return A `gt` table with formatted styling and an automatically generated title.
 #' @export
-generate_summary_tables <- function(table_data, ...) {
+generate_summary_tables <- function(table_data, rm_summary_title = FALSE, ...) {
   if ("summary-variable" %in% names(table_data)) {
     unique_summary <- unique(table_data$`summary-variable`)
     if (length(unique_summary) == 1){
-      summary_title <- table_data$`summary-variable` %>%
-        unique() %>%
-        gsub("__", " ", .) 
+      summary_title <- table_data$`summary-variable` %>% unique()
+      if (rm_summary_title){
+        summary_title <- sub(".*__", "", summary_title)
+      } else {
+        summary_title <- summary_title %>% gsub("__", " ", .)
+      }
       table_data <- dplyr::select(table_data, -`summary-variable`)
     } else {
       return(gt::gt(table_data))

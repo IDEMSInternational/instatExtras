@@ -4,10 +4,12 @@
 \alias{generate_summary_tables}
 \title{Generate Summary Tables}
 \usage{
-generate_summary_tables(table_data, ...)
+generate_summary_tables(table_data, rm_summary_title = FALSE, ...)
 }
 \arguments{
 \item{table_data}{A data frame containing the summary data, including a \code{summary-variable} column.}
+
+\item{rm_summary_title}{Optional boolean to remove the summary label from the title. Only if there is one summary given, and it is a \code{summary-variable} type. Default \code{FALSE}.}
 
 \item{...}{Additional options to read into gt()}
 }

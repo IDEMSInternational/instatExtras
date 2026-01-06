@@ -483,6 +483,19 @@ test_that("Table title is generated from `summary-variable`", {
   expect_equal(gt_table$`_heading`$title, "My Summary")
 })
 
+test_that("Table title is generated from `summary-variable`, with no summary name", {
+  df <- tibble::tibble(
+    `summary-variable` = rep("count_all__Summary", 3),
+    col1 = 1:3,
+    col2 = 4:6
+  )
+  
+  gt_table <- generate_summary_tables(df, rm_summary_title = TRUE)
+  
+  expect_s3_class(gt_table, "gt_tbl")
+  expect_equal(gt_table$`_heading`$title, "Summary")
+})
+
 test_that("Table title is generated from unique summary and variable", {
   df <- data.frame(
     summary = rep("Mean", 3),
