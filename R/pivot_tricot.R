@@ -125,8 +125,8 @@ pivot_tricot <- function(data = NULL, data_id_col = "id", data_trait_cols = NULL
       if (ncol(matching_cols) == 2) {
         data_options_b <- data_options %>% 
           dplyr::group_by(!!id_data_sym) %>%
-          dplyr::summarise(missing_var = setdiff(possible_ranks, 
-                                                 dplyr::all_of(variety_col)), .groups = "drop") %>%
+          dplyr::reframe(missing_var = setdiff(possible_ranks, 
+                                                 dplyr::all_of(variety_col))) %>%
           dplyr::mutate(trait = "middle", rank = 2) %>%
           dplyr::rename(variety = missing_var) %>% 
           dplyr::bind_rows(data_options) %>%

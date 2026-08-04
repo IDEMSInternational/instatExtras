@@ -187,15 +187,15 @@ test_that("beans data with no trait columns works", {
   
   pivot_data <- pivot_tricot(data = beans, 
                data_id_col = "id", option_cols = tricot_structure$option_cols, 
-               possible_ranks = tricot_structure$ranks, trait_good = tricot_structure$trait_good_cols, 
+               possible_ranks = tricot_structure$ranks,
+               trait_good = tricot_structure$trait_good_cols, 
                trait_bad = tricot_structure$trait_bad_cols, 
                na_value = tricot_structure$na_candidates)
   expect_true(ncol(pivot_data) == 4)
 })
 
-
 test_that("plot_pltree runs and returns a ggplot object", {
-  library(psychotree)
+  suppressWarnings(library(psychotree))
   library(PlackettLuce)
   
   # using the example from plackettluce
