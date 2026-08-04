@@ -28,13 +28,13 @@ You can install the development version of instatExtras from
 [GitHub](https://github.com/) with:
 
 ``` r
-# Install devtools package if not already installed
-if (!requireNamespace("devtools", quietly = TRUE)) {
-  install.packages("devtools")
+# Install pak package if not already installed
+if (!requireNamespace("pak", quietly = TRUE)) {
+  install.packages("pak")
 }
 
 # Install instatExtras
-devtools::install_github("IDEMSInternational/instatExtras")
+pak::pak("IDEMSInternational/instatExtras")
 ```
 
 ## Usage
