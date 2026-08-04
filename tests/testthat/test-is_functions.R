@@ -23,32 +23,81 @@ test_that("import_from_ODK handles incorrect source gracefully", {
 })
 
 test_that("import_from_ODK correctly retrieves form data from kobo", {
+  
   local_mocked_bindings(
     getPass = function(...) "mock_password",
     
     get_odk_http_get = function(url, auth = NULL) {
-      if (grepl("/api/v1/data$", url)) {
+      
+      # Form list endpoint
+      if (grepl("/api/v2/assets/\\?asset_type=survey", url)) {
+        
         fake_response <- list(
-          list(title = "Form A", id = "123"),
-          list(title = "Form B", id = "456")
+          results = list(
+            list(name = "Form A", uid = "123"),
+            list(name = "Form B", uid = "456")
+          ),
+          `next` = NULL
         )
-        return(structure(list(content = fake_response, status_code = 200), class = "response"))
-      } else if (grepl("/api/v1/data/123$", url)) {
-        return(structure(list(content = '{"field1": "value1", "field2": "value2"}', status_code = 200), class = "response"))
+        
+        return(
+          structure(
+            list(
+              content = fake_response,
+              status_code = 200
+            ),
+            class = "response"
+          )
+        )
       }
+      
+      # Form data endpoint
+      if (grepl("/api/v2/assets/123/data/", url)) {
+        
+        fake_response <- list(
+          results = list(
+            list(
+              field1 = "value1",
+              field2 = "value2"
+            )
+          ),
+          `next` = NULL
+        )
+        
+        return(
+          structure(
+            list(
+              content = fake_response,
+              status_code = 200
+            ),
+            class = "response"
+          )
+        )
+      }
+      
+      stop("Unexpected URL: ", url)
     },
     
     get_odk_http_content = function(response, type) {
-      if (type == "parse") return(response$content)
-      if (type == "text") return(response$content)
+      response$content
     }
   )
   
-  result <- import_from_ODK("mock_user", "Form A", "kobo")
+  result <- import_from_ODK(
+    "mock_user",
+    "Form A",
+    "kobo"
+  )
   
   expect_true("field1" %in% names(result))
-  expect_equal(result$field1, "value1")
-  expect_error(import_from_ODK("mock_user", platform = "kobo"))
+  expect_equal(result$field1[[1]], "value1")
+  
+  expect_error(
+    import_from_ODK(
+      "mock_user",
+      platform = "kobo"
+    )
+  )
 })
 
 test_that("import_from_ODK handles invalid password correctly", {
@@ -382,4 +431,3 @@ test_that("is.containPartialValueLabel returns FALSE when all values match label
   attr(x, "labels") <- c(1, 2, 3)
   expect_false(is.containPartialValueLabel(x))
 })
-

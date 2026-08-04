@@ -9,7 +9,7 @@
 #' @param variety A string specifying the column name for item (e.g., variety) labels.
 #' @param group Logical. Whether to group rankings (e.g., for grouped ranking designs). Default is `FALSE`.
 #'
-#' @return A named list of ranking objects (one for each trait) generated using `gosset::rank_numeric`.
+#' @return A named list of ranking objects (one for each trait) generated using `gosset::rank_tricot2`.
 #' @export
 #' 
 #' @examples
@@ -29,7 +29,7 @@ create_rankings_list <- function(data, traits = traits, id = "id", variety = "va
     purrr::map(~ {
       data %>%
         dplyr::filter(trait == .x) %>%
-        gosset::rank_numeric(data = ., 
+        gosset::rank_tricot2(data = ., 
                              items = variety, 
                              input = "rank", 
                              id = id, 

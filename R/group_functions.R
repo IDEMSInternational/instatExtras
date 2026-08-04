@@ -590,10 +590,7 @@ check_github_repo <- function(owner = NULL, repo = NULL, url = NULL) {
     repo <- basename(url)
   }
   if (requireNamespace(repo, quietly = TRUE)) {
-    print("a")
-    print(utils::packageDescription(repo))
     local_sha <- utils::packageDescription(repo)$GithubSHA1
-    print(local_sha)
     if (!is.null(local_sha)) {
       latest_commit <- tryCatch({
         response <- gh::gh("/repos/:owner/:repo/commits", owner = owner, repo = repo, .limit = 1)
@@ -601,7 +598,6 @@ check_github_repo <- function(owner = NULL, repo = NULL, url = NULL) {
       }, error = function(e) {
         return(NULL)
       })
-      print(latest_commit)
       if (!is.null(latest_commit)) {
         if (local_sha == latest_commit) return(0)
         else return(1)

@@ -24,7 +24,7 @@ create_rankings_list(
 \item{group}{Logical. Whether to group rankings (e.g., for grouped ranking designs). Default is \code{FALSE}.}
 }
 \value{
-A named list of ranking objects (one for each trait) generated using \code{gosset::rank_numeric}.
+A named list of ranking objects (one for each trait) generated using \code{gosset::rank_tricot2}.
 }
 \description{
 Converts a wide-format dataset with ranking values into a list of ranking objects,
