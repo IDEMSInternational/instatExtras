@@ -22,30 +22,59 @@
 #' 
 #'  
 get_odk_form_names <- function(username, platform) {
+  
   if (platform == "kobo") {
-    url <- "https://kc.kobotoolbox.org/api/v1/data"
+    url <- "https://kf.kobotoolbox.org/api/v2/assets/?asset_type=survey"
   } else if (platform == "ona") {
     url <- "https://api.ona.io/api/v1/data"
   } else {
     stop("Unrecognised platform.")
   }
+  
   password <- getPass(paste0(username, " password:"))
   
   if (!missing(username) && !missing(password)) {
-    has_authentication <- TRUE
     user <- httr::authenticate(username, password)
-    odk_data <- get_odk_http_get(url, user)  # Use wrapper function
+    odk_data <- get_odk_http_get(url, user)
   } else {
-    has_authentication <- FALSE
-    odk_data <- get_odk_http_get(url)  # Use wrapper function
+    user <- NULL
+    odk_data <- get_odk_http_get(url)
   }
-  if (odk_data$status_code != 200){
-    if (odk_data$status_code == 401) stop("Invalid username/password")
-    else stop(paste0("Issue in accessing ODK forms: status_code ", odk_data$status_code, ", ", nanonext::status_code(odk_data$status_code)))
-  }
-  forms <- get_odk_http_content(odk_data, "parse")  # Use wrapper function
-  form_names <- sapply(forms, function(x) x$title)
   
+  if (odk_data$status_code != 200) {
+    if (odk_data$status_code == 401) stop("Invalid username/password")
+    else stop(paste0("Issue in accessing ODK forms: status_code ",
+                     odk_data$status_code, ", ",
+                     nanonext::status_code(odk_data$status_code)))
+  }
+  
+  forms <- get_odk_http_content(odk_data, "parsed")
+  
+  # Kobo v2 is paginated, so collect all pages
+  if (platform == "kobo") {
+    
+    all_forms <- forms$results
+    next_url <- forms$`next`
+    while (!is.null(next_url)) {
+      odk_data <- get_odk_http_get(next_url, user)
+      if (odk_data$status_code != 200) {
+        stop(
+          paste0(
+            "Issue in accessing ODK forms: status_code ",
+            odk_data$status_code, ", ",
+            nanonext::status_code(odk_data$status_code)
+          )
+        )
+      }
+      forms <- get_odk_http_content(odk_data, "parsed")
+      all_forms <- c(all_forms, forms$results)
+      next_url <- forms$`next`
+    }
+    form_names <- sapply(all_forms, function(x) x$name)
+  } else {
+    # ONA retains the old structure
+    form_names <- sapply(forms, function(x) x$title)
+  }
   return(form_names)
 }
 

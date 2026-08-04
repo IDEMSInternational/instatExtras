@@ -9,13 +9,15 @@ import_from_ODK(username, form_name, platform)
 \arguments{
 \item{username}{Your username (character) on the ODK platform.}
 
-\item{form_name}{The name of the form (character) you want to import}
+\item{form_name}{The name of the form (character) you want to import.}
 
-\item{platform}{The ODK platform (character)you are using. Valid options are "kobo" or "ona".}
+\item{platform}{The ODK platform (character) you are using. Valid options
+are "kobo" or "ona".}
 }
 \value{
 The imported form data as a structured object.
 }
 \description{
-This function imports data from ODK platforms, such as KoboToolbox or Ona, based on the specified username, form name, and platform.
+This function imports data from ODK platforms, such as
+KoboToolbox or Ona, based on the specified username, form name, and platform.
 }
