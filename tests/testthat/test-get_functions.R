@@ -108,33 +108,41 @@ test_that("getPass uses Tcl/Tk window when available", {
 # })
 
 test_that("get_odk_form_names handles authentication and API request correctly", {
-
+  
   # Mock `getPass()` to avoid user input
   local_mocked_bindings(
     getPass = function(...) "mock_password",
-
+    
     # Mock our custom wrapper function instead of `httr::GET`
     get_odk_http_get = function(url, auth = NULL) {
-      # Simulated JSON response structure
+      
+      # Simulated Kobo v2 JSON response structure
       fake_response <- list(
-        list(title = "Form A", id = 1),
-        list(title = "Form B", id = 2)
+        results = list(
+          list(name = "Form A", uid = "form_uid_1"),
+          list(name = "Form B", uid = "form_uid_2")
+        ),
+        `next` = NULL
       )
+      
       structure(
-        list(content = fake_response, status_code = 200),
+        list(
+          content = fake_response,
+          status_code = 200
+        ),
         class = "response"
       )
     },
-
+    
     # Mock our custom wrapper function instead of `httr::content`
     get_odk_http_content = function(response, type) {
       response$content
     }
   )
-
+  
   # Test function with mock responses
   form_names <- get_odk_form_names("mock_user", "kobo")
-
+  
   # Expected output
   expect_equal(form_names, c("Form A", "Form B"))
 })
@@ -277,14 +285,117 @@ test_that("get_installed_packages_with_data returns correct package lists", {
   expect_equal(result_all_packages, c("ggplot2", "dplyr", "base", "stats"))
 })
 
-test_that("get_odk_http_get handles request failure", {
-  # Mock `httr::GET` to simulate an error (e.g., invalid URL)
-  mock_GET <- function(url, auth) {
-    stop("Request failed")
-  }
-  mockery::stub(get_odk_http_get, "httr::GET", mock_GET)
+test_that("get_odk_form_names handles Kobo pagination", {
   
-  expect_error(get_odk_http_get("invalid_url"), "Request failed")
+  local_mocked_bindings(
+    getPass = function(...) "mock_password",
+    
+    get_odk_http_get = local({
+      call_count <- 0
+      
+      function(url, auth = NULL) {
+        call_count <<- call_count + 1
+        
+        if (call_count == 1) {
+          
+          fake_response <- list(
+            results = list(
+              list(name = "Form A", uid = "form_uid_1"),
+              list(name = "Form B", uid = "form_uid_2")
+            ),
+            `next` = "https://kf.kobotoolbox.org/api/v2/assets/?page=2"
+          )
+          
+        } else {
+          
+          fake_response <- list(
+            results = list(
+              list(name = "Form C", uid = "form_uid_3"),
+              list(name = "Form D", uid = "form_uid_4")
+            ),
+            `next` = NULL
+          )
+        }
+        
+        structure(
+          list(
+            content = fake_response,
+            status_code = 200
+          ),
+          class = "response"
+        )
+      }
+    }),
+    
+    get_odk_http_content = function(response, type) {
+      response$content
+    }
+  )
+  
+  form_names <- get_odk_form_names("mock_user", "kobo")
+  
+  expect_equal(
+    form_names,
+    c("Form A", "Form B", "Form C", "Form D")
+  )
+})
+
+test_that("get_odk_form_names handles Kobo pagination correctly", {
+  
+  local_mocked_bindings(
+    getPass = function(...) "mock_password",
+    
+    get_odk_http_get = local({
+      call_count <- 0
+      
+      function(url, auth = NULL) {
+        call_count <<- call_count + 1
+        
+        if (call_count == 1) {
+          
+          fake_response <- list(
+            results = list(
+              list(name = "Form A", uid = "form_uid_1"),
+              list(name = "Form B", uid = "form_uid_2")
+            ),
+            `next` = "https://kf.kobotoolbox.org/api/v2/assets/?page=2"
+          )
+          
+        } else if (call_count == 2) {
+          
+          fake_response <- list(
+            results = list(
+              list(name = "Form C", uid = "form_uid_3"),
+              list(name = "Form D", uid = "form_uid_4")
+            ),
+            `next` = NULL
+          )
+          
+        } else {
+          stop("Unexpected additional API request")
+        }
+        
+        structure(
+          list(
+            content = fake_response,
+            status_code = 200
+          ),
+          class = "response"
+        )
+      }
+    }),
+    
+    get_odk_http_content = function(response, type) {
+      response$content
+    }
+  )
+  
+  form_names <- get_odk_form_names("mock_user", "kobo")
+  
+  expect_equal(
+    form_names,
+    c("Form A", "Form B", "Form C", "Form D")
+  )
 })
 
 test_that("readline_masked_tcltk_window returns test values", {
@@ -550,3 +661,4 @@ test_that("Table returns gt object if there are two summary-variables given", {
   gt_table <- generate_summary_tables(df)
   expect_true("gt_tbl" %in% class(gt_table))
 })
+

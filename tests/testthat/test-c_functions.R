@@ -255,6 +255,8 @@ test_that("check_data_levels summarises normally when valid", {
   expect_equal(check_data_levels(levels_good), "0")
 })
 
+
+
 # test-count_differences.R
 testthat::test_that("Identical vectors give 0", {
   expect_equal(count_differences(c(1, 2, 3), c(1, 2, 3)), 0)
@@ -336,3 +338,4 @@ test_that("disconnected network prints cluster report", {
   expect_match(out, "Clusters found: 3")
   expect_match(out, "Cluster sizes: 2, 1, 1")
 })
+
