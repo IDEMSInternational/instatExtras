@@ -50,9 +50,15 @@ make_names_pattern <- function(items, num) {
     ))[1]
     
     if (is.na(i)) {
-      paste0(vapply(chars[[1]], identity, character(1)), collapse = "")
+      paste0(
+        vapply(chars[[1]], identity, character(1)),
+        collapse = ""
+        )
     } else {
-      paste0(chars[[1]][seq_len(i - 1)], collapse = "")
+      paste0(
+        chars[[1]][seq_len(i - 1)],
+        collapse = ""
+        )
     }
   }
   

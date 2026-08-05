@@ -71,9 +71,12 @@ check_odk_status <- function(response, context = "ODK forms") {
     if (response$status_code == 401) {
       stop("Invalid username/password")
     } else {
-      stop(paste0("Issue in accessing ", context, ": status_code ",
-                   response$status_code, ", ",
-                   nanonext::status_code(response$status_code)))
+      stop(
+        paste0(
+          "Issue in accessing ", context, ": status_code ",
+          response$status_code, ", ",
+          nanonext::status_code(response$status_code))
+      )
     }
   }
 }
