@@ -51,3 +51,86 @@ test_that("max_consecutive_sum computes correct maximum consecutive sum", {
   expect_type(result, "double")
   expect_gt(result, 0)
 })
+
+test_that("make_names_pattern creates pattern for numeric suffixes", {
+  items <- c(
+    "X1", "X2", "X3", "X4",
+    "Y1", "Y2", "Y3", "Y4"
+  )
+  
+  expect_equal(
+    make_names_pattern(items, num = 2),
+    "(X|Y)(1|2|3|4)"
+  )
+})
+
+test_that("make_names_pattern works with non-numeric suffixes", {
+  items <- c(
+    "height_male", "height_female",
+    "weight_male", "weight_female"
+  )
+  
+  expect_equal(
+    make_names_pattern(items, num = 2),
+    "(height_|weight_)(male|female)"
+  )
+})
+
+
+test_that("make_names_pattern works with a single item per group", {
+  items <- c("X", "Y")
+  
+  expect_equal(
+    make_names_pattern(items, num = 2),
+    "(X|Y)()"
+  )
+})
+
+test_that("make_names_pattern works with more than two groups", {
+  items <- c(
+    "X1", "X2",
+    "Y1", "Y2",
+    "Z1", "Z2"
+  )
+  
+  expect_equal(
+    make_names_pattern(items, num = 3),
+    "(X|Y|Z)(1|2)"
+  )
+})
+
+test_that("make_names_pattern errors when items cannot be split evenly", {
+  items <- c("X1", "X2", "Y1")
+  
+  expect_error(
+    make_names_pattern(items, num = 2),
+    "The number of items must be divisible by the number of groups"
+  )
+})
+
+test_that("make_names_pattern handles prefixes of different lengths", {
+  items <- c(
+    "temp_1", "temp_2",
+    "rainfall_1", "rainfall_2"
+  )
+
+  expect_equal(
+    make_names_pattern(items, num = 2),
+    "(temp_|rainfall_)(1|2)"
+  )
+})
+
+test_that("make_names_pattern handles a group member that is itself a prefix of another", {
+  # "rain" and "temp" are exact prefixes of "rainfall" and "tempmax", so every
+  # character up to the shortest name's length matches and no differing
+  # position is found within each group
+  items <- c(
+    "rain", "rainfall",
+    "temp", "tempmax"
+  )
+
+  expect_equal(
+    make_names_pattern(items, num = 2),
+    "(rain|temp)(|fall)"
+  )
+})

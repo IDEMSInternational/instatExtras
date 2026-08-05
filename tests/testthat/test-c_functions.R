@@ -339,3 +339,37 @@ test_that("disconnected network prints cluster report", {
   expect_match(out, "Cluster sizes: 2, 1, 1")
 })
 
+test_that("check_odk_status returns NULL for a successful response", {
+  response <- list(status_code = 200)
+  
+  expect_null(
+    check_odk_status(response)
+  )
+})
+
+test_that("check_odk_status gives an informative error for invalid credentials", {
+  response <- list(status_code = 401)
+  
+  expect_error(
+    check_odk_status(response),
+    "Invalid username/password"
+  )
+})
+
+test_that("check_odk_status gives an informative error for other unsuccessful responses", {
+  response <- list(status_code = 404)
+  
+  expect_error(
+    check_odk_status(response),
+    "Issue in accessing ODK forms: status_code 404"
+  )
+})
+
+test_that("check_odk_status uses the supplied context in the error message", {
+  response <- list(status_code = 500)
+  
+  expect_error(
+    check_odk_status(response, context = "ODK submissions"),
+    "Issue in accessing ODK submissions: status_code 500"
+  )
+})

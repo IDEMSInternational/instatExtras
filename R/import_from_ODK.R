@@ -33,20 +33,8 @@ import_from_ODK <- function(username, form_name, platform) {
     odk_data <- get_odk_http_get(url)
   }
   
-  if (odk_data$status_code != 200) {
-    if (odk_data$status_code == 401) {
-      stop("Invalid username/password")
-    } else {
-      stop(
-        paste0(
-          "Issue in accessing ODK forms: status_code ",
-          odk_data$status_code, ", ",
-          nanonext::status_code(odk_data$status_code)
-        )
-      )
-    }
-  }
-  
+  check_odk_status(odk_data)
+
   forms <- get_odk_http_content(odk_data, "parsed")
   
   if (platform == "kobo") {
@@ -60,17 +48,9 @@ import_from_ODK <- function(username, form_name, platform) {
     while (!is.null(next_url)) {
       
       odk_data <- get_odk_http_get(next_url, user)
-      
-      if (odk_data$status_code != 200) {
-        stop(
-          paste0(
-            "Issue in accessing ODK forms: status_code ",
-            odk_data$status_code, ", ",
-            nanonext::status_code(odk_data$status_code)
-          )
-        )
-      }
-      
+
+      check_odk_status(odk_data)
+
       forms <- get_odk_http_content(odk_data, "parsed")
       all_forms <- c(all_forms, forms$results)
       next_url <- forms$`next`
@@ -96,18 +76,10 @@ import_from_ODK <- function(username, form_name, platform) {
       curr_form <- get_odk_http_get(data_url)
     }
     
-    if (curr_form$status_code != 200) {
-      stop(
-        paste0(
-          "Issue in accessing ODK form data: status_code ",
-          curr_form$status_code, ", ",
-          nanonext::status_code(curr_form$status_code)
-        )
-      )
-    }
-    
+    check_odk_status(curr_form, context = "ODK form data")
+
     form_data <- get_odk_http_content(curr_form, "parsed")
-    
+
     # Kobo v2 submission data is paginated
     all_data <- form_data$results
     
@@ -121,16 +93,8 @@ import_from_ODK <- function(username, form_name, platform) {
         curr_form <- get_odk_http_get(next_url)
       }
       
-      if (curr_form$status_code != 200) {
-        stop(
-          paste0(
-            "Issue in accessing ODK form data: status_code ",
-            curr_form$status_code, ", ",
-            nanonext::status_code(curr_form$status_code)
-          )
-        )
-      }
-      
+      check_odk_status(curr_form, context = "ODK form data")
+
       form_data <- get_odk_http_content(curr_form, "parsed")
       
       all_data <- c(all_data, form_data$results)

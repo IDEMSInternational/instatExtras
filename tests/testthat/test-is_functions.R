@@ -100,6 +100,73 @@ test_that("import_from_ODK correctly retrieves form data from kobo", {
   )
 })
 
+test_that("import_from_ODK correctly retrieves form data from ona", {
+
+  local_mocked_bindings(
+    getPass = function(...) "mock_password",
+
+    get_odk_http_get = function(url, auth = NULL) {
+
+      # Form list endpoint
+      if (identical(url, "https://api.ona.io/api/v1/data")) {
+
+        fake_response <- list(
+          list(title = "Form A", id = "123"),
+          list(title = "Form B", id = "456")
+        )
+
+        return(
+          structure(
+            list(
+              content = fake_response,
+              status_code = 200
+            ),
+            class = "response"
+          )
+        )
+      }
+
+      # Form data endpoint
+      if (identical(url, "https://api.ona.io/api/v1/data/123")) {
+
+        fake_response <- '[{"field1":"value1","field2":"value2"}]'
+
+        return(
+          structure(
+            list(
+              content = fake_response,
+              status_code = 200
+            ),
+            class = "response"
+          )
+        )
+      }
+
+      stop("Unexpected URL: ", url)
+    },
+
+    get_odk_http_content = function(response, type) {
+      response$content
+    }
+  )
+
+  result <- import_from_ODK(
+    "mock_user",
+    "Form A",
+    "ona"
+  )
+
+  expect_true("field1" %in% names(result))
+  expect_equal(result$field1[[1]], "value1")
+
+  expect_error(
+    import_from_ODK(
+      "mock_user",
+      platform = "ona"
+    )
+  )
+})
+
 test_that("import_from_ODK handles invalid password correctly", {
   # Mock `getPass()` to return an incorrect password
   local_mocked_bindings(
@@ -150,6 +217,28 @@ test_that("import_from_ODK handles missing form correctly", {
   
   expect_error(
     import_from_ODK("mock_user", "Form A", "kobo"),
+    "Form A not found in available forms"
+  )
+})
+
+test_that("import_from_ODK handles missing form correctly for ona", {
+  local_mocked_bindings(
+    getPass = function(...) "mock_password",
+
+    get_odk_http_get = function(url, auth = NULL) {
+      fake_response <- list(
+        list(title = "Form B", id = "456")  # Form A is missing intentionally
+      )
+      return(structure(list(content = fake_response, status_code = 200), class = "response"))
+    },
+
+    get_odk_http_content = function(response, type) {
+      response$content
+    }
+  )
+
+  expect_error(
+    import_from_ODK("mock_user", "Form A", "ona"),
     "Form A not found in available forms"
   )
 })

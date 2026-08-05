@@ -29,7 +29,7 @@ create_rankings_list <- function(data, traits = traits, id = "id", variety = "va
     purrr::map(~ {
       data %>%
         dplyr::filter(trait == .x) %>%
-        gosset::rank_tricot2(data = ., 
+        gosset::rank_numeric(data = .,   # rank_tricot2 is superseeding this, but how to do rank_tricot2 with groups?
                              items = variety, 
                              input = "rank", 
                              id = id, 

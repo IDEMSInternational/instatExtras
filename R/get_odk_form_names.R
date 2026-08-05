@@ -41,13 +41,8 @@ get_odk_form_names <- function(username, platform) {
     odk_data <- get_odk_http_get(url)
   }
   
-  if (odk_data$status_code != 200) {
-    if (odk_data$status_code == 401) stop("Invalid username/password")
-    else stop(paste0("Issue in accessing ODK forms: status_code ",
-                     odk_data$status_code, ", ",
-                     nanonext::status_code(odk_data$status_code)))
-  }
-  
+  check_odk_status(odk_data)
+
   forms <- get_odk_http_content(odk_data, "parsed")
   
   # Kobo v2 is paginated, so collect all pages
@@ -57,15 +52,7 @@ get_odk_form_names <- function(username, platform) {
     next_url <- forms$`next`
     while (!is.null(next_url)) {
       odk_data <- get_odk_http_get(next_url, user)
-      if (odk_data$status_code != 200) {
-        stop(
-          paste0(
-            "Issue in accessing ODK forms: status_code ",
-            odk_data$status_code, ", ",
-            nanonext::status_code(odk_data$status_code)
-          )
-        )
-      }
+      check_odk_status(odk_data)
       forms <- get_odk_http_content(odk_data, "parsed")
       all_forms <- c(all_forms, forms$results)
       next_url <- forms$`next`
@@ -76,6 +63,22 @@ get_odk_form_names <- function(username, platform) {
     form_names <- sapply(forms, function(x) x$title)
   }
   return(form_names)
+}
+
+# Stops with an informative error if an ODK HTTP response was not successful
+check_odk_status <- function(response, context = "ODK forms") {
+  if (response$status_code != 200) {
+    if (response$status_code == 401) {
+      stop("Invalid username/password")
+    } else {
+      stop(
+        paste0(
+          "Issue in accessing ", context, ": status_code ",
+          response$status_code, ", ",
+          nanonext::status_code(response$status_code))
+      )
+    }
+  }
 }
 
 # Wrapper function for `httr::GET`
