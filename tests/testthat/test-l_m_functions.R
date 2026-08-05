@@ -107,3 +107,15 @@ test_that("make_names_pattern errors when items cannot be split evenly", {
     "The number of items must be divisible by the number of groups"
   )
 })
+
+test_that("make_names_pattern handles prefixes of different lengths", {
+  items <- c(
+    "temp_1", "temp_2",
+    "rainfall_1", "rainfall_2"
+  )
+  
+  expect_equal(
+    make_names_pattern(items, num = 2),
+    "(temp_|rainfall_)(1|2)"
+  )
+})
