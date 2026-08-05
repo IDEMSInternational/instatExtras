@@ -113,9 +113,24 @@ test_that("make_names_pattern handles prefixes of different lengths", {
     "temp_1", "temp_2",
     "rainfall_1", "rainfall_2"
   )
-  
+
   expect_equal(
     make_names_pattern(items, num = 2),
     "(temp_|rainfall_)(1|2)"
+  )
+})
+
+test_that("make_names_pattern handles a group member that is itself a prefix of another", {
+  # "rain" and "temp" are exact prefixes of "rainfall" and "tempmax", so every
+  # character up to the shortest name's length matches and no differing
+  # position is found within each group
+  items <- c(
+    "rain", "rainfall",
+    "temp", "tempmax"
+  )
+
+  expect_equal(
+    make_names_pattern(items, num = 2),
+    "(rain|temp)(|fall)"
   )
 })
