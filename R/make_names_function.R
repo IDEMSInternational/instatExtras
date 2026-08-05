@@ -16,6 +16,7 @@
 #' @return A character string containing a regular expression for use with
 #'   `tidyr::pivot_longer(names_pattern = ...)`.
 #'
+#' @export
 #' @examples
 #' make_names_pattern(
 #'   c("X1", "X2", "X3", "X4",
