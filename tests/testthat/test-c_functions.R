@@ -373,3 +373,11 @@ test_that("check_odk_status uses the supplied context in the error message", {
     "Issue in accessing ODK submissions: status_code 500"
   )
 })
+
+test_that("check_odk_status gives an informative error for invalid credentials", {
+  response <- list(status_code = 500)
+  
+  expect_error(
+    check_odk_status(response),
+  )
+})
