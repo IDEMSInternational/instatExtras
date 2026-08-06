@@ -70,6 +70,12 @@ check_odk_status <- function(response, context = "ODK forms") {
   if (response$status_code != 200) {
     if (response$status_code == 401) {
       stop("Invalid username/password")
+    } else if (response$status_code == 500) {
+      stop(
+        "Kobo returned HTTP 500 when requesting form data. ",
+        "This usually indicates a server-side error with the form rather than an authentication problem. ",
+        "Try downloading the data from the Kobo web interface or test another form."
+      )
     } else {
       stop(
         paste0(
