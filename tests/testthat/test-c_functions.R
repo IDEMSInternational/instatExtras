@@ -366,11 +366,19 @@ test_that("check_odk_status gives an informative error for other unsuccessful re
 })
 
 test_that("check_odk_status uses the supplied context in the error message", {
-  response <- list(status_code = 500)
+  response <- list(status_code = 100)
   
   expect_error(
     check_odk_status(response, context = "ODK submissions"),
-    "Issue in accessing ODK submissions: status_code 500"
+    "Issue in accessing ODK submissions: status_code 100"
+  )
+})
+
+test_that("check_odk_status gives an informative error for invalid credentials", {
+  response <- list(status_code = 500)
+  
+  expect_error(
+    check_odk_status(response),
   )
 })
 
