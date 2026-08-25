@@ -100,8 +100,12 @@ digitsum <- function(x) {sapply(x ,function(n){a<-as.integer(c(strsplit(as.chara
 #'
 #' @export
 #' 
-digitsqu <- function(x) {sapply(x ,function(n){a<-as.integer(c(strsplit(as.character(n),split="")[[1]])); a^2})}
-
+digitsqu <- function(x) {
+  lapply(x, function(n) {
+    a <- as.integer(strsplit(as.character(n), "")[[1]])
+    a^2
+  })
+}
 
 #' Digit Sum of Squares
 #'
@@ -151,8 +155,13 @@ digitssq <- function(x) {sapply(x ,function(n){a<-as.integer(c(strsplit(as.chara
 #'
 #' @export
 #' 
-pascal <- function(x) {sapply(x ,function(x) {lapply(x, function(i) {choose(i, 0:i)})})}
-
+pascal <- function(x) {
+  sapply(x, function(x) {
+    lapply(x, function(i) {
+      choose(i, 0:i)
+    })
+  })
+}
 
 #' Fraction Representation
 #'
@@ -207,5 +216,6 @@ fractions <- function(x) {as.character(MASS::fractions(x))}
 #'
 #' @export
 #' 
-decimals <- function(x)  {sapply(x , FUN = function(v) {sapply(v,FUN = function(w) eval(parse(text=w)))})}
-
+decimals <- function(x) {
+  unname(sapply(x, function(w) eval(parse(text = w))))
+}
