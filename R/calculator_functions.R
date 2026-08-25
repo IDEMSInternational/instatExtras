@@ -156,11 +156,7 @@ digitssq <- function(x) {sapply(x ,function(n){a<-as.integer(c(strsplit(as.chara
 #' @export
 #' 
 pascal <- function(x) {
-  sapply(x, function(x) {
-    lapply(x, function(i) {
-      choose(i, 0:i)
-    })
-  })
+  lapply(x, function(n) choose(n, 0:n))
 }
 
 #' Fraction Representation
