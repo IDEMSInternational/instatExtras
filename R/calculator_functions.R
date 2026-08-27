@@ -27,7 +27,9 @@
 #'
 #' @export
 #' 
-ssq <- function(x) {sum(x * x, na.rm=TRUE)}
+ssq <- function(x) {
+  sum(x * x, na.rm=TRUE)
+  }
 
 
 #' Corrected Sum of Squares
@@ -58,7 +60,9 @@ ssq <- function(x) {sum(x * x, na.rm=TRUE)}
 #'
 #' @export
 #' 
-cssq <- function(x) {sum((x - mean(x))^2 ,na.rm=TRUE)}   
+cssq <- function(x) {
+  sum((x - mean(x))^2, na.rm=TRUE)
+  }   
 
 
 #' Sum of Digits
@@ -76,7 +80,13 @@ cssq <- function(x) {sum((x - mean(x))^2 ,na.rm=TRUE)}
 #' This function is intended to provide functionality similar to
 #' \code{DescTools::DigitSum()}, although the behaviour may differ for
 #' 
-digitsum <- function(x) {sapply(x ,function(n){a<-as.integer(c(strsplit(as.character(n),split="")[[1]])); sum(a)})}
+digitsum <- function(x) {
+  sapply(x,
+         function(n){
+           a <- as.integer(c(strsplit(as.character(n),split="")[[1]]))
+           sum(a)
+         })
+  }
 
 
 #' Squares of Digits
@@ -125,7 +135,13 @@ digitsqu <- function(x) {
 #'
 #' @export
 #' 
-digitssq <- function(x) {sapply(x ,function(n){a<-as.integer(c(strsplit(as.character(n),split="")[[1]])); sum(a^2)})}
+digitssq <- function(x) {
+  sapply(x,
+         function(n){
+           a <- as.integer(c(strsplit(as.character(n),split="")[[1]]))
+           sum(a^2)
+         })
+  }
 
 
 #' Pascal Triangle Coefficients
@@ -156,7 +172,8 @@ digitssq <- function(x) {sapply(x ,function(n){a<-as.integer(c(strsplit(as.chara
 #' @export
 #' 
 pascal <- function(x) {
-  lapply(x, function(n) choose(n, 0:n))
+  lapply(x,
+         function(n) choose(n, 0:n))
 }
 
 #' Fraction Representation
@@ -181,7 +198,9 @@ pascal <- function(x) {
 #'
 #' @export
 #' 
-fractions <- function(x) {as.character(MASS::fractions(x))}
+fractions <- function(x) {
+  as.character(MASS::fractions(x))
+  }
 
 
 #' Decimal Representation
@@ -213,5 +232,6 @@ fractions <- function(x) {as.character(MASS::fractions(x))}
 #' @export
 #' 
 decimals <- function(x) {
-  unname(sapply(x, function(w) eval(parse(text = w))))
+  unname(sapply(x,
+                function(w) eval(parse(text = w))))
 }
