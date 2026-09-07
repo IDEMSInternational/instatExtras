@@ -111,8 +111,8 @@ digitsum <- function(x) {
 #' @export
 #' 
 digitsqu <- function(x) {
-  lapply(x, function(n) {
-    a <- as.integer(strsplit(as.character(n), "")[[1]])
+  sapply(x, function(n) {
+    a <- as.integer(c(strsplit(as.character(n), split = "")[[1]]))
     a^2
   })
 }
