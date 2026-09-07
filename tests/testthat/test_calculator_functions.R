@@ -20,10 +20,15 @@ test_that("digitsum calculates sum of digits correctly", {
 })
 
 
-test_that("digitsqu calculates squared digits correctly", {
+test_that("digitsqu calculates the squares of digits correctly", {
+  
   expect_equal(
     digitsqu(c(8, 23, 471)),
-    list(c(64), c(4, 9), c(16, 49, 1))
+    list(
+      c(64),
+      c(4, 9),
+      c(16, 49, 1)
+    )
   )
 })
 
