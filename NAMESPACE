@@ -2,6 +2,7 @@
 
 export("%>%")
 export("%notin%")
+export(add_count_labels)
 export(add_nc)
 export(add_t_range)
 export(add_xy_area_range)
